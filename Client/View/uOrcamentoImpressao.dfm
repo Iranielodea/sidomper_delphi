@@ -71,7 +71,7 @@ object frmOrcamentoImpressao: TfrmOrcamentoImpressao
     Top = 0
     Width = 617
     Height = 323
-    ActivePage = tsConfig
+    ActivePage = tsImpressao
     Align = alClient
     TabOrder = 0
     object tsImpressao: TTabSheet

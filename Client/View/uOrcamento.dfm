@@ -133,7 +133,7 @@
           Top = 1
           Width = 1008
           Height = 599
-          ActivePage = tsItensOrcamento
+          ActivePage = tsPrincipal
           Align = alClient
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
