@@ -1,0 +1,151 @@
+unit uGrade;
+
+interface
+
+uses
+  System.SysUtils, Data.DB, Vcl.DBGrids, Vcl.Graphics, winapi.Windows, Vcl.Grids,
+  Vcl.ComCtrls, Winapi.Messages, System.Variants, System.Classes, Vcl.Controls,
+  Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls;
+
+type
+  TGrade = class
+  public
+    class procedure Zebrar(DataSet: TDataSet; Var Grid: TDBGrid; Sender: TObject; const
+      Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    class procedure RetornaCamposGrid(var Grid: TDBGrid; var ComboBox: TComboBox);
+    class function FiltrarCampo(var Grid: TDBGrid; var ComboBox: TComboBox): string;
+
+    class procedure CheckBoxDesenharCelula(Column: TColumn; Campo: string; var Grid: TDBGrid;
+      Const Rect: TRect; CampoMarcar: Boolean);
+    class procedure CheckBoxClicarCelula(Coluna: TColumn; ColunaClick, CampoAlterar: string; DataSet: TDataSet);
+
+
+    class procedure DesabilitarTelcasDeleteGrid(var Key: Word; var Shift: TShiftState);
+    class procedure NavegarGrid(AColunaInicial, AQtdeColunas: Integer; var AGrid: TDBGrid; ADataSet: TDataSet);
+    class procedure NavegarGridModeloII(AColunaInicial, AQtdeColunas, ColunaFoco: Integer; var AGrid: TDBGrid; ADataSet: TDataSet);
+  end;
+
+implementation
+
+{ TGrade }
+
+class procedure TGrade.CheckBoxClicarCelula(Coluna: TColumn; ColunaClick,
+  CampoAlterar: string; DataSet: TDataSet);
+begin
+  if Coluna.Field.FieldName = ColunaClick then
+  begin
+    DataSet.Edit;
+    if DataSet.FieldByName(CampoAlterar).AsBoolean = True then
+      DataSet.FieldByName(CampoAlterar).AsBoolean := False
+    else
+      DataSet.FieldByName(CampoAlterar).AsBoolean := True;
+    DataSet.Post;
+  end;
+end;
+
+class procedure TGrade.CheckBoxDesenharCelula(Column: TColumn; Campo: string;
+  var Grid: TDBGrid; const Rect: TRect; CampoMarcar: Boolean);
+var
+  Check: Integer;
+  R: TRect;
+begin
+//Desenha um checkbox no dbgrid
+  if Column.FieldName = Campo then
+  begin
+    Grid.Canvas.FillRect(Rect);
+    Check := 0;
+    if CampoMarcar = True then
+      Check := DFCS_CHECKED
+    else
+      Check := 0;
+    R:=Rect;
+    InflateRect(R,-2,-2); {Diminue o tamanho do CheckBox}
+    DrawFrameControl(Grid.Canvas.Handle,R,DFC_BUTTON, DFCS_BUTTONCHECK or Check);
+  end;
+end;
+
+class procedure TGrade.DesabilitarTelcasDeleteGrid(var Key: Word;
+  var Shift: TShiftState);
+begin
+  if (Shift = [ssCtrl]) and (Key = 46) then
+    Key := 0;
+end;
+
+class function TGrade.FiltrarCampo(var Grid: TDBGrid; var ComboBox: TComboBox): string;
+var
+  i: Integer;
+begin
+  for i := 0 to Grid.Columns.Count -1 do
+  begin
+    if Grid.Columns[i].Title.Caption = ComboBox.Text then
+      Break;
+  end;
+  Result := Grid.columns[i].FieldName;
+end;
+
+class procedure TGrade.NavegarGrid(AColunaInicial, AQtdeColunas: Integer;
+  var AGrid: TDBGrid; ADataSet: TDataSet);
+begin
+  if AGrid.SelectedIndex <= 3 then
+    AGrid.SelectedIndex := AGrid.SelectedIndex + 1
+  else begin
+    if (ADataSet.RecNo = ADataSet.RecordCount) or (ADataSet.RecNo = -1) then
+      ADataSet.Append
+    else
+      ADataSet.Next;
+
+    AGrid.SelectedIndex := 2;
+  end;
+end;
+
+class procedure TGrade.NavegarGridModeloII(AColunaInicial,
+  AQtdeColunas, ColunaFoco: Integer; var AGrid: TDBGrid; ADataSet: TDataSet);
+begin
+  if AGrid.SelectedIndex < AQtdeColunas then
+    AGrid.SelectedIndex := AGrid.SelectedIndex + 1
+  else begin
+    if (ADataSet.RecNo = ADataSet.RecordCount) or (ADataSet.RecNo = -1) then
+      ADataSet.Append
+    else
+      ADataSet.Next;
+
+    AGrid.SelectedIndex := ColunaFoco;
+  end;
+end;
+
+class procedure TGrade.RetornaCamposGrid(var Grid: TDBGrid; var ComboBox: TComboBox);
+var
+  i: Integer;
+begin
+  for i := 0 to Grid.Columns.Count -1 do
+  begin
+    if Grid.Columns[i].Visible then
+    begin
+      if Copy(Grid.Columns[i].FieldName, 1,5) <> 'Calc_' then
+        ComboBox.Items.Add(Grid.Columns[i].Title.Caption);
+    end;
+  end;
+  ComboBox.ItemIndex := 1;
+end;
+
+class procedure TGrade.Zebrar(DataSet: TDataSet; var Grid: TDBGrid; Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+   if odd(DataSet.RecNo) then
+    Grid.Canvas.Brush.Color:= $00B9FFFF
+  else
+    Grid.Canvas.Brush.Color:= clCream;
+
+  TDbGrid(Sender).Canvas.font.Color:= clBlack;
+    if gdSelected in State then
+      with (Sender as TDBGrid).Canvas do
+        begin
+          Brush.Color := $004080FF;
+          FillRect(Rect);
+          Font.Style := [fsbold]
+        end;
+
+  TDbGrid(Sender).DefaultDrawDataCell(Rect, TDbGrid(Sender).columns[datacol].field, State);
+end;
+
+end.

@@ -1,0 +1,621 @@
+unit ULicenca;
+
+interface
+
+uses uDM, System.SysUtils, FireDAC.Stan.Param,
+  Data.DB, ULicencaVO, uFireDAC, uLicencaItensVO, uGenericDAO,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, System.Generics.Collections, uDMFB,
+  uFiltroLicenca, uFuncoesServidor, uClienteVO, uCliente, System.MaskUtils;
+
+  const CConsulta: string =
+    'SELECT Lic_Id, Lic_Codigo, Lic_CNPJCPF,Lic_Empresa,Lic_QtdeEstacao,Lic_QtdeUsuario,Lic_IPExterno,Lic_DataAtualizacao,Lic_Build,Lic_IPLocal, Lic_Cliente, Cli_Nome, Rev_Nome FROM Licenca'
+    + ' LEFT JOIN Cliente ON Lic_Cliente = Cli_Id'
+    + ' LEFT JOIN Revenda ON Cli_Revenda = Rev_Id';
+
+  const CConsultaItens: string =
+    'SELECT LicIte_Id, LicIte_Codigo, LicIte_CNPJCPF,LicIte_DataLcto,LicIte_Licenca,LicIte_DataUtilizacao,LicIte_Situacao, LicIte_Utilizada, LicIte_Cliente, Cli_Nome, Rev_Nome  FROM Licenca_Itens'
+    + ' LEFT JOIN Cliente ON LicIte_Cliente = Cli_Id'
+    + ' LEFT JOIN Revenda ON Cli_Revenda = Rev_Id';
+
+type
+  TLicenca = class
+  private
+{
+    Somente os métodos abaixo estão sendo utilizados:
+      ListarTodos(AFiltro: TFiltroLicenca)
+      ListarTodosItens(AFiltro: TFiltroLicenca)
+
+    Os demais ainda não estão sendo utilizados por enquanto.
+}
+    function LocalizarPorId(AId: Integer): TLicencaVO;
+    function LocalizarPorCNPJ(ACNPJ: string): Integer;
+    function LocalizarPorCodigo(ACodigo: integer): Integer;
+    procedure Salvar(ALicenca: TLicencaVO);
+//--- ITENS---------------------------------------------------------------------
+    function LocalizarItensPorId(AId: Integer): TLicencaItensVO;
+    function LocalizarItensPorCNPJ(ACNPJ: string): Integer;
+    function LocalizarItensPorCodigo(ACodigo: integer): Integer;
+    procedure SalvarItem(ALicencaItem: TLicencaItensVO);
+//--- FIREBIRD------------------------------------------------------------------
+    function FBListarLicenca: TObjectList<TLicencaVO>;
+    function FBListarLicencaItens: TObjectList<TLicencaItensVO>;
+  public
+    procedure Importar();
+    procedure ImportarItens();
+    function ListarTodos(AFiltro: TFiltroLicenca): TObjectList<TLicencaVO>;
+    function ListarTodosItens(AFiltro: TFiltroLicenca): TObjectList<TLicencaItensVO>;
+    function LicencaSalvar(ALicenca: TObjectList<TLicencaVO>): string;
+    function LicencaItensSalvar(ALicencaItens: TObjectList<TLicencaItensVO>): string;
+    function LocalizarPorDoct(ADoc: string; var AIdCliente: integer; var ARazaoSocial: string): string;
+    function LimparLicencas(): string;
+  end;
+
+implementation
+
+uses
+  uParametros;
+
+{ TLicenca }
+
+function TLicenca.FBListarLicenca: TObjectList<TLicencaVO>;
+var
+  sb: TStringBuilder;
+  Qry: TFDQuery;
+  lista: TObjectList<TLicencaVO>;
+  model: TLicencaVO;
+begin
+  lista := TObjectList<TLicencaVO>.Create();
+  sb := TStringBuilder.Create;
+  Qry := TFDQuery.create(nil);
+  try
+    sb.AppendLine('select ');
+    sb.AppendLine('clilicid,');
+    sb.AppendLine('cliliccnpjcpf,');
+    sb.AppendLine('clilicempresa,');
+    sb.AppendLine('clilicquantestacao,');
+    sb.AppendLine('clilicquantusuario,');
+    sb.AppendLine('clilicipexterno,');
+    sb.AppendLine('clilicdatahratualizacao,');
+    sb.AppendLine('clilicbuild,');
+    sb.AppendLine('cliliciplocal');
+    sb.AppendLine(' from tclientelicenca');
+
+    Qry.Connection := DMFB.FBConexao;
+    Qry.SQL.Text := sb.ToString();
+    Qry.Open();
+
+    while not Qry.Eof do
+    begin
+      model := TLicencaVO.Create;
+      model.Codigo := Qry.FieldByName('clilicid').AsInteger;
+      model.CNPJCPF := Qry.FieldByName('cliliccnpjcpf').AsString;
+      model.Empresa := Qry.FieldByName('clilicempresa').AsString;
+      model.QtdeEstacao := Qry.FieldByName('clilicquantestacao').AsInteger;
+      model.QtdeUsuario := Qry.FieldByName('clilicquantusuario').AsInteger;
+      model.IPExterno := Qry.FieldByName('clilicipexterno').AsString;
+      model.DataAtualizacao := Qry.FieldByName('clilicdatahratualizacao').AsDateTime;
+      model.Build := Qry.FieldByName('clilicbuild').AsString;
+      model.IPLocal := Qry.FieldByName('cliliciplocal').AsString;
+      lista.Add(model);
+      Qry.Next;
+    end;
+  finally
+    FreeAndNil(sb);
+    freeAndNil(Qry);
+  end;
+  Result := lista;
+end;
+
+function TLicenca.FBListarLicencaItens: TObjectList<TLicencaItensVO>;
+var
+  sb: TStringBuilder;
+  FD: TFDQuery;
+  lista: TObjectList<TLicencaItensVO>;
+  model: TLicencaItensVO;
+begin
+  lista := TObjectList<TLicencaItensVO>.Create();
+  sb := TStringBuilder.Create;
+  FD := TFDQuery.create(nil);
+  try
+    sb.AppendLine('select ');
+    sb.AppendLine('licid,');
+    sb.AppendLine('liccnpjcpf,');
+    sb.AppendLine('licdatahoralcto,');
+    sb.AppendLine('liclicenca,');
+    sb.AppendLine('licutilizada,');
+    sb.AppendLine('licdatahrutilizacao,');
+    sb.AppendLine('licsituacao');
+    sb.AppendLine(' from tlicenca');
+
+    FD.Connection := DMFB.FBConexao;
+    FD.SQL.Text := sb.ToString();
+    FD.Open();
+    while not FD.Eof do
+    begin
+      model := TLicencaItensVO.Create;
+      model.Codigo := FD.FieldByName('licid').AsInteger;
+      model.CNPJCPF := FD.FieldByName('liccnpjcpf').AsString;
+      model.DataLcto := FD.FieldByName('licdatahoralcto').AsDateTime;
+      model.Licenca := FD.FieldByName('liclicenca').AsString;
+      model.LicencaUtilizada := FD.FieldByName('licutilizada').AsString;
+      model.DataUtilizacao := FD.FieldByName('licdatahrutilizacao').AsDateTime;
+      model.Situacao := FD.FieldByName('licsituacao').AsString;
+      lista.Add(model);
+      FD.Next;
+    end;
+  finally
+    FreeAndNil(sb);
+    freeAndNil(FD);
+  end;
+  Result := lista;
+end;
+
+procedure TLicenca.Importar();
+var
+  lista: TObjectList<TLicencaVO>;
+  model: TLicencaVO;
+  Item: TLicencaVO;
+  id: Integer;
+  Cliente: TClienteVO;
+  ClienteNegocio: TCliente;
+begin
+  lista := FBListarLicenca();
+  model := TLicencaVO.Create;
+  ClienteNegocio := TCliente.Create;
+  try
+    for Item in lista do
+    begin
+      id := LocalizarPorCNPJ(Item.CNPJCPF);
+      model.Id := id;
+      model.CNPJCPF := Item.CNPJCPF;
+      model.Empresa := Item.Empresa;
+      model.QtdeEstacao := Item.QtdeEstacao;
+      model.QtdeUsuario := Item.QtdeUsuario;
+      model.IPExterno := Item.IPExterno;
+      model.DataAtualizacao := Item.DataAtualizacao;
+      model.Build := Item.Build;
+      model.IPLocal := Item.IPLocal;
+      model.Codigo := Item.Codigo;
+
+      Cliente := ClienteNegocio.LocalizarPorDoct(item.CNPJCPF);
+      if Cliente.Id > 0 then
+      begin
+        model.IdCliente := Cliente.Id;
+        model.RazaoSocial := Cliente.RazaoSocial;
+      end;
+      Salvar(model);
+    end;
+  finally
+    FreeAndNil(lista);
+    FreeAndNil(model);
+    FreeAndNil(ClienteNegocio);
+  end;
+end;
+
+procedure TLicenca.ImportarItens;
+var
+  lista: TObjectList<TLicencaItensVO>;
+  model: TLicencaItensVO;
+  Item: TLicencaItensVO;
+  id: Integer;
+begin
+  lista := FBListarLicencaItens();
+  model := TLicencaItensVO.Create;
+  try
+    for Item in lista do
+    begin
+      id := LocalizarItensPorCNPJ(Item.CNPJCPF);
+      model.Id := id;
+      model.CNPJCPF := Item.CNPJCPF;
+      model.Codigo := Item.Codigo;
+      model.DataLcto := Item.DataLcto;
+      model.Licenca := Item.Licenca;
+      model.DataUtilizacao := Item.DataUtilizacao;
+      model.Situacao := Item.Situacao;
+      model.LicencaUtilizada := Item.LicencaUtilizada;
+      SalvarItem(model);
+    end;
+  finally
+    FreeAndNil(lista);
+    FreeAndNil(model);
+  end;
+end;
+
+function TLicenca.LicencaItensSalvar(
+  ALicencaItens: TObjectList<TLicencaItensVO>): string;
+var
+  model: TLicencaItensVO;
+  Item: TLicencaItensVO;
+  id: Integer;
+  iContador: Integer;
+  idCliente: Integer;
+  sRazaoSocial: string;
+begin
+  model := TLicencaItensVO.Create;
+  iContador := 1;
+  try
+    try
+      for Item in ALicencaItens do
+      begin
+        id := LocalizarItensPorCodigo(Item.Codigo);
+        model.Id := id;
+        model.CNPJCPF := Item.CNPJCPF;
+        model.Codigo := Item.Codigo;
+        model.DataLcto := Item.DataLcto;
+        model.Licenca := Item.Licenca;
+        model.DataUtilizacao := Item.DataUtilizacao;
+        model.Situacao := Item.Situacao;
+        model.LicencaUtilizada := Copy(Item.LicencaUtilizada,1,1);
+
+        model.SituacaoTela := model.Situacao;
+        model.UtilizadaTela := model.LicencaUtilizada;
+
+        LocalizarPorDoct(Item.CNPJCPF, idCliente, sRazaoSocial);
+
+        if idCliente > 0 then
+        begin
+          model.IdCliente := idCliente;
+          model.RazaoSocial := sRazaoSocial;
+        end;
+
+        SalvarItem(model);
+        Inc(iContador);
+      end;
+      Result := '';
+    except
+      on E: Exception do
+      begin
+        Result := E.Message + IntToStr(iContador);
+      end;
+    end;
+  finally
+    FreeAndNil(model);
+  end;
+end;
+
+function TLicenca.LicencaSalvar(ALicenca: TObjectList<TLicencaVO>): string;
+var
+  model: TLicencaVO;
+  Item: TLicencaVO;
+  id: Integer;
+  idCliente: Integer;
+  sRazaoSocial: string;
+  Cliente: TCliente;
+begin
+  Cliente := TCliente.Create;
+  model := TLicencaVO.Create;
+  try
+    try
+      for Item in ALicenca do
+      begin
+
+        id := LocalizarPorCodigo(Item.Codigo);
+
+        LocalizarPorDoct(item.CNPJCPF, idCliente, sRazaoSocial);
+
+        if idCliente > 0 then
+        begin
+          model.IdCliente := idCliente;
+          Cliente.AtualizaVersao(idCliente, item.Build);
+        end;
+
+        model.Id := id;
+        model.RazaoSocial := sRazaoSocial;
+        model.CNPJCPF := Item.CNPJCPF;
+        model.Empresa := Item.Empresa;
+        model.QtdeEstacao := Item.QtdeEstacao;
+        model.QtdeUsuario := Item.QtdeUsuario;
+        model.IPExterno := Item.IPExterno;
+        model.DataAtualizacao := Item.DataAtualizacao;
+        model.Build := Item.Build;
+        model.IPLocal := Item.IPLocal;
+        model.Codigo := Item.Codigo;
+
+        Salvar(model);
+      end;
+      Result := '';
+    except
+      on E: Exception do
+      begin
+        Result := E.Message;
+      end;
+    end;
+  finally
+    if Assigned(model) then
+      FreeAndNil(model);
+    FreeAndNil(Cliente);
+  end;
+end;
+
+function TLicenca.LimparLicencas: string;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    dm.StartTransacao();
+    try
+      obj.ExecutarSQL('DELETE FROM Licenca_Itens');
+      obj.ExecutarSQL('DELETE FROM Licenca');
+      dm.Commit();
+    except
+      On E: Exception do
+      begin
+        dm.Roolback();
+        Result := E.Message;
+      end;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TLicenca.ListarTodos(AFiltro: TFiltroLicenca): TObjectList<TLicencaVO>;
+var
+  obj: TFireDAC;
+  lista: TObjectList<TLicencaVO>;
+  model: TLicencaVO;
+  InstrucaoSQL: string;
+  sData: string;
+begin
+  lista := TObjectList<TLicencaVO>.Create();
+  obj := TFireDAC.create;
+  try
+    InstrucaoSQL := CConsulta;
+    InstrucaoSQL := InstrucaoSQL + ' WHERE Lic_Id > 0';
+
+    sData := Trim(AFiltro.DataUtilizacaoInicial);
+    if sData <> DataEmBranco then
+      InstrucaoSQL := InstrucaoSQL + ' AND Lic_DataAtualizacao >= ' + TFuncoes.DataIngles(sData);
+
+    sData := Trim(AFiltro.DataUtilizacaoFinal);
+    if sData <> DataEmBranco then
+      InstrucaoSQL := InstrucaoSQL + ' AND Lic_DataAtualizacao <= ' + TFuncoes.DataIngles(sData);
+
+    if AFiltro.IdCliente > 0 then
+      InstrucaoSQL := InstrucaoSQL + ' AND Cli_Id = ' + AFiltro.IdCliente.ToString();
+
+    if AFiltro.Cliente.IdRevenda <> '' then
+      InstrucaoSQL := InstrucaoSQL + ' AND Rev_Id = ' + AFiltro.Cliente.IdRevenda;
+
+    obj.OpenSQL(InstrucaoSQL);
+    while not obj.Model.Eof do
+    begin
+      model := TLicencaVO.Create;
+      model.Id := obj.Model.FieldByName('Lic_Id').AsInteger;
+      model.Codigo := obj.Model.FieldByName('Lic_Codigo').AsInteger;
+      model.CNPJCPF := obj.Model.FieldByName('Lic_CNPJCPF').AsString;
+      model.Empresa := obj.Model.FieldByName('Lic_Empresa').AsString;
+      model.QtdeEstacao := obj.Model.FieldByName('Lic_QtdeEstacao').AsInteger;
+      model.QtdeUsuario := obj.Model.FieldByName('Lic_QtdeUsuario').AsInteger;
+      model.IPExterno := obj.Model.FieldByName('Lic_IPExterno').AsString;
+      model.DataAtualizacao := obj.Model.FieldByName('Lic_DataAtualizacao').AsDateTime;
+      model.Build := obj.Model.FieldByName('Lic_Build').AsString;
+      model.IPLocal := obj.Model.FieldByName('Lic_IPLocal').AsString;
+      model.IdCliente := obj.Model.FieldByName('Lic_Cliente').AsInteger;
+      model.RazaoSocial := obj.Model.FieldByName('Cli_Nome').AsString;
+      lista.Add(model);
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+  Result := lista;
+end;
+
+function TLicenca.ListarTodosItens(AFiltro: TFiltroLicenca): TObjectList<TLicencaItensVO>;
+var
+  obj: TFireDAC;
+  lista: TObjectList<TLicencaItensVO>;
+  model: TLicencaItensVO;
+  InstrucaoSQL: string;
+  sSituacao: string;
+  sUtilizada: string;
+begin
+  lista := TObjectList<TLicencaItensVO>.Create();
+  obj := TFireDAC.create;
+  try
+    InstrucaoSQL := CConsultaItens;
+    InstrucaoSQL := InstrucaoSQL + ' WHERE LicIte_Id > 0';
+
+    if AFiltro.DataUtilizacaoInicial.Trim <> DataEmBranco then
+      InstrucaoSQL := InstrucaoSQL + ' AND LicIte_DataLcto >= ' + TFuncoes.DataIngles(AFiltro.DataUtilizacaoInicial);
+
+    if AFiltro.DataUtilizacaoFinal.Trim <> DataEmBranco then
+      InstrucaoSQL := InstrucaoSQL + ' AND LicIte_DataLcto <= ' + TFuncoes.DataIngles(AFiltro.DataUtilizacaoFinal);
+
+    if AFiltro.IdCliente > 0 then
+      InstrucaoSQL := InstrucaoSQL + ' AND Cli_Id = ' + AFiltro.IdCliente.ToString();
+
+    if AFiltro.Cliente.IdRevenda <> '' then
+      InstrucaoSQL := InstrucaoSQL + ' AND Rev_Id = ' + AFiltro.Cliente.IdRevenda;
+
+    sUtilizada := Copy(AFiltro.Utilizadas,1,1);
+    if sUtilizada <> 'T' then
+      InstrucaoSQL := InstrucaoSQL + ' AND LicIte_Utilizada = ' + QuotedStr(sUtilizada);
+
+    sSituacao := Copy(AFiltro.Situacao,1,1);
+    if sSituacao <> 'T' then
+    begin
+      if sSituacao = 'N' then
+        InstrucaoSQL := InstrucaoSQL + ' AND LicIte_Situacao = 1'
+      else
+        InstrucaoSQL := InstrucaoSQL + ' AND LicIte_Situacao = 2';
+    end;
+
+
+
+    obj.OpenSQL(InstrucaoSQL);
+    while not obj.Model.Eof do
+    begin
+      model := TLicencaItensVO.Create;
+      model.Id := obj.Model.FieldByName('LicIte_Id').AsInteger;
+      try
+        model.Codigo := obj.Model.FieldByName('LicIte_Codigo').AsInteger;
+      except
+        model.Codigo := 0;
+      end;
+      model.CNPJCPF := obj.Model.FieldByName('LicIte_CNPJCPF').AsString;
+      model.DataLcto := obj.Model.FieldByName('LicIte_DataLcto').AsDateTime;
+      model.Licenca := obj.Model.FieldByName('LicIte_Licenca').AsString;
+      model.LicencaUtilizada := obj.Model.FieldByName('LicIte_Utilizada').AsString;
+      model.DataUtilizacao := obj.Model.FieldByName('LicIte_DataUtilizacao').AsDateTime;
+      model.Situacao := obj.Model.FieldByName('LicIte_Situacao').AsString;
+      model.IdCliente := obj.Model.FieldByName('LicIte_Cliente').AsInteger;
+      model.RazaoSocial := obj.Model.FieldByName('Cli_Nome').AsString;
+      lista.Add(model);
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+  Result := lista;
+end;
+
+function TLicenca.LocalizarItensPorCNPJ(ACNPJ: string): Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsultaItens + ' WHERE LicIte_CNPJCPF = ' + QuotedStr(ACNPJ));
+
+    Result := obj.Model.FieldByName('LicIte_Id').AsInteger;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TLicenca.LocalizarItensPorCodigo(ACodigo: integer): Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsultaItens + ' WHERE LicIte_Codigo = ' + IntToStr(ACodigo));
+
+    Result := obj.Model.FieldByName('LicIte_Id').AsInteger;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TLicenca.LocalizarItensPorId(AId: Integer): TLicencaItensVO;
+var
+  obj: TFireDAC;
+  model: TLicencaItensVO;
+begin
+  model := TLicencaItensVO.Create;
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsulta + ' WHERE LicIte_Id = ' + IntToStr(AId));
+
+    model.Id := obj.Model.FieldByName('LicIte_Id').AsInteger;
+    model.Codigo := obj.Model.FieldByName('LicIte_Codigo').AsInteger;
+    model.CNPJCPF := obj.Model.FieldByName('LicIte_CNPJCPF').AsString;
+    model.DataLcto := obj.Model.FieldByName('LicIte_DataLcto').AsDateTime;
+    model.Licenca := obj.Model.FieldByName('LicIte_Licenca').AsString;
+    model.DataUtilizacao := obj.Model.FieldByName('LicIte_DataUtilizacao').AsDateTime;
+    model.Situacao := obj.Model.FieldByName('LicIte_Situacao').AsString;
+    model.LicencaUtilizada := obj.Model.FieldByName('LicIte_Utilizada').AsString;
+  finally
+    FreeAndNil(obj);
+  end;
+  Result := model;
+end;
+
+function TLicenca.LocalizarPorCNPJ(ACNPJ: string): Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsulta + ' WHERE Lic_CNPJCPF = ' + QuotedStr(ACNPJ));
+
+    Result := obj.Model.FieldByName('Lic_Id').AsInteger;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TLicenca.LocalizarPorCodigo(ACodigo: integer): Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsulta + ' WHERE Lic_Codigo = ' + IntToStr(ACodigo));
+
+    Result := obj.Model.FieldByName('Lic_Id').AsInteger;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TLicenca.LocalizarPorDoct(ADoc: string; var AIdCliente: integer; var ARazaoSocial: string): string;
+var
+  obj: TFireDAC;
+  sDoc: string;
+begin
+  obj := TFireDAC.create;
+
+  sDoc := ADoc;
+  if Copy(sDoc, 1, 3) = '000' then
+    sDoc := Copy(sDoc, 4, 15);
+
+  if length(sDoc) = 14 then
+    sDoc := FormatMaskText('##.###.###/####-##;0;_', sDoc)
+  else
+    sDoc := FormatMaskText('###.###.###-##;0;_', sDoc);
+
+  try
+    obj.OpenSQL('SELECT Cli_Id, Cli_Revenda, Cli_Nome FROM Cliente WHERE Cli_Dcto = ' + QuotedStr(SDoc) );
+
+    AIdCliente := obj.Model.FieldByName('Cli_Id').AsInteger;
+    if AIdCliente > 0 then
+      ARazaoSocial := obj.Model.FieldByName('Cli_Nome').AsString
+    else
+      ARazaoSocial := '';
+    Result := '';
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TLicenca.LocalizarPorId(AId: Integer): TLicencaVO;
+var
+  obj: TFireDAC;
+  model: TLicencaVO;
+begin
+  model := TLicencaVO.Create();
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsulta + ' WHERE Lic_Id = ' + IntToStr(AId));
+
+    model.Id := obj.Model.FieldByName('Lic_Id').AsInteger;
+    model.Codigo := obj.Model.FieldByName('Lic_Codigo').AsInteger;
+    model.CNPJCPF := obj.Model.FieldByName('Lic_CNPJCPF').AsString;
+    model.Empresa := obj.Model.FieldByName('Lic_Empresa').AsString;
+    model.QtdeEstacao := obj.Model.FieldByName('Lic_QtdeEstacao').AsInteger;
+    model.QtdeUsuario := obj.Model.FieldByName('Lic_QtdeUsuario').AsInteger;
+    model.IPExterno := obj.Model.FieldByName('Lic_IPExterno').AsString;
+    model.DataAtualizacao := obj.Model.FieldByName('Lic_DataAtualizacao').AsDateTime;
+    model.Build := obj.Model.FieldByName('Lic_Build').AsString;
+    model.IPLocal := obj.Model.FieldByName('Lic_IPLocal').AsString;
+  finally
+    FreeAndNil(obj);
+  end;
+  Result := model;
+end;
+
+procedure TLicenca.Salvar(ALicenca: TLicencaVO);
+begin
+  TGenericDAO.Save<TLicencaVO>(ALicenca);
+end;
+
+procedure TLicenca.SalvarItem(ALicencaItem: TLicencaItensVO);
+begin
+  TGenericDAO.Save<TLicencaItensVO>(ALicencaItem);
+end;
+
+end.

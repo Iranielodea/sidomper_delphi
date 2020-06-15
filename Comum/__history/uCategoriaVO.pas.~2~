@@ -1,0 +1,19 @@
+unit uCategoriaVO;
+
+interface
+
+uses
+  System.SysUtils, uTableName, uKeyField;
+
+type
+  TCategoriaVO = class
+  public
+    property Id: Integer;
+    property Codigo: Integer;
+    property Nome: string;
+    property Ativo: Boolean;
+  end;
+
+implementation
+
+end.

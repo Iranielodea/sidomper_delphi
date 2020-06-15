@@ -1,0 +1,385 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{17439B50-4D5D-41BE-946D-2DC33B1469AD}</ProjectGuid>
+        <ProjectVersion>15.1</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>SIDomperServer.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_UsePackage>FireDACSqliteDriver;rbUSER1519;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;TeeDB;frx19;vclib;inetdbbde;DBXInterBaseDriver;DataSnapClient;DataSnapCommon;DataSnapServer;DataSnapProviderClient;DBXSybaseASEDriver;DbxCommonDriver;rbDIDE1519;vclimg;rbIBE1519;dbxcds;DatasnapConnectorsFreePascal;MetropolisUILiveTile;rbADO1519;rbFireDAC1519;vcldb;vcldsnap;fmxFireDAC;DBXDb2Driver;rbIDE1519;rbTCUI1519;DBXOracleDriver;CustomIPTransport;rbBDE1519;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;IndyIPCommon;CloudService;DBXMSSQLDriver;FmxTeeUI;FireDACIBDriver;CodeSiteExpressPkg;FireDACDBXDriver;dclRBE1519;rbCIDE1519;inetdbxpress;webdsnap;dclRBDBE1519;frxe19;JclDeveloperTools;FireDACDb2Driver;adortl;frxDB19;FireDACASADriver;bindcompfmx;fs19;dclRBIBE1519;vcldbx;FireDACODBCDriver;rbUSERDesign1519;rbRAP1519;rtl;dbrtl;DbxClientDriver;rbDBDE1519;FireDACCommon;bindcomp;inetdb;Tee;JclContainers;DBXOdbcDriver;vclFireDAC;xmlrtl;svnui;ibxpress;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;bindengine;vclactnband;soaprtl;bindcompdbx;FMXTee;TeeUI;bindcompvcl;rbDAD1519;vclie;Jcl;FireDACADSDriver;vcltouch;rbTC1519;VclSmp;FireDACMSSQLDriver;FireDAC;VCLRESTComponents;Intraweb;DBXInformixDriver;rbDBE1519;DataSnapConnectors;FireDACDataSnapDriver;dclRBADO1519;dclRBFireDAC1519;dsnapcon;DBXFirebirdDriver;rbRCL1519;inet;PCN2;fmxobj;JclVcl;FireDACMySQLDriver;vclx;rbDB1519;svn;DBXSybaseASADriver;FireDACOracleDriver;fmxdae;RESTComponents;rbRIDE1519;bdertl;dclRBBDE1519;FireDACMSAccDriver;DataSnapIndy10ServerTransport;dbexpress;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>FireDACSqliteDriver;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;TeeDB;vclib;DBXInterBaseDriver;DataSnapClient;DataSnapCommon;DataSnapServer;DataSnapProviderClient;DBXSybaseASEDriver;DbxCommonDriver;vclimg;dbxcds;DatasnapConnectorsFreePascal;MetropolisUILiveTile;vcldb;vcldsnap;fmxFireDAC;DBXDb2Driver;DBXOracleDriver;CustomIPTransport;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;IndyIPCommon;CloudService;DBXMSSQLDriver;FmxTeeUI;FireDACIBDriver;FireDACDBXDriver;inetdbxpress;webdsnap;FireDACDb2Driver;adortl;FireDACASADriver;bindcompfmx;FireDACODBCDriver;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;inetdb;Tee;DBXOdbcDriver;vclFireDAC;xmlrtl;ibxpress;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;bindengine;vclactnband;soaprtl;bindcompdbx;FMXTee;TeeUI;bindcompvcl;vclie;FireDACADSDriver;vcltouch;VclSmp;FireDACMSSQLDriver;FireDAC;VCLRESTComponents;Intraweb;DBXInformixDriver;DataSnapConnectors;FireDACDataSnapDriver;dsnapcon;DBXFirebirdDriver;inet;fmxobj;FireDACMySQLDriver;vclx;DBXSybaseASADriver;FireDACOracleDriver;fmxdae;RESTComponents;FireDACMSAccDriver;DataSnapIndy10ServerTransport;dbexpress;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <DCC_ExeOutput>.\Exe</DCC_ExeOutput>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Locale>1046</VerInfo_Locale>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_ExeOutput>.\Exe</DCC_ExeOutput>
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_ExeOutput>.\exe</DCC_ExeOutput>
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Locale>1046</VerInfo_Locale>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_Build>8</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.8;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <Debugger_HostApplication>C:\Projetos\Domper\SIDomper\Client\Exe\SIDomper.exe</Debugger_HostApplication>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <DCC_ExeOutput>.\Exe</DCC_ExeOutput>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="uServidor.pas">
+            <Form>frmServidor</Form>
+        </DCCReference>
+        <DCCReference Include="ServerMethodsUnit1.pas">
+            <Form>ServerMethods1</Form>
+            <DesignClass>TDSServerModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="ServerContainerUnit1.pas">
+            <Form>ServerContainer1</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="uDM.pas">
+            <Form>DM</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Negocio\uCadastroPadrao.pas"/>
+        <DCCReference Include="Negocio\uUsuario.pas"/>
+        <DCCReference Include="..\Comum\uEnumerador.pas"/>
+        <DCCReference Include="Negocio\uDepartamento.pas"/>
+        <DCCReference Include="Negocio\uDepartamentoAcesso.pas"/>
+        <DCCReference Include="Negocio\uCadastroInterface.pas"/>
+        <DCCReference Include="Negocio\uFormaPagto.pas"/>
+        <DCCReference Include="Negocio\uModulo.pas"/>
+        <DCCReference Include="Negocio\uStatus.pas"/>
+        <DCCReference Include="Negocio\uProspect.pas"/>
+        <DCCReference Include="Negocio\uTipo.pas"/>
+        <DCCReference Include="Negocio\uClienteModulo.pas"/>
+        <DCCReference Include="Negocio\uBaseConhecimento.pas"/>
+        <DCCReference Include="Negocio\uClienteEmail.pas"/>
+        <DCCReference Include="Negocio\uClienteEspecificacao.pas"/>
+        <DCCReference Include="Negocio\uGeral.pas"/>
+        <DCCReference Include="..\Comum\uConfig.pas"/>
+        <DCCReference Include="Negocio\uSolicitacaoOcorrencia.pas"/>
+        <DCCReference Include="Negocio\uSolicitacaoCronograma.pas"/>
+        <DCCReference Include="..\Comum\uChamadoStatusVO.pas"/>
+        <DCCReference Include="..\Comum\uFiltroSolicitacao.pas"/>
+        <DCCReference Include="..\Comum\uFiltroCliente.pas"/>
+        <DCCReference Include="Negocio\uSolicitacaoStatus.pas"/>
+        <DCCReference Include="Negocio\uSolicitacao.pas"/>
+        <DCCReference Include="..\Comum\uFiltroBaseConhecimento.pas"/>
+        <DCCReference Include="Negocio\uVisita.pas"/>
+        <DCCReference Include="..\Comum\uFiltroVisita.pas"/>
+        <DCCReference Include="Negocio\uChamado.pas"/>
+        <DCCReference Include="Negocio\uContaEmail.pas"/>
+        <DCCReference Include="..\Comum\uFiltroVersao.pas"/>
+        <DCCReference Include="..\Comum\uFiltroChamado.pas"/>
+        <DCCReference Include="Negocio\uVersao.pas"/>
+        <DCCReference Include="Negocio\uChamadoOcorrencia.pas"/>
+        <DCCReference Include="..\Comum\uSolicitacaoStatusVO.pas"/>
+        <DCCReference Include="Negocio\uClassValidacao.pas"/>
+        <DCCReference Include="Negocio\uLerXML.pas"/>
+        <DCCReference Include="Negocio\uDMChamado.pas">
+            <Form>DMChamado</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Comum\uRevendaVO.pas"/>
+        <DCCReference Include="Negocio\uDMVisita.pas">
+            <Form>DMVisita</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Negocio\uVersaoSistema.pas"/>
+        <DCCReference Include="Negocio\uFormVersao.pas">
+            <Form>frmVersao</Form>
+        </DCCReference>
+        <DCCReference Include="..\Comum\uFiltroUsuario.pas"/>
+        <DCCReference Include="Negocio\uUsuarioPermissao.pas"/>
+        <DCCReference Include="..\Comum\uArquivos.pas"/>
+        <DCCReference Include="Negocio\uChamadoEmail.pas"/>
+        <DCCReference Include="Negocio\uSolicitacaoEmail.pas"/>
+        <DCCReference Include="Negocio\uVisitaEmail.pas"/>
+        <DCCReference Include="Negocio\uFuncoesServidor.pas"/>
+        <DCCReference Include="..\Comum\uModuloVO.pas"/>
+        <DCCReference Include="uServerModulo2.pas">
+            <Form>ServerModule2</Form>
+            <DesignClass>TDSServerModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Negocio\uAgendamento.pas"/>
+        <DCCReference Include="..\Comum\uAgendamentoVO.pas"/>
+        <DCCReference Include="..\Comum\uFiltroAgendamento.pas"/>
+        <DCCReference Include="Negocio\uAgendamentoEmail.pas"/>
+        <DCCReference Include="..\Comum\uPlanoBackupVO.pas"/>
+        <DCCReference Include="Negocio\uPlanoBackup.pas"/>
+        <DCCReference Include="Negocio\uCliente.pas"/>
+        <DCCReference Include="..\Comum\uProspectVO.pas"/>
+        <DCCReference Include="..\Comum\uFiltroProspect.pas"/>
+        <DCCReference Include="..\Comum\uProspectEmailVO.pas"/>
+        <DCCReference Include="Negocio\uOrcamento.pas"/>
+        <DCCReference Include="..\Comum\uFiltroOrcamento.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoVO.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoItemVO.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoItemModuloVO.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoOcorrenciaVO.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoVectoVO.pas"/>
+        <DCCReference Include="..\Comum\uParcelas.pas"/>
+        <DCCReference Include="..\Comum\uChamadoVO.pas"/>
+        <DCCReference Include="..\Comum\uChamadoOcorrenciaVO.pas"/>
+        <DCCReference Include="..\Comum\uChamadoStatus.pas"/>
+        <DCCReference Include="..\Comum\uChamadoColaboradorVO.pas"/>
+        <DCCReference Include="..\Comum\uUsuarioVO.pas"/>
+        <DCCReference Include="Negocio\uDMVersao.pas">
+            <Form>DMVersao</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Comum\uFormaPagtoItemVO.pas"/>
+        <DCCReference Include="..\Comum\uObservacaoVO.pas"/>
+        <DCCReference Include="Negocio\uModeloRelatorio.pas"/>
+        <DCCReference Include="Negocio\uRamal.pas"/>
+        <DCCReference Include="..\Comum\uFormaPagtoVO.pas"/>
+        <DCCReference Include="Negocio\uRecado.pas"/>
+        <DCCReference Include="..\Comum\uModeloRelatorioVO.pas"/>
+        <DCCReference Include="..\Comum\uEnviarEmail.pas"/>
+        <DCCReference Include="..\Comum\uEmailBase.pas"/>
+        <DCCReference Include="..\Comum\uContaEmailVO.pas"/>
+        <DCCReference Include="..\Comum\uDepartamentoEmailVO.pas"/>
+        <DCCReference Include="..\Comum\uDepartamentoVO.pas"/>
+        <DCCReference Include="..\Comum\uDepartamentoAcessoVO.pas"/>
+        <DCCReference Include="..\Comum\uClienteEmailVO.pas"/>
+        <DCCReference Include="..\Comum\uClienteModuloVO.pas"/>
+        <DCCReference Include="..\Comum\uProdutoVO.pas"/>
+        <DCCReference Include="Negocio\uCRUD.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoEmailVO.pas"/>
+        <DCCReference Include="..\Comum\DAO\uGenericDAO.pas"/>
+        <DCCReference Include="..\Comum\DAO\uKeyField.pas"/>
+        <DCCReference Include="..\Comum\DAO\uTableName.pas"/>
+        <DCCReference Include="..\Comum\uConverter.pas"/>
+        <DCCReference Include="Negocio\uFireDAC.pas"/>
+        <DCCReference Include="..\Comum\uRamalVO.pas"/>
+        <DCCReference Include="..\Comum\uRamalItensVO.pas"/>
+        <DCCReference Include="Negocio\uObservacao.pas"/>
+        <DCCReference Include="..\Comum\uTipoVO.pas"/>
+        <DCCReference Include="Negocio\uOrcamentoNAprovado.pas"/>
+        <DCCReference Include="..\Comum\uOrcamentoNaoAprovadoVO.pas"/>
+        <DCCReference Include="..\Comum\uRecadoVO.pas"/>
+        <DCCReference Include="Negocio\uTabPreco.pas"/>
+        <DCCReference Include="..\Comum\uRecadoFiltro.pas"/>
+        <DCCReference Include="..\Comum\uStatusVO.pas"/>
+        <DCCReference Include="..\Comum\uSolicitacaoTempoVO.pas"/>
+        <DCCReference Include="Negocio\uSolicitacaoTempo.pas"/>
+        <DCCReference Include="..\Comum\uSolicitacaoVO.pas"/>
+        <DCCReference Include="Negocio\uEscala.pas"/>
+        <DCCReference Include="Negocio\uCidade.pas"/>
+        <DCCReference Include="..\Comum\uEscalaVO.pas"/>
+        <DCCReference Include="Negocio\uDMEscala.pas">
+            <Form>dmEscala</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Negocio\uRevenda.pas"/>
+        <DCCReference Include="..\Comum\uCidadeVO.pas"/>
+        <DCCReference Include="..\Comum\uInscricaoEstadual.pas"/>
+        <DCCReference Include="..\Comum\uClienteVO.pas"/>
+        <DCCReference Include="..\Comum\uContatoVO.pas"/>
+        <DCCReference Include="Negocio\uContato.pas"/>
+        <DCCReference Include="Negocio\ULicenca.pas"/>
+        <DCCReference Include="..\Comum\ULicencaVO.pas"/>
+        <DCCReference Include="..\Comum\uLicencaItensVO.pas"/>
+        <DCCReference Include="uDMFB.pas">
+            <Form>DMFB</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Comum\uFiltroLicenca.pas"/>
+        <DCCReference Include="..\Comum\uParametroVO.pas"/>
+        <DCCReference Include="Negocio\uArquivoTexto.pas"/>
+        <DCCReference Include="Negocio\uExportarParametros.pas"/>
+        <DCCReference Include="Negocio\uParametros.pas"/>
+        <DCCReference Include="Negocio\uExportarDepartamento.pas"/>
+        <DCCReference Include="Negocio\uExportarDepartamentoAcesso.pas"/>
+        <DCCReference Include="Negocio\uExportarTipos.pas"/>
+        <DCCReference Include="Negocio\uExportarStatus.pas"/>
+        <DCCReference Include="Negocio\uDMSolicitacao.pas">
+            <Form>DMSolicitacao</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\Comum\ViewModel\uSolicitacaoViewModel.pas"/>
+        <DCCReference Include="..\Comum\ViewModel\uChamadoQuadroViewModel.pas"/>
+        <DCCReference Include="..\Comum\ViewModel\uRecadoQuadroViewModel.pas"/>
+        <DCCReference Include="Negocio\uFeriado.pas"/>
+        <DCCReference Include="..\Comum\uUsuarioPermissaoVO.pas"/>
+        <DCCReference Include="..\Comum\uPermissaoSolicitacaoVO.pas"/>
+        <DCCReference Include="..\Comum\uPermissaoChamadoVO.pas"/>
+        <DCCReference Include="Negocio\uProduto.pas"/>
+        <DCCReference Include="..\Comum\uCategoriaVO.pas"/>
+        <DCCReference Include="..\Comum\uSolicitacaoCronogramaVO.pas"/>
+        <DCCReference Include="..\Comum\uSolicitacaoOcorrenciaVO.pas"/>
+        <DCCReference Include="..\Comum\uTabelaPrecoVO.pas"/>
+        <DCCReference Include="Negocio\uCategoria.pas"/>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">SIDomperServer.dpr</Source>
+                </Source>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1046</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                    <VersionInfoKeys Name="CFBundleName"/>
+                    <VersionInfoKeys Name="CFBundleDisplayName"/>
+                    <VersionInfoKeys Name="UIDeviceFamily"/>
+                    <VersionInfoKeys Name="CFBundleIdentifier"/>
+                    <VersionInfoKeys Name="CFBundleVersion"/>
+                    <VersionInfoKeys Name="CFBundlePackageType"/>
+                    <VersionInfoKeys Name="CFBundleSignature"/>
+                    <VersionInfoKeys Name="CFBundleAllowMixedLocalizations"/>
+                    <VersionInfoKeys Name="UISupportedInterfaceOrientations"/>
+                    <VersionInfoKeys Name="CFBundleExecutable"/>
+                    <VersionInfoKeys Name="CFBundleResourceSpecification"/>
+                    <VersionInfoKeys Name="LSRequiresIPhoneOS"/>
+                    <VersionInfoKeys Name="CFBundleInfoDictionaryVersion"/>
+                    <VersionInfoKeys Name="CFBundleDevelopmentRegion"/>
+                    <VersionInfoKeys Name="package"/>
+                    <VersionInfoKeys Name="label"/>
+                    <VersionInfoKeys Name="versionCode"/>
+                    <VersionInfoKeys Name="versionName"/>
+                    <VersionInfoKeys Name="persistent"/>
+                    <VersionInfoKeys Name="restoreAnyVersion"/>
+                    <VersionInfoKeys Name="installLocation"/>
+                    <VersionInfoKeys Name="largeHeap"/>
+                    <VersionInfoKeys Name="theme"/>
+                </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k190.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp190.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment/>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

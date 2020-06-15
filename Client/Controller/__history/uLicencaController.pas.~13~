@@ -1,0 +1,78 @@
+unit uLicencaController;
+
+interface
+
+uses
+  System.SysUtils, uDMOrcamento, uRegras, uEnumerador, uDM, Data.DB, Vcl.Forms,
+  uFiltroOrcamento, Data.DBXJSON, Data.DBXJSONReflect, uUsuario, uParcelas, uOrcamentoVO,
+  uFormaPagtoVO, uObsevacaoController, uConverter, System.Generics.Collections,
+  uOrcamentoEmailVO, uGenericProperty, uDepartamentoEmailVO,
+  uParametrosController, uFormaPagtoController, uClienteController,
+  uTipoController, uTipoVO, uContatoVO, ULicencaVO, uLicencaItensVO;
+
+type
+  TLicencaController = class
+  public
+    procedure Importar();
+    function BuscarLicencas(): TObjectList<TLicencaVO>;
+    function BuscarLicencasItens(): TObjectList<TLicencaItensVO>;
+    procedure PermissaoAcessar(AIdUsuario: Integer);
+  end;
+
+implementation
+
+{ TLicencaController }
+
+function TLicencaController.BuscarLicencas: TObjectList<TLicencaVO>;
+var
+  Negocio: TServerModule2Client;
+  lista : TObjectList<TLicencaVO>;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    lista := TConverte.JSONToObject<TListaLicenca>(Negocio.LicencasListarTodos());
+    Result := lista;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+function TLicencaController.BuscarLicencasItens: TObjectList<TLicencaItensVO>;
+var
+  Negocio: TServerModule2Client;
+  lista : TObjectList<TLicencaItensVO>;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    lista := TConverte.JSONToObject<TListaLicencaItens>(Negocio.LicencasListarTodosItens());
+    Result := lista;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TLicencaController.Importar;
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    Negocio.LicencasImportar();
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TLicencaController.PermissaoAcessar(AIdUsuario: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    Negocio.LicencaPermissaoAcessar(CLicenca, AIdUsuario);
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+end.

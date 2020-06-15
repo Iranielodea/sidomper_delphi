@@ -1,0 +1,42 @@
+unit uExportarDepartamentoAcesso;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uArquivoTexto, uDM, uFireDAC,
+  uDepartamentoAcessoVO, System.Generics.Collections, uGenericDAO;
+
+type
+  TExportarDepartamentoAcesso = class
+  private
+    FArquivo: string;
+  public
+    procedure Exportar();
+    function Importar(): TObjectList<TDepartamentoAcessoVO>;
+
+    constructor Create(); overload;
+  end;
+
+
+implementation
+
+{ TExportarDepartamentoAcesso }
+
+constructor TExportarDepartamentoAcesso.Create;
+begin
+  inherited Create;
+
+  FArquivo := 'D:\DOMPER\SIDomper\Banco\Departamento.txt';
+end;
+
+procedure TExportarDepartamentoAcesso.Exportar;
+begin
+
+end;
+
+function TExportarDepartamentoAcesso.Importar: TObjectList<TDepartamentoAcessoVO>;
+begin
+
+end;
+
+end.

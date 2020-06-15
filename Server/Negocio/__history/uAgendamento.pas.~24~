@@ -1,0 +1,580 @@
+unit uAgendamento;
+
+interface
+
+uses uDM, System.SysUtils, FireDAC.Stan.Param,
+  Data.DB, FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uAgendamentoVO, uUsuario,
+  System.Variants, uFiltroAgendamento, uFireDAC;
+
+  const CConsulta: string =
+    'SELECT'
+    +'	Age_Id,'
+    +'	Age_Data,'
+    +'	Age_Hora,'
+    +'  Age_Cliente,'
+    +'	Age_NomeCliente,'
+    +'	Tip_Nome,'
+    +'  Usu_Nome,'
+    +'	Sta_Nome'
+    +' FROM Agendamento'
+    +'	INNER JOIN Cliente ON Age_Cliente = Cli_Id'
+    +'	INNER JOIN Tipo ON Age_Tipo = Tip_Id'
+    +'	INNER JOIN Usuario ON Age_Usuario = Usu_Id'
+    +'	INNER JOIN Status ON Age_Status = Status.Sta_Id';
+
+  const CQuadro: string =
+    'SELECT'
+    +'	Age_Id,'
+    +'	Age_Data,'
+    +'	Age_Hora,'
+    +'  Age_Cliente,'
+    +'	Age_NomeCliente,'
+    +'	Usu_Nome,'
+    +'	Sta_Nome'
+    +' FROM Agendamento'
+    +' INNER JOIN Cliente ON  Age_Cliente = Cli_Id'
+    +' INNER JOIN Usuario ON Age_Usuario = Usu_Id'
+    +' INNER JOIN Status ON Age_Status = Sta_Id';
+
+  const CTRL = #10+#13;
+
+
+type
+  TAgendamento = class
+  private
+    function DataIngles(AData: string): string;
+    function RetornarStatusParametros(ACodigo: string): string;
+
+
+  public
+    procedure Novo(APrograma, AIdUsuario: Integer);
+    procedure Excluir(APrograma, AIdUsuario, AId: Integer);
+    function Editar(APrograma, AIdUsuario: Integer): Boolean;
+    function Filtrar(AFiltro: TFiltroAgendamento; ACampo, ATexto: string; AIdUsuario: Integer; AContem: Boolean = True): string;
+    function FiltrarPorId(AId: Integer): string;
+    function LocalizarId(var AQry: TFDQuery; AId: integer): Boolean;
+    function Salvar(APrograma, AIdUsuario: Integer; AAgendamentoVO: TAgendamentoVO;
+      var AStoredProcedure: TFDStoredProc): Integer;
+    procedure Relatorio(APrograma, AIdUsuario: Integer);
+    function Quadro(ADataInicial, ADataFinal: string; AIdUsuario, AIdRevenda: Integer): string;
+
+    procedure Reagendamento(AIdUsuario, AIdAgendamento: Integer; AData, AHora, ATexto: string);
+    procedure Cancelamento(AIdUsuario, AIdAgendamento: Integer; AData, AHora, ATexto: string);
+    procedure Encerramento(AIdUsuario, AIdAgenda, AIdPrograma: Integer);
+    procedure EncerramentoWEB(AIdUsuario, AIdAgenda: Integer);
+
+    function LocalizarStatusAbertura: Integer;
+    function TipoPrograma(AIdAgenda: Integer): Integer;
+    function UsuarioIgualCadastro(AId, AIdUsuario, ATipoOperacao: Integer): Boolean;
+    function VerificarAgendamentoAberto(AIdUsuario: Integer): Boolean;
+
+  end;
+
+implementation
+
+{ TAgendamento }
+
+uses uStatus, uParametros, uFuncoesServidor;
+
+procedure TAgendamento.Cancelamento(AIdUsuario, AIdAgendamento: Integer; AData, AHora,
+  ATexto: string);
+var
+  lQry: TFDQuery;
+  sTexto: string;
+  sIdStatus: string;
+begin
+  sIdStatus := RetornarStatusParametros('34');
+
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(' SELECT Age_Motivo, Age_Usuario, Age_Data, Age_Hora, Sta_Nome FROM Agendamento');
+    lQry.SQL.Add(' INNER JOIN Status ON Age_Status = Sta_Id');
+    lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgendamento));
+    lQry.Open();
+
+    if lQry.FieldByName('Age_Usuario').AsInteger <> AIdUsuario then
+      raise Exception.Create('Para Cancelar, somente o mesmo usuário da Abertura!');
+
+    sTexto := lQry.Fields[0].AsString;
+    if sTexto.Trim <> '' then
+      sTexto := sTexto + sLineBreak;
+
+    sTexto := sTexto    +      ' ' + lQry.FieldByName('Sta_Nome').AsString
+                        + '-' + lQry.FieldByName('Age_Data').AsString
+                        + '-' + lQry.FieldByName('Age_Hora').AsString;
+
+    AHora := FormatDateTime('hh:mm', StrToTime(AHora));
+    AData := FormatDateTime('yyyy-mm-dd', StrToDate(AData));
+
+    lQry.Close;
+    lQry.SQL.Clear;
+    lQry.SQL.Add(' UPDATE Agendamento SET');
+    lQry.SQL.Add('  Age_Motivo = ' + QuotedStr(sTexto + sLineBreak + ATexto) + ',');
+    lQry.SQL.Add('  Age_Hora = CAST(' +  QuotedStr(AHora) + ' AS time),');
+    lQry.SQL.Add('  Age_Data = CAST(' + QuotedStr(AData) + ' AS Date),');
+    lQry.SQL.Add('  Age_Status = ' + sIdStatus);
+    lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgendamento));
+    lQry.ExecSQL();
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TAgendamento.DataIngles(AData: string): string;
+begin
+  try
+    Result := QuotedStr(FormatDateTime('YYYYMMDD', StrToDate(AData)));
+  except
+    raise Exception.Create('Data Inválida.');
+  end;
+end;
+
+function TAgendamento.Editar(APrograma, AIdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(APrograma, AIdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TAgendamento.EncerramentoWEB(AIdUsuario, AIdAgenda: Integer);
+var
+  obj: TFireDAC;
+  sIdStatus: string;
+begin
+  obj := TFireDAC.create;
+  try
+    sIdStatus := RetornarStatusParametros('36');
+    obj.OpenSQL('SELECT Age_Usuario, Age_Status FROM Agendamento WHERE Age_Id = ' + IntToStr(AIdAgenda));
+    if obj.Model.Fields[0].AsInteger <> AIdUsuario then
+      raise Exception.Create('Para encerrar, somente o mesmo usuário de abertura!');
+
+    if obj.Model.FieldByName('Age_Status').AsInteger = StrToInt(sIdStatus) then
+      raise Exception.Create('Agendamento já encerrado!');
+
+    obj.Lista.Clear();
+    obj.Lista.Add(' UPDATE Agendamento SET');
+    obj.Lista.Add('   Age_Status = ' + sIdStatus);
+    obj.Lista.Add(' WHERE Age_Id = ' + IntToStr(AIdAgenda));
+    obj.ExecutarSQL();
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TAgendamento.Encerramento(AIdUsuario, AIdAgenda, AIdPrograma: Integer);
+var
+  lQry: TFDQuery;
+  sIdStatus: string;
+  iAtividade: Integer;
+begin
+
+//  if IdPrograma <= 0 then
+//    raise Exception.Create('Informe a Atividade ou Visita!');
+
+  sIdStatus := RetornarStatusParametros('36');
+
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(' SELECT Age_Programa, Age_Usuario FROM Agendamento');
+    lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgenda));
+    lQry.Open();
+
+    if AIdPrograma = 0 then
+    begin
+      if lQry.FieldByName('Age_Usuario').AsInteger <> AIdUsuario then
+        raise Exception.Create('Para Encerrar, somente o mesmo usuário da Abertura!');
+    end;
+
+    if AIdPrograma > 0 then
+    begin
+      iAtividade := lQry.Fields[0].AsInteger;
+
+      case iAtividade of
+        2: // visita
+        begin
+          lQry.Close;
+          lQry.SQL.Clear;
+          lQry.SQL.Add(' UPDATE Agendamento SET');
+          lQry.SQL.Add('  Age_Visita = ' + IntToStr(AIdPrograma));
+          lQry.SQL.Add(', Age_Status = ' + sIdStatus);
+          lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgenda));
+          lQry.ExecSQL();
+        end;
+
+        7: // atividade
+        begin
+          lQry.Close;
+          lQry.SQL.Clear;
+          lQry.SQL.Add(' UPDATE Agendamento SET');
+          lQry.SQL.Add('  Age_Atividade = ' + IntToStr(AIdPrograma));
+          lQry.SQL.Add(', Age_Status = ' + sIdStatus);
+          lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgenda));
+          lQry.ExecSQL();
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TAgendamento.Excluir(APrograma, AIdUsuario, AId: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(APrograma, AIdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+  DM.ExecutarSQL('DELETE FROM Agendamento WHERE Age_Id = ' + IntToStr(AId));
+end;
+
+function TAgendamento.Filtrar(AFiltro: TFiltroAgendamento; ACampo, ATexto: string;
+  AIdUsuario: Integer; AContem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+  Usuario: TUsuario;
+begin
+  sTexto := '''' + ATexto + '%''';
+  if AContem then
+    sTexto := '''%' + ATexto + '%''';
+
+  Usuario := TUsuario.Create;
+  try
+    sConsulta := CConsulta + ' WHERE ' + ACampo + ' LIKE ' + sTexto;
+    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario);
+  finally
+    FreeAndNil(Usuario);
+  end;
+
+  if Trim(AFiltro.DataInicial) <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Age_Data >= ' + DataIngles(AFiltro.DataInicial);
+
+  if Trim(AFiltro.DataFinal) <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Age_Data <= ' + DataIngles(AFiltro.DataFinal);
+
+  if AFiltro.IdCliente <> '' then
+    sConsulta := sConsulta + ' AND Age_Cliente IN' + AFiltro.IdCliente;
+
+  if AFiltro.IdTipo <> '' then
+    sConsulta := sConsulta + ' AND Age_Tipo IN' + AFiltro.IdTipo;
+
+  if AFiltro.IdStatus <> '' then
+    sConsulta := sConsulta + ' AND Age_Status IN' + AFiltro.IdStatus;
+
+  if AFiltro.IdUsuario <> '' then
+    sConsulta := sConsulta + ' AND Age_Usuario IN' + AFiltro.IdUsuario;
+
+  Result := sConsulta;
+end;
+
+function TAgendamento.FiltrarPorId(AId: Integer): string;
+begin
+    Result := CConsulta + ' WHERE Age_Id = ' + IntToStr(AId);
+end;
+
+procedure TAgendamento.Reagendamento(AIdUsuario, AIdAgendamento: Integer; AData, AHora, ATexto: string);
+var
+  lQry: TFDQuery;
+  sTexto: string;
+  sIdStatus: string;
+begin
+  sIdStatus := RetornarStatusParametros('35');
+
+
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(' SELECT Age_Motivo, Age_Data, Age_Usuario, Age_Hora, Sta_Nome FROM Agendamento');
+    lQry.SQL.Add(' INNER JOIN Status ON Age_Status = Sta_Id');
+    lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgendamento));
+    lQry.Open();
+
+    if lQry.FieldByName('Age_Usuario').AsInteger <> AIdUsuario then
+      raise Exception.Create('Para Reagendar, somente o mesmo usuário da Abertura!');
+
+    sTexto := lQry.Fields[0].AsString;
+    if sTexto.Trim <> '' then
+      sTexto := sTexto + sLineBreak;
+
+    sTexto := sTexto +  ' ' + lQry.FieldByName('Sta_Nome').AsString
+                        + '-' + lQry.FieldByName('Age_Data').AsString
+                        + '-' + lQry.FieldByName('Age_Hora').AsString;
+
+    AHora := FormatDateTime('hh:mm', StrToTime(AHora));
+    AData := FormatDateTime('yyyy-mm-dd', StrToDate(AData));
+
+    lQry.Close;
+    lQry.SQL.Clear;
+    lQry.SQL.Add(' UPDATE Agendamento SET');
+    lQry.SQL.Add('  Age_Motivo = ' + QuotedStr(sTexto + sLineBreak + ATexto) + ',');
+    lQry.SQL.Add('  Age_Hora = CAST(' + QuotedStr(AHora) + ' AS time),');
+    lQry.SQL.Add('  Age_Data = CAST(' + QuotedStr(AData) + ' AS Date),');
+    lQry.SQL.Add('  Age_Status = ' + sIdStatus);
+    lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgendamento));
+    lQry.ExecSQL();
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TAgendamento.LocalizarId(var AQry: TFDQuery; AId: integer): Boolean;
+begin
+  AQry.Close;
+  AQry.Params[0].AsInteger := AId;
+  AQry.Open();
+
+  Result := (not AQry.IsEmpty);
+end;
+
+function TAgendamento.LocalizarStatusAbertura: Integer;
+var
+  Status: TParametros;
+begin
+  Status := TParametros.Create;
+  try
+    Result := StrToIntDef(Status.LocalizarParametro(StrToIntDef('33', 0), 112), 0);
+  finally
+    FreeAndNil(Status);
+  end;
+end;
+
+procedure TAgendamento.Novo(APrograma, AIdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(APrograma, AIdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  VerificarAgendamentoAberto(AIdUsuario);
+end;
+
+function TAgendamento.Quadro(ADataInicial, ADataFinal: string;
+  AIdUsuario, AIdRevenda: Integer): string;
+var
+  sConsulta: string;
+  Usuario: TUsuario;
+begin
+  sConsulta := CQuadro;
+  sConsulta := sConsulta + ' WHERE Age_Data >= ' + DataIngles(ADataInicial);
+  sConsulta := sConsulta + ' AND Age_Data <= ' + DataIngles(ADataFinal);
+
+  Usuario := TUsuario.Create;
+  try
+    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario);
+  finally
+    FreeAndNil(Usuario);
+  end;
+
+  if AIdRevenda > 0 then
+    sConsulta := sConsulta + ' AND Cli_Revenda = ' + IntToStr(AIdRevenda);
+
+  sConsulta := sConsulta + ' ORDER BY Age_Data';
+  Result := sConsulta;
+end;
+
+procedure TAgendamento.Relatorio(APrograma, AIdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(APrograma, AIdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TAgendamento.RetornarStatusParametros(ACodigo: string): string;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(' SELECT');
+    lQry.SQL.Add(' 	Sta_Id');
+    lQry.SQL.Add(' FROM Parametros');
+    lQry.SQL.Add(' 	INNER JOIN Status ON Par_Valor = Sta_Codigo');
+    lQry.SQL.Add(' WHERE Par_Codigo = ' + QuotedStr(ACodigo));
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsString;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TAgendamento.Salvar(APrograma, AIdUsuario: Integer;
+  AAgendamentoVO: TAgendamentoVO; var AStoredProcedure: TFDStoredProc): Integer;
+var
+  sIU: string;
+begin
+  if AAgendamentoVO.Data = 0 then
+    raise Exception.Create('Informe a Data!');
+
+  if AAgendamentoVO.Hora = 0 then
+    raise Exception.Create('Informe a Hora!');
+
+  if AAgendamentoVO.IdUsuario = 0 then
+    raise Exception.Create('Informe o Usuário!');
+
+  if AAgendamentoVO.IdCliente = 0 then
+    raise Exception.Create('Informe o Código Cliente!');
+
+  if AAgendamentoVO.NomeCliente.Trim() = '' then
+    raise Exception.Create('Informe o Nome do Cliente!');
+
+  if AAgendamentoVO.IdTipo = 0 then
+    raise Exception.Create('Informe o Tipo!');
+
+  if AAgendamentoVO.IdStatus = 0 then
+    raise Exception.Create('Informe o Status!');
+
+  if Trim(AAgendamentoVO.Descricao) = '' then
+    raise Exception.Create('Informe a Descrição!');
+
+  if AAgendamentoVO.Id = 0 then
+  begin
+    if AAgendamentoVO.Data = Date then
+    begin
+      if AAgendamentoVO.Hora < Time then
+        raise Exception.Create('Não será possível agendar para este horário!');
+    end;
+  end;
+
+
+  sIU := 'U';
+  if AAgendamentoVO.Id = 0 then
+    sIU := 'I';
+
+  AStoredProcedure.Close;
+  AStoredProcedure.ParamByName('@IU').AsString          := sIU;
+  AStoredProcedure.ParamByName('@Id').AsInteger         := AAgendamentoVO.Id;
+  AStoredProcedure.ParamByName('@Data').AsDate          := AAgendamentoVO.Data;
+  AStoredProcedure.ParamByName('@Hora').AsTime          := AAgendamentoVO.Hora;
+  AStoredProcedure.ParamByName('@IdUsuario').AsInteger  := AAgendamentoVO.IdUsuario;
+  AStoredProcedure.ParamByName('@IdCliente').AsInteger  := AAgendamentoVO.IdCliente;
+  AStoredProcedure.ParamByName('@Contato').AsString     := AAgendamentoVO.Contato;
+  AStoredProcedure.ParamByName('@Programa').AsInteger   := AAgendamentoVO.Programa;
+  AStoredProcedure.ParamByName('@IdTipo').AsInteger     := AAgendamentoVO.IdTipo;
+  AStoredProcedure.ParamByName('@IdStatus').AsInteger   := AAgendamentoVO.IdStatus;
+  AStoredProcedure.ParamByName('@Descricao').AsString   := AAgendamentoVO.Descricao;
+  AStoredProcedure.ParamByName('@Motivo').AsString      := AAgendamentoVO.Motivo;
+  AStoredProcedure.ParamByName('@NomeCliente').AsString      := AAgendamentoVO.NomeCliente;
+
+  if AAgendamentoVO.IdVisita > 0 then
+    AStoredProcedure.ParamByName('@IdVisita').AsInteger := AAgendamentoVO.IdVisita
+  else
+    AStoredProcedure.ParamByName('@IdVisita').Value := null;
+
+  if AAgendamentoVO.IdAtividade > 0 then
+    AStoredProcedure.ParamByName('@IdAtividade').AsInteger := AAgendamentoVO.IdAtividade
+  else
+    AStoredProcedure.ParamByName('@IdAtividade').Value := null;
+
+  AStoredProcedure.ExecProc;
+
+  Result := AStoredProcedure.ParamByName('@RetornoId').AsInteger;
+
+  AStoredProcedure.Close;
+end;
+
+function TAgendamento.TipoPrograma(AIdAgenda: Integer): Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(' SELECT Age_Programa FROM Agendamento');
+    lQry.SQL.Add(' WHERE Age_Id = ' + IntToStr(AIdAgenda));
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger;
+    lQry.Close;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TAgendamento.UsuarioIgualCadastro(AId, AIdUsuario,
+  ATipoOperacao: Integer): Boolean;
+var
+  obj: TFireDAC;
+begin
+{
+   ATipoOperacao = 2-Edicao 3-Exclusao
+}
+  Result := True;
+  if (ATipoOperacao = 2) or (ATipoOperacao = 3) then
+  begin
+    obj := TFireDAC.create;
+    try
+      obj.OpenSQL('SELECT Age_Usuario FROM Agendamento WHERE Age_Id = ' + IntToStr(AId));
+      Result  := (obj.Model.FieldByName('Age_Usuario').AsInteger = AIdUsuario);
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+function TAgendamento.VerificarAgendamentoAberto(AIdUsuario: Integer): Boolean;
+var
+  parametros: TParametros;
+  CodigoEncerrado: string;
+  CodigoCancelado: string;
+
+  status: TStatus;
+  obj: TFireDAC;
+  sb: TStringBuilder;
+begin
+  obj := TFireDAC.create;
+  status := TStatus.Create;
+  parametros := TParametros.Create;
+  sb := TStringBuilder.Create;
+  try
+     CodigoCancelado := parametros.AgendamentoCodigoCancelado();
+     CodigoEncerrado := parametros.AgendamentoCodigoEncerrado();
+
+     CodigoCancelado := IntToStr(status.LocalizarCodigo(StrToIntDef(CodigoCancelado, 0)));
+     CodigoEncerrado := IntToStr(status.LocalizarCodigo(StrToIntDef(CodigoEncerrado, 0)));
+
+     sb.AppendLine(' SELECT COUNT(Age_Id) FROM Agendamento ');
+     sb.AppendLine(' WHERE Age_Usuario = ' + IntToStr(AIdUsuario));
+     sb.AppendLine(' AND Age_Status NOT IN (' + CodigoCancelado + ',' + CodigoEncerrado + ')');
+     sb.AppendLine(' AND Age_Data < ' + TFuncoes.DataIngles(DateToStr(Date)) );
+
+
+     obj.OpenSQL(sb.ToString);
+
+     if obj.Model.Fields[0].AsInteger > 0 then
+      Result := True
+     else
+      Result := False;
+
+  finally
+    FreeAndNil(parametros);
+    FreeAndNil(status);
+    FreeAndNil(sb);
+    FreeAndNil(obj);
+  end;
+
+
+end;
+
+end.

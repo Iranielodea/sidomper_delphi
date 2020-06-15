@@ -1,0 +1,70 @@
+unit uFiltroSolicitacao;
+
+interface
+
+uses uFiltroCliente, System.SysUtils;
+
+type
+  TFiltroSolicitacao = class
+  private
+    FIdTipo: string;
+    FIdAnalista: string;
+    FIdModulo: string;
+    FIdProduto: string;
+    FIdCliente: string;
+    FIdUsuarioAbertura: string;
+    FDataFinal: string;
+    FDataInicial: string;
+    FIdOperador: string;
+    FIdDesenvolvedor: string;
+    FIdStatus: string;
+    FNivel: Integer;
+    FCliente: TFiltroCliente;
+    FidVersao: string;
+    FMostrarTempo: Boolean;
+    FId: Integer;
+    FIdCategoria: string;
+    procedure SetidVersao(const Value: string);
+  public
+    constructor Create();
+    destructor destroy; override;
+    property DataInicial: string read FDataInicial write FDataInicial;
+    property DataFinal: string read FDataFinal write FDataFinal;
+    property IdUsuarioAbertura: string read FIdUsuarioAbertura write FIdUsuarioAbertura;
+    property IdCliente: string read FIdCliente write FIdCliente;
+    property IdModulo: string read FIdModulo write FIdModulo;
+    property IdProduto: string read FIdProduto write FIdProduto;
+    property IdAnalista: string read FIdAnalista write FIdAnalista;
+    property IdTipo: string read FIdTipo write FIdTipo;
+    property IdDesenvolvedor: string read FIdDesenvolvedor write FIdDesenvolvedor;
+    property IdOperador: string read FIdOperador write FIdOperador;
+    property IdStatus: string read FIdStatus write FIdStatus;
+    property Nivel: Integer read FNivel write FNivel;
+    property Cliente: TFiltroCliente read FCliente write FCliente;
+    property idVersao: string read FidVersao write SetidVersao;
+    property Id: Integer read FId write FId;
+    property IdCategoria: string read FIdCategoria write FIdCategoria;
+  end;
+
+implementation
+
+{ TFiltroSolicitacao }
+
+constructor TFiltroSolicitacao.Create;
+begin
+  inherited Create();
+  FCliente := TFiltroCliente.Create;
+end;
+
+destructor TFiltroSolicitacao.destroy;
+begin
+  FreeAndNil(FCliente);
+  inherited;
+end;
+
+procedure TFiltroSolicitacao.SetidVersao(const Value: string);
+begin
+  FidVersao := Value;
+end;
+
+end.

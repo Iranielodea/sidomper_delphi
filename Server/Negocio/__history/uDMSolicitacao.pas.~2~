@@ -1,0 +1,25 @@
+unit uDMSolicitacao;
+
+interface
+
+uses
+  System.SysUtils, System.Classes;
+
+type
+  TDMSolicitacao = class(TDataModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMSolicitacao: TDMSolicitacao;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

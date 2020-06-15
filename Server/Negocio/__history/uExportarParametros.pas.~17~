@@ -1,0 +1,107 @@
+unit uExportarParametros;
+
+interface
+
+uses
+  System.SysUtils, uIExportar, System.Classes, uArquivoTexto, uDM, uFireDAC,
+  uParametroVO, System.Generics.Collections;
+
+type
+  TExportarParametros = class
+  private
+    FParametros: TArquivoTexto;
+    FArquivo: string;
+  public
+    procedure Exportar();
+    function Importar(): TObjectList<TParametroVO>;
+    constructor Create(); overload;
+    destructor  Destroy; override;
+  end;
+
+implementation
+
+{ TExportarParametros }
+
+constructor TExportarParametros.Create;
+begin
+  FArquivo := 'D:\DOMPER\SIDomper\Banco\Parametros.txt';
+  FParametros := TArquivoTexto.Create('D:\DOMPER\SIDomper\Banco\Parametros.txt', tpExportar);
+end;
+
+destructor TExportarParametros.Destroy;
+begin
+  FreeAndNil(FParametros);
+  inherited;
+end;
+
+procedure TExportarParametros.Exportar;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT * FROM Parametros');
+    while not obj.Model.Eof do
+    begin
+      FParametros.ExportarInt(obj.Model.FieldByName('Par_Codigo').AsInteger,      001, 005);
+      FParametros.ExportarInt(obj.Model.FieldByName('Par_Programa').AsInteger,    006, 005);
+      FParametros.ExportarString(obj.Model.FieldByName('Par_Nome').AsString,      011, 200);
+      FParametros.ExportarString(obj.Model.FieldByName('Par_Valor').AsString,     211, 250);
+      FParametros.ExportarString(obj.Model.FieldByName('Par_Obs').AsString,       411, 500);
+      FParametros.NovaLinha();
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+
+function TExportarParametros.Importar: TObjectList<TParametroVO>;
+var
+  model: TParametroVO;
+  lista: TObjectList<TParametroVO>;
+  Arq: TArquivoTexto;
+begin
+  lista := TObjectList<TParametroVO>.Create();
+  Arq := TArquivoTexto.Create(FArquivo, tpImportar);
+  try
+    while not (Arq.FimArquivo()) do
+    begin
+      Arq.ProximoRegistro();
+
+      model := TParametroVO.Create;
+      model.Id        := 0;
+      model.Codigo    := FParametros.ImportarString(001, 005);
+      model.Programa  := FParametros.ImportarString(006, 005);
+      model.Nome      := FParametros.ImportarString(011, 200);
+      model.Valor     := FParametros.ImportarString(211, 250);
+      model.Obs       := FParametros.ImportarString(461, 500);
+
+      lista.Add(model);
+    end;
+  finally
+    FreeAndNil(Arq);
+  end;
+  Result := lista;
+end;
+
+//procedure TImportarParametros.Importar;
+//var
+//  model: TParametroVO;
+//begin
+//  while not (FParametros.FimArquivo()) do
+//  begin
+//    FParametros.ProximoRegistro();
+//
+//    model := TParametroVO.Create;
+//    model.Id        := 0;
+//    model.Codigo    := FParametros.ImportarString(001, 005);
+//    model.Programa  := FParametros.ImportarString(006, 005);
+//    model.Nome      := FParametros.ImportarString(011, 200);
+//    model.Valor     := FParametros.ImportarString(211, 250);
+//    model.Obs       := FParametros.ImportarString(461, 500);
+//  end;
+//end;
+
+end.

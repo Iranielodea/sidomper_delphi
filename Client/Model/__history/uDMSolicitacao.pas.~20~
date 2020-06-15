@@ -1,0 +1,777 @@
+unit uDMSolicitacao;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient;
+
+type
+  TDMSolicitacao = class(TDMBase)
+    CDSConsultaSol_Id: TAutoIncField;
+    CDSConsultaSol_Data: TDateField;
+    CDSConsultaSol_Hora: TTimeField;
+    CDSConsultaSol_Cliente: TIntegerField;
+    CDSConsultaSol_Titulo: TStringField;
+    CDSCadastroSol_Id: TAutoIncField;
+    CDSCadastroSol_Analista: TIntegerField;
+    CDSCadastroSol_Anexo: TStringField;
+    CDSCadastroSol_Cliente: TIntegerField;
+    CDSCadastroSol_Data: TDateField;
+    CDSCadastroSol_Desenvolvedor: TIntegerField;
+    CDSCadastroSol_Hora: TTimeField;
+    CDSCadastroSol_Modulo: TIntegerField;
+    CDSCadastroSol_Nivel: TIntegerField;
+    CDSCadastroSol_PrevisaoEntrega: TDateField;
+    CDSCadastroSol_Produto: TIntegerField;
+    CDSCadastroSol_Status: TIntegerField;
+    CDSCadastroSol_TempoPrevisto: TBCDField;
+    CDSCadastroSol_Tipo: TIntegerField;
+    CDSCadastroSol_Titulo: TStringField;
+    CDSCadastroSol_UsuarioAbertura: TIntegerField;
+    CDSCadastroSol_Versao: TStringField;
+    CDSCadastroSta_Codigo: TIntegerField;
+    CDSCadastroSta_Nome: TWideStringField;
+    CDSCadastroTip_Codigo: TIntegerField;
+    CDSCadastroTip_Nome: TWideStringField;
+    CDSCadastroUAb_Codigo: TIntegerField;
+    CDSCadastroAnal_Codigo: TIntegerField;
+    CDSCadastroCli_Codigo: TIntegerField;
+    CDSCadastroCli_Nome: TWideStringField;
+    CDSCadastroDesenv_Codigo: TIntegerField;
+    CDSCadastroMod_Codigo: TIntegerField;
+    CDSCadastroMod_Nome: TWideStringField;
+    CDSCadastroProd_Codigo: TIntegerField;
+    CDSCadastroProd_Nome: TWideStringField;
+    CDSConsultaCli_Codigo: TIntegerField;
+    CDSConsultaCli_Nome: TWideStringField;
+    CDSConsultaSol_Nivel: TStringField;
+    CDSCronogramaConsulta: TClientDataSet;
+    CDSCronogramaConsultaSCro_Id: TAutoIncField;
+    CDSCronogramaConsultaSCro_Data: TDateField;
+    CDSCronogramaConsultaSCro_HoraFim: TTimeField;
+    CDSCronogramaConsultaSCro_HoraInicio: TTimeField;
+    CDSCronogramaConsultaSCro_Solicitacao: TIntegerField;
+    CDSCronogramaConsultaSCro_UsuarioOperacional: TIntegerField;
+    CDSCronogramaConsultaUsu_Codigo: TIntegerField;
+    CDSOcorrenciaGeralConsulta: TClientDataSet;
+    CDSOcorrenciaGeralConsultaSOcor_Id: TAutoIncField;
+    CDSOcorrenciaGeralConsultaSOcor_Anexo: TStringField;
+    CDSOcorrenciaGeralConsultaSOcor_Classificacao: TIntegerField;
+    CDSOcorrenciaGeralConsultaSOcor_Data: TDateField;
+    CDSOcorrenciaGeralConsultaSOcor_Hora: TTimeField;
+    CDSOcorrenciaGeralConsultaSOcor_Solicitacao: TIntegerField;
+    CDSOcorrenciaGeralConsultaSOcor_Tipo: TIntegerField;
+    CDSOcorrenciaGeralConsultaSOcor_UsuarioOperacional: TIntegerField;
+    CDSOcorrenciaGeralConsultaTip_Codigo: TIntegerField;
+    CDSOcorrenciaGeralConsultaTip_Nome: TWideStringField;
+    CDSOcorrenciaGeralConsultaUsu_Codigo: TIntegerField;
+    CDSOcorrenciaTecnicaConsulta: TClientDataSet;
+    CDSOcorrenciaTecnicaConsultaSOcor_Id: TAutoIncField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Anexo: TStringField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Classificacao: TIntegerField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Data: TDateField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Hora: TTimeField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Solicitacao: TIntegerField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Tipo: TIntegerField;
+    CDSOcorrenciaTecnicaConsultaSOcor_UsuarioOperacional: TIntegerField;
+    CDSOcorrenciaTecnicaConsultaTip_Codigo: TIntegerField;
+    CDSOcorrenciaTecnicaConsultaTip_Nome: TWideStringField;
+    CDSOcorrenciaTecnicaConsultaUsu_Codigo: TIntegerField;
+    CDSStatusConsulta: TClientDataSet;
+    CDSStatusConsultaSSta_Data: TDateField;
+    CDSStatusConsultaSta_Nome: TWideStringField;
+    CDSConsultaSta_Nome: TWideStringField;
+    CDSConsultaTip_Nome: TWideStringField;
+    CDSSolicitacaoQuadro1: TClientDataSet;
+    CDSSolicitacaoQuadro2: TClientDataSet;
+    CDSSolicitacaoQuadro2Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro2Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro3: TClientDataSet;
+    CDSSolicitacaoQuadro3Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro3Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro4: TClientDataSet;
+    CDSSolicitacaoQuadro4Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro4Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro5: TClientDataSet;
+    CDSSolicitacaoQuadro5Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro5Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro6: TClientDataSet;
+    CDSSolicitacaoQuadro6Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro6Cli_Nome: TWideStringField;
+    CDSCadastroSol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro1Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro1Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro1Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro2Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro3Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro4Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro5Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro6Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro7: TClientDataSet;
+    CDSSolicitacaoQuadro8: TClientDataSet;
+    CDSSolicitacaoQuadro9: TClientDataSet;
+    CDSSolicitacaoQuadro10: TClientDataSet;
+    CDSSolicitacaoQuadro11: TClientDataSet;
+    CDSSolicitacaoQuadro12: TClientDataSet;
+    CDSSolicitacaoQuadro7Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro7Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro7Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro8Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro8Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro8Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro9Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro9Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro9Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro10Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro10Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro10Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro11Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro11Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro11Cli_Nome: TWideStringField;
+    CDSSolicitacaoQuadro12Sol_Id: TAutoIncField;
+    CDSSolicitacaoQuadro12Sol_Titulo: TStringField;
+    CDSSolicitacaoQuadro12Cli_Nome: TWideStringField;
+    CDSCadastroUAb_Nome: TWideStringField;
+    CDSCadastroAnal_Nome: TWideStringField;
+    CDSCadastroDesenv_Nome: TWideStringField;
+    CDSCronogramaConsultaUsu_Nome: TWideStringField;
+    CDSOcorrenciaTecnicaConsultaUsu_Nome: TWideStringField;
+    CDSOcorrenciaGeralConsultaUsu_Nome: TWideStringField;
+    CDSStatusConsultaUsu_nome: TWideStringField;
+    CDSCadastroSol_Contato: TStringField;
+    CDSConsultaCli_Fantasia: TWideStringField;
+    CDSConsultaSol_Status: TIntegerField;
+    CDSStatusConsultaSSta_Hora: TTimeField;
+    CDSSolicitacaoQuadro1Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro2Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro3Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro4Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro5Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro6Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro7Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro8Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro9Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro10Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro11Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoQuadro12Sol_UsuarioAtendeAtual: TIntegerField;
+    CDSSolicitacaoAnexo: TClientDataSet;
+    CDSSolicitacaoAnexoSol_Id: TAutoIncField;
+    CDSSolicitacaoAnexoSol_Data: TDateField;
+    CDSSolicitacaoAnexoSol_Hora: TTimeField;
+    CDSSolicitacaoAnexoSol_Contato: TStringField;
+    CDSSolicitacaoAnexoSol_Anexo: TStringField;
+    CDSSolicitacaoAnexoCli_Nome: TWideStringField;
+    CDSSolicitacaoAnexoSOcor_Data: TDateField;
+    CDSSolicitacaoAnexoSOcor_Hora: TTimeField;
+    CDSSolicitacaoAnexoTipo: TStringField;
+    CDSSolicitacaoAnexoSOcor_Anexo: TStringField;
+    CDSCadastroSol_DescricaoLiberacao: TMemoField;
+    CDSCadastroSol_Descricao: TMemoField;
+    CDSOcorrenciaGeralConsultaSOcor_Descricao: TMemoField;
+    CDSOcorrenciaTecnicaConsultaSOcor_Descricao: TMemoField;
+    CDSCadastroSol_VersaoId: TIntegerField;
+    CDSCadastroVer_Versao: TStringField;
+    CDSSolicitacaoQuadro1Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro7Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro2Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro8Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro3Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro9Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro4Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro10Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro5Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro11Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro6Usu_Nome: TWideStringField;
+    CDSSolicitacaoQuadro12Usu_Nome: TWideStringField;
+    cdsQuadro1: TClientDataSet;
+    cdsQuadro1Sol_Id: TIntegerField;
+    cdsQuadro1Sol_Titulo: TStringField;
+    cdsQuadro1Cli_Nome: TStringField;
+    cdsQuadro1Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro1Usu_Nome: TStringField;
+    cdsQuadro2: TClientDataSet;
+    cdsQuadro2Sol_Id: TIntegerField;
+    cdsQuadro2Sol_Titulo: TStringField;
+    cdsQuadro2Cli_Nome: TStringField;
+    cdsQuadro2Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro2Usu_Nome: TStringField;
+    cdsQuadro3: TClientDataSet;
+    cdsQuadro3Sol_Id: TIntegerField;
+    cdsQuadro3Sol_Titulo: TStringField;
+    cdsQuadro3Cli_Nome: TStringField;
+    cdsQuadro3Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro3Usu_Nome: TStringField;
+    cdsQuadro4: TClientDataSet;
+    cdsQuadro4Sol_Id: TIntegerField;
+    cdsQuadro4Sol_Titulo: TStringField;
+    cdsQuadro4Cli_Nome: TStringField;
+    cdsQuadro4Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro4Usu_Nome: TStringField;
+    cdsQuadro5: TClientDataSet;
+    cdsQuadro5Sol_Id: TIntegerField;
+    cdsQuadro5Sol_Titulo: TStringField;
+    cdsQuadro5Cli_Nome: TStringField;
+    cdsQuadro5Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro5Usu_Nome: TStringField;
+    cdsQuadro6: TClientDataSet;
+    cdsQuadro6Sol_Id: TIntegerField;
+    cdsQuadro6Sol_Titulo: TStringField;
+    cdsQuadro6Cli_Nome: TStringField;
+    cdsQuadro6Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro6Usu_Nome: TStringField;
+    cdsQuadro7: TClientDataSet;
+    cdsQuadro7Sol_Id: TIntegerField;
+    cdsQuadro7Sol_Titulo: TStringField;
+    cdsQuadro7Cli_Nome: TStringField;
+    cdsQuadro7Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro7Usu_Nome: TStringField;
+    cdsQuadro8: TClientDataSet;
+    cdsQuadro8Sol_Id: TIntegerField;
+    cdsQuadro8Sol_Titulo: TStringField;
+    cdsQuadro8Cli_Nome: TStringField;
+    cdsQuadro8Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro8Usu_Nome: TStringField;
+    cdsQuadro9: TClientDataSet;
+    cdsQuadro9Sol_Id: TIntegerField;
+    cdsQuadro9Sol_Titulo: TStringField;
+    cdsQuadro9Cli_Nome: TStringField;
+    cdsQuadro9Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro9Usu_Nome: TStringField;
+    cdsQuadro10: TClientDataSet;
+    cdsQuadro10Sol_Id: TIntegerField;
+    cdsQuadro10Sol_Titulo: TStringField;
+    cdsQuadro10Cli_Nome: TStringField;
+    cdsQuadro10Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro10Usu_Nome: TStringField;
+    cdsQuadro11: TClientDataSet;
+    cdsQuadro11Sol_Id: TIntegerField;
+    cdsQuadro11Sol_Titulo: TStringField;
+    cdsQuadro11Cli_Nome: TStringField;
+    cdsQuadro11Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro11Usu_Nome: TStringField;
+    cdsQuadro12: TClientDataSet;
+    cdsQuadro12Sol_Id: TIntegerField;
+    cdsQuadro12Sol_Titulo: TStringField;
+    cdsQuadro12Cli_Nome: TStringField;
+    cdsQuadro12Sol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadro12Usu_Nome: TStringField;
+    cdsQuadro: TClientDataSet;
+    cdsQuadroQuadro: TStringField;
+    cdsQuadroSol_Id: TIntegerField;
+    cdsQuadroSol_Titulo: TStringField;
+    cdsQuadroSol_UsuarioAtendeAtual: TIntegerField;
+    cdsQuadroCli_Nome: TWideStringField;
+    cdsQuadroUsu_Nome: TWideStringField;
+    cdsQuadroNivel: TIntegerField;
+    cdsQuadro2Nivel: TIntegerField;
+    cdsQuadro3Nivel: TIntegerField;
+    cdsQuadro4Nivel: TIntegerField;
+    cdsQuadro5Nivel: TIntegerField;
+    cdsQuadro6Nivel: TIntegerField;
+    cdsQuadro7Nivel: TIntegerField;
+    cdsQuadro8Nivel: TIntegerField;
+    cdsQuadro9Nivel: TIntegerField;
+    cdsQuadro10Nivel: TIntegerField;
+    cdsQuadro11Nivel: TIntegerField;
+    cdsQuadro12Nivel: TIntegerField;
+    cdsQuadro1Nivel: TIntegerField;
+    CDSConsultaVer_Versao: TStringField;
+    cdsQuadroAberta: TIntegerField;
+    cdsQuadro1Aberta: TIntegerField;
+    cdsQuadro2Aberta: TIntegerField;
+    cdsQuadro3Aberta: TIntegerField;
+    cdsQuadro4Aberta: TIntegerField;
+    cdsQuadro5Aberta: TIntegerField;
+    cdsQuadro6Aberta: TIntegerField;
+    cdsQuadro7Aberta: TIntegerField;
+    cdsQuadro8Aberta: TIntegerField;
+    cdsQuadro9Aberta: TIntegerField;
+    cdsQuadro10Aberta: TIntegerField;
+    cdsQuadro11Aberta: TIntegerField;
+    cdsQuadro12Aberta: TIntegerField;
+    CDSTempo: TClientDataSet;
+    CDSTempoSTemp_Id: TIntegerField;
+    CDSTempoSTemp_UsuarioOperacional: TIntegerField;
+    CDSTempoSTemp_Solicitacao: TIntegerField;
+    CDSTempoSTemp_Data: TDateField;
+    CDSTempoSTemp_HoraInicio: TTimeField;
+    CDSTempoSTemp_HoraFim: TTimeField;
+    CDSTempoUsu_Codigo: TIntegerField;
+    CDSTempoUsu_Nome: TStringField;
+    CDSTempoSol_Id: TIntegerField;
+    CDSTempoSol_Titulo: TStringField;
+    CDSTempoSol_Cliente: TIntegerField;
+    CDSTempoSTemp_TotalHoras: TFloatField;
+    CDSTempoSTemp_Status: TIntegerField;
+    CDSTempoSta_Codigo: TIntegerField;
+    CDSTempoSta_Nome: TStringField;
+    CDSTempoCli_Codigo: TIntegerField;
+    CDSTempoCli_Nome: TStringField;
+    CDSTempoPrograma: TStringField;
+    cdsQuadro1Sol_StatusId: TIntegerField;
+    cdsQuadro2Sol_StatusId: TIntegerField;
+    cdsQuadro3Sol_StatusId: TIntegerField;
+    cdsQuadro4Sol_StatusId: TIntegerField;
+    cdsQuadro5Sol_StatusId: TIntegerField;
+    cdsQuadro6Sol_StatusId: TIntegerField;
+    cdsQuadro7Sol_StatusId: TIntegerField;
+    cdsQuadro8Sol_StatusId: TIntegerField;
+    cdsQuadro9Sol_StatusId: TIntegerField;
+    cdsQuadro10Sol_StatusId: TIntegerField;
+    cdsQuadro11Sol_StatusId: TIntegerField;
+    cdsQuadro12Sol_StatusId: TIntegerField;
+    cdsQuadroSol_Status: TIntegerField;
+    cdsQuadro1Cli_Perfil: TStringField;
+    cdsQuadro2Cli_Perfil: TStringField;
+    cdsQuadro3Cli_Perfil: TStringField;
+    cdsQuadro4Cli_Perfil: TStringField;
+    cdsQuadro5Cli_Perfil: TStringField;
+    cdsQuadro6Cli_Perfil: TStringField;
+    cdsQuadro7Cli_Perfil: TStringField;
+    cdsQuadro8Cli_Perfil: TStringField;
+    cdsQuadro9Cli_Perfil: TStringField;
+    cdsQuadro10Cli_Perfil: TStringField;
+    cdsQuadro11Cli_Perfil: TStringField;
+    cdsQuadro12Cli_Perfil: TStringField;
+    CDSOcorrenciaRegraConsulta: TClientDataSet;
+    CDSOcorrenciaRegraConsultaSOcor_Anexo: TStringField;
+    CDSOcorrenciaRegraConsultaSOcor_Classificacao: TIntegerField;
+    CDSOcorrenciaRegraConsultaSOcor_Data: TDateField;
+    CDSOcorrenciaRegraConsultaSOcor_Descricao: TMemoField;
+    CDSOcorrenciaRegraConsultaSOcor_Hora: TTimeField;
+    CDSOcorrenciaRegraConsultaSOcor_Id: TAutoIncField;
+    CDSOcorrenciaRegraConsultaSOcor_Solicitacao: TIntegerField;
+    CDSOcorrenciaRegraConsultaSOcor_Tipo: TIntegerField;
+    CDSOcorrenciaRegraConsultaSOcor_UsuarioOperacional: TIntegerField;
+    CDSOcorrenciaRegraConsultaTip_Codigo: TIntegerField;
+    CDSOcorrenciaRegraConsultaTip_Nome: TWideStringField;
+    CDSOcorrenciaRegraConsultaUsu_Codigo: TIntegerField;
+    CDSOcorrenciaRegraConsultaUsu_Nome: TWideStringField;
+    CDSCadastroSol_Categoria: TIntegerField;
+    CDSCadastroCat_Codigo: TIntegerField;
+    CDSCadastroCat_Nome: TStringField;
+    procedure CDSCadastroBeforePost(DataSet: TDataSet);
+    procedure CDSCadastroReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure CDSCadastroNewRecord(DataSet: TDataSet);
+    procedure CDSCadastroSol_DataSetText(Sender: TField; const Text: string);
+    procedure CDSCadastroSol_HoraSetText(Sender: TField; const Text: string);
+    procedure CDSCadastroSol_PrevisaoEntregaSetText(Sender: TField;
+      const Text: string);
+    procedure CDSCronogramaConsultaBeforePost(DataSet: TDataSet);
+    procedure CDSCronogramaConsultaNewRecord(DataSet: TDataSet);
+    procedure DataModuleCreate(Sender: TObject);
+    procedure CDSCronogramaConsultaSCro_DataSetText(Sender: TField;
+      const Text: string);
+    procedure CDSCronogramaConsultaReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure CDSCronogramaConsultaSCro_HoraFimSetText(Sender: TField; const Text:
+        string);
+    procedure CDSCronogramaConsultaSCro_HoraInicioSetText(Sender: TField; const
+        Text: string);
+    procedure CDSOcorrenciaGeralConsultaSOcor_DataSetText(Sender: TField;
+      const Text: string);
+    procedure CDSOcorrenciaTecnicaConsultaSOcor_DataSetText(Sender: TField;
+      const Text: string);
+    procedure CDSOcorrenciaGeralConsultaReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure CDSOcorrenciaTecnicaConsultaReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure CDSOcorrenciaGeralConsultaNewRecord(DataSet: TDataSet);
+    procedure CDSOcorrenciaTecnicaConsultaNewRecord(DataSet: TDataSet);
+    procedure CDSOcorrenciaGeralConsultaBeforePost(DataSet: TDataSet);
+    procedure CDSOcorrenciaGeralConsultaSOcor_HoraSetText(Sender: TField; const
+        Text: string);
+    procedure CDSOcorrenciaTecnicaConsultaBeforePost(DataSet: TDataSet);
+    procedure CDSOcorrenciaTecnicaConsultaSOcor_HoraSetText(Sender: TField; const
+        Text: string);
+    procedure CDSOcorrenciaRegraConsultaSOcor_DataSetText(Sender: TField;
+      const Text: string);
+    procedure CDSOcorrenciaRegraConsultaSOcor_HoraSetText(Sender: TField;
+      const Text: string);
+    procedure CDSOcorrenciaRegraConsultaBeforePost(DataSet: TDataSet);
+    procedure CDSOcorrenciaRegraConsultaNewRecord(DataSet: TDataSet);
+    procedure CDSOcorrenciaRegraConsultaReconcileError(
+      DataSet: TCustomClientDataSet; E: EReconcileError;
+      UpdateKind: TUpdateKind; var Action: TReconcileAction);
+  private
+    { Private declarations }
+    FContadorGeral: Integer;
+    FContadorTecnico: Integer;
+    FContadorRegra: Integer;
+    FContadorCronograma: Integer;
+    procedure CriarIndicesSolicitacao();
+    procedure CriarIndices(AClientDataSet: TClientDataSet);
+  public
+    { Public declarations }
+  end;
+
+var
+  DMSolicitacao: TDMSolicitacao;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+uses uDM, uFuncoesSIDomper;
+
+{$R *.dfm}
+
+procedure TDMSolicitacao.CDSCadastroBeforePost(DataSet: TDataSet);
+begin
+  inherited;
+  if CDSCadastroSol_Hora.AsString <> '' then
+    CDSCadastroSol_Hora.AsString := FormatDateTime('hh:mm', CDSCadastroSol_Hora.AsDateTime);
+
+end;
+
+procedure TDMSolicitacao.CDSCadastroNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSCadastroSol_Data.AsDateTime := Date;
+  CDSCadastroSol_Hora.AsDateTime := Time;
+  CDSCadastroSol_Nivel.AsInteger := 2;
+end;
+
+procedure TDMSolicitacao.CDSCadastroReconcileError(
+  DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind;
+  var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMSolicitacao.CDSCadastroSol_DataSetText(Sender: TField;
+  const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaDatas(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSCadastroSol_HoraSetText(Sender: TField; const Text:
+    string);
+begin
+  inherited;
+  TFuncoes.ValidaHora(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSCadastroSol_PrevisaoEntregaSetText(Sender: TField;
+  const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaDatas(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSCronogramaConsultaBeforePost(DataSet: TDataSet);
+begin
+  if (CDSCronogramaConsultaSCro_HoraInicio.AsString <> '') and (CDSCronogramaConsultaSCro_HoraFim.AsString <> '') then
+  begin
+    if CDSCronogramaConsultaSCro_HoraInicio.AsDateTime > CDSCronogramaConsultaSCro_HoraFim.AsDateTime then
+      raise Exception.Create('Hora Inicial maior que Hora Final.');
+  end;
+
+  if (CDSCronogramaConsultaSCro_HoraInicio.AsString <> '') then
+    CDSCronogramaConsultaSCro_HoraInicio.AsString := FormatDateTime('hh:mm', CDSCronogramaConsultaSCro_HoraInicio.AsDateTime);
+
+  if (CDSCronogramaConsultaSCro_HoraFim.AsString <> '') then
+    CDSCronogramaConsultaSCro_HoraFim.AsString := FormatDateTime('hh:mm', CDSCronogramaConsultaSCro_HoraFim.AsDateTime);
+
+  if CDSCronogramaConsultaSCro_UsuarioOperacional.AsInteger = 0 then
+    raise Exception.Create('Informe o Operador!');
+
+  if CDSCronogramaConsulta.State = dsInsert then
+  begin
+    CDSCronogramaConsultaSCro_Id.AsInteger := FContadorCronograma;
+    Dec(FContadorCronograma);
+  end;
+
+  inherited;
+end;
+
+procedure TDMSolicitacao.CDSCronogramaConsultaNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSCronogramaConsultaSCro_Solicitacao.AsInteger := -1;
+end;
+
+procedure TDMSolicitacao.CDSCronogramaConsultaReconcileError(
+  DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind;
+  var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMSolicitacao.CDSCronogramaConsultaSCro_DataSetText(Sender: TField;
+  const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaDatas(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSCronogramaConsultaSCro_HoraFimSetText(Sender:
+    TField; const Text: string);
+begin
+  TFuncoes.ValidaHora(Sender, Text);
+  inherited;
+end;
+
+procedure TDMSolicitacao.CDSCronogramaConsultaSCro_HoraInicioSetText(Sender:
+    TField; const Text: string);
+begin
+  TFuncoes.ValidaHora(Sender, Text);
+  inherited;
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaGeralConsultaBeforePost(
+  DataSet: TDataSet);
+begin
+  inherited;
+
+  if Trim(CDSOcorrenciaGeralConsultaSOcor_Descricao.asstring) = '' then
+    raise Exception.Create('Informe a Descrição da Ocorrência Geral.');
+
+  if CDSOcorrenciaGeralConsulta.State = dsInsert then
+  begin
+    CDSOcorrenciaGeralConsultaSOcor_Id.AsInteger := FContadorGeral;
+    Dec(FContadorGeral);
+  end;
+
+  if CDSOcorrenciaGeralConsultaSOcor_UsuarioOperacional.AsInteger = 0 then
+    raise Exception.Create('Informe o Operador da Ocorrência Geral.');
+
+//  if CDSOcorrenciaGeralConsultaSOcor_Tipo.AsInteger = 0 then
+//    raise Exception.Create('Informe o Tipo da Ocorrência Geral.');
+
+//  if Trim(CDSOcorrenciaGeralConsultaSOcor_Anexo.asstring) <> '' then
+//  begin
+//    if not FileExists(CDSOcorrenciaGeralConsultaSOcor_Anexo.asstring) then
+//      raise Exception.Create('Arquivo do Anexo Ocorrência Geral não Existe.');
+//  end;
+
+  if (CDSOcorrenciaGeralConsultaSOcor_Hora.AsString <> '') then
+    CDSOcorrenciaGeralConsultaSOcor_Hora.AsString := FormatDateTime('hh:mm', CDSOcorrenciaGeralConsultaSOcor_Hora.AsDateTime);
+
+
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaGeralConsultaNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSOcorrenciaGeralConsultaSOcor_Solicitacao.AsInteger := -1;
+  CDSOcorrenciaGeralConsultaSOcor_Classificacao.AsInteger := 1;
+  CDSOcorrenciaGeralConsultaSOcor_Data.AsDateTime := Date;
+  CDSOcorrenciaGeralConsultaSOcor_Hora.AsDateTime := Time;
+
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaGeralConsultaReconcileError(
+  DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind;
+  var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaGeralConsultaSOcor_DataSetText(Sender: TField;
+  const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaDatas(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaGeralConsultaSOcor_HoraSetText(Sender:
+    TField; const Text: string);
+begin
+  TFuncoes.ValidaHora(Sender, Text);
+  inherited;
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaRegraConsultaBeforePost(
+  DataSet: TDataSet);
+begin
+  inherited;
+  if CDSOcorrenciaRegraConsultaSOcor_UsuarioOperacional.AsInteger = 0 then
+    raise Exception.Create('Informe o Operador da Ocorrência Regra.');
+
+  if Trim(CDSOcorrenciaRegraConsultaSOcor_Descricao.asstring) = '' then
+    raise Exception.Create('Informe a Descrição da Ocorrência Regra.');
+
+//  if CDSOcorrenciaTecnicaConsultaSOcor_Tipo.AsInteger = 0 then
+//    raise Exception.Create('Informe o Tipo da Ocorrência Técnica.');
+
+//  if Trim(CDSOcorrenciaRegraConsultaSOcor_Anexo.asstring) <> '' then
+//  begin
+//    if not FileExists(CDSOcorrenciaRegraConsultaSOcor_Anexo.asstring) then
+//      raise Exception.Create('Arquivo do Anexo Ocorrência Regras não Existe.');
+//  end;
+
+  if CDSOcorrenciaRegraConsultaSOcor_Hora.AsString <> '' then
+    CDSOcorrenciaRegraConsultaSOcor_Hora.AsString := FormatDateTime('hh:mm', CDSOcorrenciaRegraConsultaSOcor_Hora.AsDateTime);
+
+  if CDSOcorrenciaRegraConsulta.State = dsInsert then
+  begin
+    CDSOcorrenciaRegraConsultaSOcor_Id.AsInteger := FContadorRegra;
+    Dec(FContadorRegra);
+  end;
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaRegraConsultaNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSOcorrenciaRegraConsultaSOcor_Solicitacao.AsInteger := -1;
+  CDSOcorrenciaRegraConsultaSOcor_Classificacao.AsInteger := 3;
+  CDSOcorrenciaRegraConsultaSOcor_Data.AsDateTime := Date;
+  CDSOcorrenciaRegraConsultaSOcor_Hora.AsDateTime := Time;
+
+  Dec(FContadorRegra);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaRegraConsultaReconcileError(
+  DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind;
+  var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaRegraConsultaSOcor_DataSetText(
+  Sender: TField; const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaDatas(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaRegraConsultaSOcor_HoraSetText(
+  Sender: TField; const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaHora(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaTecnicaConsultaBeforePost(
+  DataSet: TDataSet);
+begin
+  inherited;
+  if CDSOcorrenciaTecnicaConsultaSOcor_UsuarioOperacional.AsInteger = 0 then
+    raise Exception.Create('Informe o Operador da Ocorrência Técnica.');
+
+  if Trim(CDSOcorrenciaTecnicaConsultaSOcor_Descricao.asstring) = '' then
+    raise Exception.Create('Informe a Descrição da Ocorrência Técnica.');
+
+//  if CDSOcorrenciaTecnicaConsultaSOcor_Tipo.AsInteger = 0 then
+//    raise Exception.Create('Informe o Tipo da Ocorrência Técnica.');
+
+//  if Trim(CDSOcorrenciaTecnicaConsultaSOcor_Anexo.asstring) <> '' then
+//  begin
+//    if not FileExists(CDSOcorrenciaTecnicaConsultaSOcor_Anexo.asstring) then
+//      raise Exception.Create('Arquivo do Anexo Ocorrência Técnica não Existe.');
+//  end;
+
+  if CDSOcorrenciaTecnicaConsultaSOcor_Hora.AsString <> '' then
+    CDSOcorrenciaTecnicaConsultaSOcor_Hora.AsString := FormatDateTime('hh:mm', CDSOcorrenciaTecnicaConsultaSOcor_Hora.AsDateTime);
+
+  if CDSOcorrenciaTecnicaConsulta.State = dsInsert then
+  begin
+    CDSOcorrenciaTecnicaConsultaSOcor_Id.AsInteger := FContadorTecnico;
+    Dec(FContadorTecnico);
+  end;
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaTecnicaConsultaNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSOcorrenciaTecnicaConsultaSOcor_Solicitacao.AsInteger := -1;
+  CDSOcorrenciaTecnicaConsultaSOcor_Classificacao.AsInteger := 2;
+  CDSOcorrenciaTecnicaConsultaSOcor_Data.AsDateTime := Date;
+  CDSOcorrenciaTecnicaConsultaSOcor_Hora.AsDateTime := Time;
+
+  Dec(FContadorTecnico);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaTecnicaConsultaReconcileError(
+  DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind;
+  var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaTecnicaConsultaSOcor_DataSetText(Sender: TField;
+  const Text: string);
+begin
+  inherited;
+  TFuncoes.ValidaDatas(Sender, Text);
+end;
+
+procedure TDMSolicitacao.CDSOcorrenciaTecnicaConsultaSOcor_HoraSetText(Sender:
+    TField; const Text: string);
+begin
+  TFuncoes.ValidaHora(Sender, Text);
+  inherited;
+end;
+
+procedure TDMSolicitacao.CriarIndices(AClientDataSet: TClientDataSet);
+begin
+  AClientDataSet.IndexDefs.Add('IndexPerfil', 'Cli_Perfil', [ixDescending]);
+  AClientDataSet.IndexDefs.Add('IndexNivel', 'Nivel', [ixDescending]);
+
+  AClientDataSet.IndexDefs.Add('IndexPerfilNivel', 'Cli_Perfil;Nivel', [ixDescending]);
+  AClientDataSet.IndexName := 'IndexPerfilNivel';
+end;
+
+procedure TDMSolicitacao.CriarIndicesSolicitacao;
+begin
+  CriarIndices(cdsQuadro1);
+  CriarIndices(cdsQuadro2);
+  CriarIndices(cdsQuadro3);
+  CriarIndices(cdsQuadro4);
+  CriarIndices(cdsQuadro5);
+  CriarIndices(cdsQuadro6);
+  CriarIndices(cdsQuadro7);
+  CriarIndices(cdsQuadro8);
+  CriarIndices(cdsQuadro9);
+  CriarIndices(cdsQuadro10);
+  CriarIndices(cdsQuadro11);
+  CriarIndices(cdsQuadro12);
+end;
+
+procedure TDMSolicitacao.DataModuleCreate(Sender: TObject);
+var
+  i: Integer;
+begin
+  for I := 0 to Self.ComponentCount-1 do
+  begin
+    if Self.Components[i] is TClientDataSet then
+      TClientDataSet(Components[i]).RemoteServer := dm.DSPConexao;
+  end;
+
+  FContadorGeral := -1;
+  FContadorTecnico := -1;
+  FContadorCronograma := -1;
+  FContadorRegra := -1;
+
+  cdsQuadro1.CreateDataSet;
+  cdsQuadro2.CreateDataSet;
+  cdsQuadro3.CreateDataSet;
+  cdsQuadro4.CreateDataSet;
+  cdsQuadro5.CreateDataSet;
+  cdsQuadro6.CreateDataSet;
+  cdsQuadro7.CreateDataSet;
+  cdsQuadro8.CreateDataSet;
+  cdsQuadro9.CreateDataSet;
+  cdsQuadro10.CreateDataSet;
+  cdsQuadro11.CreateDataSet;
+  cdsQuadro12.CreateDataSet;
+
+  CDSTempo.CreateDataSet;
+
+  CriarIndicesSolicitacao();
+end;
+
+end.

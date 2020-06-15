@@ -1,0 +1,356 @@
+unit uRecado;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, System.Generics.Collections,
+  uRecadoVO, uCadastroInterface, uRecadoFiltro, uFuncoesServidor, uGenericDAO,
+  uParametros, uFireDAC;
+
+  const CConsulta: string =
+      ' SELECT'
+    + ' 	Rec_Id,'
+    + ' 	UsuLan.Usu_Nome AS NomeUsuarioLcto,'
+    + ' 	Rec_Data,'
+    + ' 	Rec_Hora,'
+    + ' 	Rec_RazaoSocial,'
+    + ' 	Rec_Contato,'
+    + ' 	Rec_Telefone,'
+    + ' 	Rec_Nivel,'
+    + '   UsuDest.Usu_Nome AS NomeUsuarioDest,'
+    + '   Sta_Nome'
+    + ' FROM Recado'
+    + ' 	INNER JOIN Usuario AS UsuLan On Rec_UsuarioLcto = UsuLan.Usu_Id'
+    + ' 	INNER JOIN Usuario AS UsuDest On Rec_UsuarioDestino = UsuDest.Usu_Id'
+    + ' 	INNER JOIN Status ON Rec_Status = Sta_Id';
+
+type
+  TRecado = class(TInterfacedObject, ICadastroInterface)
+  private
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string; overload;
+    function Filtrar(Filtro: TRecadoFiltro; Campo, Texto: string; Contem: Boolean = True): string; overload;
+    function FiltrarId(AId: Integer): string;
+    function FiltrarCodigo(Codigo: Integer): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    procedure Salvar(Programa, IdUsuario: Integer); overload;
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+    function Salvar(ARecadoVO: TRecadoVO): Integer; overload;
+    function PermissaoAcesso(IdUsuario: Integer; AAcao: string): Boolean;
+    function RetornaQuadro(AIdUsuario, AIdRevenda: Integer): string;
+  end;
+
+implementation
+
+{ TProduto }
+
+uses uUsuario;
+
+function TRecado.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TRecado.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  DM.ExecutarSQL('DELETE FROM Recado WHERE Rec_Id = ' + IntToStr(Id));
+end;
+
+function TRecado.Filtrar(Campo, Texto, Ativo: string;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+
+  Result := sConsulta;
+end;
+
+function TRecado.FiltrarCodigo(Codigo: Integer): string;
+begin
+  Result := ''; // CConsulta + ' WHERE Prod_Codigo = ' + Codigo.ToString();
+end;
+
+function TRecado.FiltrarId(AId: Integer): string;
+begin
+  Result := CConsulta + ' WHERE Rec_Id = ' + AId.ToString();
+end;
+
+function TRecado.Filtrar(Filtro: TRecadoFiltro; Campo, Texto: string;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  if Campo = 'NomeUsuarioLcto' then
+    Campo := 'UsuLan.Usu_Nome';
+
+  if Campo = 'NomeUsuarioDest' then
+    Campo := 'UsuDest.Usu_Nome';
+
+
+
+  if Texto.Trim <> '' then
+    sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto
+  else
+    sConsulta := CConsulta + ' WHERE Rec_Id > 0';
+
+  if Filtro.DataInicial.Trim <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Rec_Data >= ' + TFuncoes.DataIngles(Filtro.DataInicial);
+
+  if Filtro.DataFinal.Trim <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Rec_Data <= ' + TFuncoes.DataIngles(Filtro.DataFinal);
+
+  if Filtro.DataInicialDest.Trim <> DataEmBranco then
+    sConsulta := sConsulta + 'AND Rec_DataFinal >= ' + TFuncoes.DataIngles(Filtro.DataInicialDest);
+
+  if Filtro.DataInicialDest.Trim <> DataEmBranco then
+    sConsulta := sConsulta + 'AND Rec_DataFinal <= ' + TFuncoes.DataIngles(Filtro.DataFinalDest);
+
+  if Filtro.IdUsuarioLcto <> '' then
+    sConsulta := sConsulta +' AND Rec_UsuarioLcto in ' + Filtro.IdUsuarioLcto;
+
+  if Filtro.IdUsuarioDestino <> '' then
+    sConsulta := sConsulta +' AND Rec_UsuarioDestino in ' + Filtro.IdUsuarioDestino;
+
+  if Filtro.IdCliente <> '' then
+    sConsulta := sConsulta +' AND Rec_Cliente in ' + Filtro.IdCliente;
+
+  if Filtro.IdTipo <> '' then
+    sConsulta := sConsulta +' AND Rec_Tipo in ' + Filtro.IdTipo;
+
+  if Filtro.IdStatus <> '' then
+    sConsulta := sConsulta +' AND Rec_Status in ' + Filtro.IdStatus;
+
+  Result := sConsulta;
+end;
+
+procedure TRecado.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+begin
+// nao usado
+end;
+
+function TRecado.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+procedure TRecado.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TRecado.PermissaoAcesso(IdUsuario: Integer; AAcao: string): Boolean;
+var
+  obj: TUsuario;
+begin
+  obj := TUsuario.Create;
+  try
+    if AAcao.ToLower = 'acessar' then
+      Result := obj.PermissaoUsuario(119, IdUsuario, 'Acessar')
+    else
+      Result := True;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TRecado.ProximoCodigo: Integer;
+begin
+  Result := 0;
+end;
+
+function TRecado.ProximoId: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT IDENT_CURRENT(''Recado'')';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TRecado.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TRecado.RetornaQuadro(AIdUsuario, AIdRevenda: Integer): string;
+var
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  sb.AppendLine('  SELECT ');
+  sb.AppendLine('''L'' AS Tipo,');
+  sb.AppendLine('	Rec_Id,');
+  sb.AppendLine('	Rec_Data,');
+  sb.AppendLine('	Rec_Nivel,');
+  sb.AppendLine('	Rec_RazaoSocial,');
+  sb.AppendLine('	Rec_Telefone,');
+  sb.AppendLine('  Rec_Hora,');
+  sb.AppendLine('  Rec_UsuarioLcto,');
+  sb.AppendLine('  Rec_UsuarioDestino,');
+  sb.AppendLine('	UsuL.Usu_Nome AS UsuarioLcto,');
+  sb.AppendLine('	UsuD.Usu_Nome AS UsuarioDestino ');
+  sb.AppendLine(' FROM Recado');
+  sb.AppendLine('	INNER JOIN Usuario AS UsuL ON Rec_UsuarioLcto = UsuL.Usu_Id');
+  sb.AppendLine('	INNER JOIN Status ON Rec_Status = Sta_Id');
+  sb.AppendLine('  LEFT JOIN Cliente ON Rec_Cliente = Cli_Id');
+  sb.AppendLine('	LEFT JOIN Usuario AS UsuD ON Rec_UsuarioDestino = UsuD.Usu_Id');
+  sb.AppendLine(' WHERE Rec_DataFinal IS NULL');
+
+  if AIdUsuario > 0 then
+    sb.AppendLine(' AND Rec_UsuarioLcto = ' + IntToStr(AIdUsuario));
+
+  if AIdRevenda > 0 then
+    sb.AppendLine(' AND Cli_Revenda = ' + IntToStr(AIdRevenda));
+
+  sb.AppendLine(' UNION');
+  sb.AppendLine(' SELECT');
+  sb.AppendLine('	''D'' AS Tipo,');
+  sb.AppendLine('	Rec_Id,');
+  sb.AppendLine('	Rec_Data,');
+  sb.AppendLine('	Rec_Nivel,');
+  sb.AppendLine('	Rec_RazaoSocial,');
+  sb.AppendLine('	Rec_Telefone,');
+  sb.AppendLine('  Rec_Hora,');
+  sb.AppendLine('  Rec_UsuarioLcto,');
+  sb.AppendLine('  Rec_UsuarioDestino,');
+  sb.AppendLine('	UsuL.Usu_Nome AS UsuarioLcto,');
+  sb.AppendLine('	UsuD.Usu_Nome AS UsuarioDestino');
+  sb.AppendLine(' FROM Recado');
+  sb.AppendLine('	INNER JOIN Usuario AS UsuL ON Rec_UsuarioLcto = UsuL.Usu_Id');
+  sb.AppendLine('  INNER JOIN Status ON Rec_Status = Sta_Id');
+  sb.AppendLine('  LEFT JOIN Cliente ON Rec_Cliente = Cli_Id');
+  sb.AppendLine('	LEFT JOIN Usuario AS UsuD ON Rec_UsuarioDestino = UsuD.Usu_Id');
+
+  sb.AppendLine('--WHERE Sta_Codigo NOT IN (SELECT COALESCE(Par_Valor,0) FROM Parametros WHERE Par_Codigo = 44)');
+  sb.AppendLine(' WHERE Rec_DataFinal IS NULL');
+
+  if AIdUsuario > 0 then
+    sb.AppendLine(' AND Rec_UsuarioDestino = ' + IntToStr(AIdUsuario));
+
+  if AIdRevenda > 0 then
+    sb.AppendLine(' AND Cli_Revenda = ' + IntToStr(AIdRevenda));
+
+  Result := sb.ToString;
+  FreeAndNil(sb);
+
+end;
+
+function TRecado.Salvar(ARecadoVO: TRecadoVO): Integer;
+var
+  Parametro: TParametros;
+begin
+  if ARecadoVO.RazaoSocial.Trim() = '' then
+    raise Exception.Create('Informe a Razão Social!');
+
+  if ARecadoVO.IdTipo = 0 then
+    raise Exception.Create('Informe o Tipo!');
+
+  if ARecadoVO.IdUsuarioLcto = 0 then
+    raise Exception.Create('Informe o Usuário de Lançamento!');
+
+  if ARecadoVO.IdUsuarioDestino = 0 then
+    raise Exception.Create('Informe o Usuário Destino!');
+
+  if ARecadoVO.IdStatus = 0 then
+    raise Exception.Create('Informe o Status!');
+
+  if ARecadoVO.DescricaoInicial.Trim = '' then
+    raise Exception.Create('Informe a Descrição inicial!');
+
+  if ARecadoVO.Operacao =  'E' then // encerramento
+  begin
+    ARecadoVO.DataFinal := Date;
+    ARecadoVO.HoraFinal := Time;
+
+    if ARecadoVO.Data > ARecadoVO.DataFinal then
+      raise Exception.Create('Data do Lançamento maior que Data do Encerramento!');
+
+    Parametro := TParametros.Create;
+    try
+      ARecadoVO.IdStatus  := Parametro.StatusEncerramentoRecados();
+
+      if ARecadoVO.IdStatus = 0 then
+        raise Exception.Create('Informe o Status de Enceramento dos Recados nos parâmetros do Sistema!');
+
+      if ARecadoVO.DescricaoFinal.Trim = '' then
+        raise Exception.Create('Informe a Descrição Final!');
+    finally
+      FreeAndNil(Parametro);
+    end;
+  end;
+
+  Result := TGenericDAO.Save<TRecadoVO>(ARecadoVO);
+end;
+
+procedure TRecado.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+end.

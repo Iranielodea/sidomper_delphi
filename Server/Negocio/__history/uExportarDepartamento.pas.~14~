@@ -1,0 +1,114 @@
+unit uExportarDepartamento;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uArquivoTexto, uDM, uFireDAC,
+  uDepartamentoVO, System.Generics.Collections, uGenericDAO;
+
+type
+  TExportarDepartamento = class
+  private
+    FArquivo: string;
+  public
+    procedure Exportar();
+    function Importar(): TObjectList<TDepartamentoVO>;
+
+    constructor Create(); overload;
+  end;
+
+
+implementation
+
+{ TExportarDepartamento }
+
+constructor TExportarDepartamento.Create;
+begin
+  inherited Create;
+  FArquivo := 'D:\DOMPER\SIDomper\Banco\Departamento.txt';
+end;
+
+procedure TExportarDepartamento.Exportar;
+var
+  obj: TFireDAC;
+  Arq: TArquivoTexto;
+begin
+  obj := TFireDAC.create;
+  Arq := TArquivoTexto.Create(FArquivo, tpExportar);
+  try
+    obj.OpenSQL('SELECT TOP(1) * FROM Departamento');
+    while not obj.Model.Eof do
+    begin
+      Arq.ExportarInt(obj.Model.FieldByName('Dep_Codigo').AsInteger,              001, 005);
+      Arq.ExportarString(obj.Model.FieldByName('Dep_Nome').AsString,              006, 050);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_Ativo').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_SolicitaAbertura').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_SolicitaAnalise').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_SolicitaOcorGeral').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_SolicitaOcorTecnica').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_SolicitaStatus').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_SolicitaQuadro').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_ChamadoAbertura').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_ChamadoStatus').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_ChamadoQuadro').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_ChamadoOcor').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_AtividadeAbertura').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_AtividadeStatus').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_AtividadeQuadro').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_AtividadeOcor').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_AgendamentoQuadro').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('Dep_MostrarAnexos').AsBoolean);
+
+      Arq.NovaLinha();
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Arq);
+  end;
+end;
+
+function TExportarDepartamento.Importar: TObjectList<TDepartamentoVO>;
+var
+  model: TDepartamentoVO;
+  lista: TObjectList<TDepartamentoVO>;
+  Arq: TArquivoTexto;
+begin
+  lista := TObjectList<TDepartamentoVO>.Create();
+  Arq := TArquivoTexto.Create(FArquivo, tpImportar);
+  try
+    while not (Arq.FimArquivo()) do
+    begin
+      Arq.ProximoRegistro();
+
+      model := TDepartamentoVO.Create;
+      model.Id                            := 0;
+      model.Codigo                        := Arq.ImportarInt(001, 005);
+      model.Nome                          := Arq.ImportarString(006, 050);
+      model.Ativo                         := Arq.ImportarBool(056, 001);
+      model.SolicitacaoAbertura           := Arq.ImportarBool(057, 001);
+      model.SolicitacaoAnalise            := Arq.ImportarBool(058, 001);
+      model.SolicitacaoOcorrenciaGeral    := Arq.ImportarBool(059, 001);
+      model.SolicitacaoOcorrenciaTecnica  := Arq.ImportarBool(060, 001);
+      model.SolicitacaoStatus             := Arq.ImportarBool(061, 001);
+      model.SolicitacaoQuadro             := Arq.ImportarBool(062, 001);
+      model.ChamadoAbertura               := Arq.ImportarBool(063, 001);
+      model.ChamadoStatus                 := Arq.ImportarBool(064, 001);
+      model.ChamadoQuadro                 := Arq.ImportarBool(065, 001);
+      model.ChamadoOcorrencia             := Arq.ImportarBool(066, 001);
+      model.AtividadeAbertura             := Arq.ImportarBool(067, 001);
+      model.AtividadeStatus               := Arq.ImportarBool(068, 001);
+      model.AtividadeQuadro               := Arq.ImportarBool(069, 001);
+      model.AtividadeOcorrencia           := Arq.ImportarBool(070, 001);
+      model.AgendamentoQuadro             := Arq.ImportarBool(071, 001);
+      model.MostrarAnexos                 := Arq.ImportarBool(072, 001);
+
+      lista.Add(model);
+    end;
+  finally
+    FreeAndNil(Arq);
+  end;
+  Result := lista;
+end;
+
+end.

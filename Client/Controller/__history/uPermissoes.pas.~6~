@@ -1,0 +1,18 @@
+unit uPermissoes;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections;
+
+type
+  TPermissoes = class
+  private
+
+  public
+
+  end;
+
+implementation
+
+end.

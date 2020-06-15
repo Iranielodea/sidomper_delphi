@@ -1,0 +1,52 @@
+unit uPermissoesController;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, uDepartamentoVO, uDepartamentoAcessoVO;
+
+type
+  TPermissoesController = class
+  private
+    FIdUsuario: Integer;
+    FDepartamento: TDepartamentoVO;
+    procedure SetDepartamento(const Value: TDepartamentoVO);
+    procedure SetIdUsuario(const Value: Integer);
+
+  public
+    property IdUsuario: Integer read FIdUsuario write SetIdUsuario;
+    class function ListarDepartamentos(AIdUsuario: Integer): Boolean;
+//    constructor Create(); overload;
+//    destructor Destroy(); override;
+  end;
+
+implementation
+
+{ TPermissoes }
+
+//constructor TPermissoesController.Create;
+//begin
+//  inherited Create;
+//
+//  FDepartamento := TDepartamentoVO.Create;
+//end;
+
+//destructor TPermissoesController.Destroy;
+//begin
+//  FreeAndNil(FDepartamento);
+//  inherited;
+//end;
+
+class function TPermissoesController.ListarDepartamentos(AIdUsuario: Integer): Boolean;
+var
+  lista: TObjectList<TDepartamentoAcessoVO>;
+  model: TDepartamentoAcessoVO;
+begin
+  lista := TObjectList<TDepartamentoAcessoVO>.Create(nil);
+  model := TDepartamentoVO.Create;
+  model.
+
+//  lista.
+end;
+
+end.

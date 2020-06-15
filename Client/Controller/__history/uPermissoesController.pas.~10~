@@ -1,0 +1,65 @@
+unit uPermissoesController;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, uDepartamentoVO, uDepartamentoAcessoVO;
+
+type
+  TPermissoesController = class
+  private
+    FIdUsuario: Integer;
+    FDepartamento: TDepartamentoVO;
+    procedure SetDepartamento(const Value: TDepartamentoVO);
+    procedure SetIdUsuario(const Value: Integer);
+
+  public
+    property IdUsuario: Integer read FIdUsuario write SetIdUsuario;
+    class function ListarDepartamentos(AIdUsuario: Integer): Boolean;
+//    constructor Create(); overload;
+//    destructor Destroy(); override;
+  end;
+
+implementation
+
+{ TPermissoes }
+
+//constructor TPermissoesController.Create;
+//begin
+//  inherited Create;
+//
+//  FDepartamento := TDepartamentoVO.Create;
+//end;
+
+//destructor TPermissoesController.Destroy;
+//begin
+//  FreeAndNil(FDepartamento);
+//  inherited;
+//end;
+
+class function TPermissoesController.ListarDepartamentos(AIdUsuario: Integer): Boolean;
+var
+  lista: TObjectList<TDepartamentoAcessoVO>;
+  item: TDepartamentoAcessoVO;
+  model: TDepartamentoAcessoVO;
+  ListaAcessos: TObjectList<TDepartamentoAcessoVO>;
+begin
+  lista := TObjectList<TDepartamentoAcessoVO>.Create(nil);
+
+
+  for item in ListaAcessos do
+  begin
+    model := TDepartamentoAcessoVO.Create;
+    model.Programa = item.Programa;
+    model.Acesso = item.Acesso;
+    model.Incluir = item.Incluir;
+    model.Editar = item.Editar;
+    model.Excluir = item.Excluir;
+    model.Relatorio = item.Relatorio;
+    lista.Add(model);
+  end;
+
+
+end;
+
+end.

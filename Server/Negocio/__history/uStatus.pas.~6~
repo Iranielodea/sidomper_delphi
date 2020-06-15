@@ -1,0 +1,436 @@
+unit uStatus;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, uStatusVO,
+  uFireDAC, uGenericDAO, uExportarStatus, System.Generics.Collections;
+
+  const CConsulta: string =
+    ' SELECT'
+    +'	Sta_Codigo,'
+    +'	Sta_Id,'
+    +'	Sta_Nome,'
+    +'  Sta_NotificarCliente,'
+    +'  Sta_NotificarSupervisor,'
+    +'  Sta_NotificarConsultor,'
+    +'  Sta_NotificarRevenda,'
+    +'  Sta_Ativo,'
+    +'	Sta_Programa,'
+    +'	CASE Sta_Programa'
+    +'		WHEN 1 THEN ''1-Chamado'''
+    +'		WHEN 2 THEN ''2-Visita'''
+    +'		WHEN 3 THEN ''3-Solicitação'''
+    +'		WHEN 4 THEN ''4-Versão'''
+    +'		WHEN 5 THEN ''5-Qualidade'''
+    +'		WHEN 6 THEN ''6-Base de Conhecimento'''
+    +'		WHEN 7 THEN ''7-Atividade'''
+    +'		WHEN 8 THEN ''8-Agendamento'''
+    +'		WHEN 10 THEN ''10-Recado'''
+    +'	END	AS StatusDescricao'
+    +' FROM Status';
+
+  const CNotificacao: string = 'SELECT COUNT(Sta_Id) AS qtde FROM Status';
+
+type
+  TStatus = class(TInterfacedObject, ICadastroInterface)
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string;
+    function FiltrarCodigo(Codigo: Integer): string;
+    function FiltrarPrograma(Campo, Texto, Ativo: string; StatusPrograma: Integer; Contem: Boolean = True): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean; overload;
+    function LocalizarId(AId: Integer): TStatusVO; overload;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer); overload;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo, StatusPrograma: integer); overload;
+    function LocalizarCodigo(ACodigo: integer): Integer; overload;
+    function BuscarDescricao(ACodigo: Integer): string;
+    procedure Salvar(Programa, IdUsuario: Integer); overload;
+    function Salvar(AStatus: TStatusVO): Integer; overload;
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+    function NotificarConsultor(IdStatus: integer): Boolean;
+    function NotificarRevenda(IdStatus: integer): Boolean;
+    function NotificarSupervisor(IdStatus: integer): Boolean;
+    function NotificarCliente(IdStatus: integer): Boolean;
+    procedure Exportar();
+    procedure Importar();
+  end;
+
+implementation
+
+{ TStatus }
+
+uses uUsuario;
+
+function TStatus.BuscarDescricao(ACodigo: Integer): string;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT Sta_Nome FROM Status WHERE Sta_Codigo = ' + IntToStr(ACodigo));
+    Result := obj.Model.Fields[0].AsString;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TStatus.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TStatus.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  DM.ExecutarSQL('DELETE FROM Status WHERE Sta_Id = ' + IntToStr(Id));
+end;
+
+procedure TStatus.Exportar;
+var
+  obj: TExportarStatus;
+begin
+  obj := TExportarStatus.Create;
+  try
+    obj.Exportar();
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TStatus.Filtrar(Campo, Texto, Ativo: string;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+  if Ativo <> 'T' then
+  begin
+    if Ativo = 'A' then
+      sConsulta := sConsulta + ' AND Sta_Ativo = 1'
+    else
+      sConsulta := sConsulta + ' AND Sta_Ativo = 0';
+  end;
+//  sConsulta := sConsulta + ' ORDER BY ' + Campo;
+
+  Result := sConsulta;
+end;
+
+function TStatus.FiltrarCodigo(Codigo: Integer): string;
+begin
+  Result := CConsulta + ' WHERE Sta_Codigo = ' + Codigo.ToString();
+end;
+
+function TStatus.FiltrarPrograma(Campo, Texto, Ativo: string;
+  StatusPrograma: Integer; Contem: Boolean): string;
+var
+  sResult: string;
+begin
+  sResult := Filtrar(Campo, Texto, Ativo, Contem);
+
+  if StatusPrograma > 0 then // Mostrar todos
+    sResult := sResult + ' AND Sta_Programa = ' +  IntToStr(StatusPrograma);
+
+  sResult := sResult + ' ORDER BY ' + Campo;
+  Result := sResult;
+end;
+
+procedure TStatus.Importar;
+var
+  Arq: TExportarStatus;
+  lista: TObjectList<TStatusVO>;
+  Item: TStatusVO;
+begin
+  Arq := TExportarStatus.Create();
+  try
+    lista := Arq.Importar();
+
+    for Item in lista do
+      Salvar(Item);
+
+  finally
+    FreeAndNil(Arq);
+    FreeAndNil(lista);
+  end;
+end;
+
+procedure TStatus.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT Sta_Id, Sta_Ativo FROM Status WHERE Sta_Codigo = ' + IntToStr(Codigo);
+    lQry.Open();
+
+    if Codigo > 0 then
+    begin
+      if (lQry.IsEmpty) then
+        raise Exception.Create(CRegistroNaoEncontrado);
+
+      LocalizarId(Qry, lQry.Fields[0].AsInteger);
+      if lQry.FieldByName('Sta_Ativo').AsBoolean = False then
+      begin
+        LocalizarId(Qry, 0);
+        raise Exception.Create(CRegistroInativo);
+      end;
+    end
+    else
+      LocalizarId(Qry, 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TStatus.LocalizarCodigo(var Qry: TFDQuery; Codigo,
+  StatusPrograma: integer);
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add('SELECT Sta_Id, Sta_Ativo FROM Status WHERE Sta_Codigo = ' + IntToStr(Codigo));
+
+    if StatusPrograma > 0 then
+      lQry.SQL.Add(' AND Sta_Programa = ' + IntToStr(StatusPrograma));
+
+    lQry.Open();
+
+    if Codigo > 0 then
+    begin
+      if (lQry.IsEmpty) then
+        raise Exception.Create(CRegistroNaoEncontrado);
+
+      LocalizarId(Qry, lQry.Fields[0].AsInteger);
+      if lQry.FieldByName('Sta_Ativo').AsBoolean = False then
+      begin
+        LocalizarId(Qry, 0);
+        raise Exception.Create(CRegistroInativo);
+      end;
+    end
+    else
+      LocalizarId(Qry, 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TStatus.LocalizarCodigo(ACodigo: integer): Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(CConsulta + ' WHERE Sta_Codigo = ' + IntToStr(ACodigo));
+    Result := obj.Model.FieldByName('Sta_Id').AsInteger;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TStatus.LocalizarId(AId: Integer): TStatusVO;
+var
+  obj: TFireDAC;
+  VO: TStatusVO;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add('   Sta_Id,');
+    obj.Lista.Add('   Sta_Codigo,');
+    obj.Lista.Add('   Sta_Nome');
+    obj.Lista.Add(' FROM Status');
+    obj.Lista.Add(' WHERE Sta_Id = ' + IntToStr(AId));
+    obj.OpenSQL();
+
+    VO := TStatusVO.Create;
+    VO.Id := obj.Model.FieldByName('Sta_Id').AsInteger;
+    VO.Codigo := obj.Model.FieldByName('Sta_Codigo').AsInteger;
+    VO.Nome := obj.Model.FieldByName('Sta_Nome').AsString;
+
+    Result := VO;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TStatus.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+function TStatus.NotificarCliente(IdStatus: integer): Boolean;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(CNotificacao + ' WHERE Sta_Id = ' + IntToStr(IdStatus));
+    lQry.SQL.Add(' AND Sta_NotificarCliente = 1');
+    lQry.Open();
+    Result := (lQry.Fields[0].AsInteger > 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TStatus.NotificarConsultor(IdStatus: integer): Boolean;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(CNotificacao + ' WHERE Sta_Id = ' + IntToStr(IdStatus));
+    lQry.SQL.Add(' AND Sta_NotificarConsultor = 1');
+    lQry.Open();
+    Result := (lQry.Fields[0].AsInteger > 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TStatus.NotificarRevenda(IdStatus: integer): Boolean;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(CNotificacao + ' WHERE Sta_Id = ' + IntToStr(IdStatus));
+    lQry.SQL.Add(' AND Sta_NotificarRevenda = 1');
+    lQry.Open();
+    Result := (lQry.Fields[0].AsInteger > 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TStatus.NotificarSupervisor(IdStatus: integer): Boolean;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Add(CNotificacao + ' WHERE Sta_Id = ' + IntToStr(IdStatus));
+    lQry.SQL.Add(' AND Sta_NotificarSupervisor = 1');
+    lQry.Open();
+    Result := (lQry.Fields[0].AsInteger > 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TStatus.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TStatus.ProximoCodigo: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT MAX(Sta_Codigo) FROM Status';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TStatus.ProximoId: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT IDENT_CURRENT(''Status'')';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TStatus.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TStatus.Salvar(AStatus: TStatusVO): Integer;
+begin
+  if AStatus.Codigo = 0 then
+    raise Exception.Create('Informe o código!');
+
+  if AStatus.Nome.Trim = '' then
+    raise Exception.Create('Informe o Nome!');
+
+  Result := TGenericDAO.Save<TStatusVO>(AStatus);
+end;
+
+procedure TStatus.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+end.

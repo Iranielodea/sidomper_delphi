@@ -1,0 +1,261 @@
+unit uAgendamentoMotivo;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Mask,
+  Vcl.Buttons, uEnumerador, Vcl.ComCtrls;
+
+const
+  COR_PADRAO: Integer = clBlack;
+  COR_TITULO: Integer = clRed;
+
+
+type
+  TfrmAgendamentoMotivo = class(TForm)
+    lblData: TLabel;
+    edtData: TMaskEdit;
+    lblHora: TLabel;
+    edtHora: TMaskEdit;
+    lblMotivo: TLabel;
+    Panel1: TPanel;
+    btnConfirmar: TBitBtn;
+    btnCancelar: TBitBtn;
+    mmoTexto: TRichEdit;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
+    procedure btnConfirmarClick(Sender: TObject);
+    procedure RichEdit1Enter(Sender: TObject);
+    procedure RichEdit1Exit(Sender: TObject);
+  private
+    { Private declarations }
+    FIdAgendamento: Integer;
+    FTipo: TEnumAgendamento;
+    procedure Motivos;
+    procedure FormatarLinha(var AMemo: TRichEdit; ACor: Integer; ATexto: string; ANegrito: Boolean = False);
+    procedure BuscarDataAgendamento;
+  public
+    { Public declarations }
+    constructor create(AIdAgendamento: integer; ATipo: TEnumAgendamento); overload;
+    constructor create(AIdAgendamento: Integer; ADetalhe: Boolean=False); overload;
+  end;
+
+var
+  frmAgendamentoMotivo: TfrmAgendamentoMotivo;
+
+implementation
+
+{$R *.dfm}
+
+uses uImagens, uAgendamentoController;
+
+procedure TfrmAgendamentoMotivo.btnCancelarClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmAgendamentoMotivo.btnConfirmarClick(Sender: TObject);
+begin
+  try
+    StrToDate(edtData.Text);
+  except
+    raise Exception.Create('Data Inválida!');
+  end;
+
+  try
+    StrToTime(edtHora.Text);
+  except
+    raise Exception.Create('Hora Inválida!');
+  end;
+
+  Motivos();
+
+  Close;
+  ModalResult := mrOk;
+end;
+
+
+procedure TfrmAgendamentoMotivo.BuscarDataAgendamento;
+var
+  Controller: TAgendamentoController;
+begin
+  Controller := TAgendamentoController.Create;
+  try
+    Controller.LocalizarId();
+  finally
+    FreeAndNil(Controller);
+  end;
+end;
+
+constructor TfrmAgendamentoMotivo.create(AIdAgendamento: Integer; ADetalhe: Boolean);
+var
+  Controller: TAgendamentoController;
+  sTipo: string;
+  iComp: Integer;
+begin
+  inherited create(nil);
+  Controller := TAgendamentoController.Create;
+  FIdAgendamento := AIdAgendamento;
+  try
+    Controller.LocalizarId(AIdAgendamento);
+
+    iComp := 69;
+
+    if ADetalhe then
+    begin
+      mmoTexto.Align := alClient;
+      mmoTexto.ReadOnly := True;
+
+      lblMotivo.Visible := False;
+      sTipo := 'Visita';
+      if Controller.Model.CDSCadastroAge_Programa.AsInteger = 7 then
+        sTipo := 'Atividade Interna';
+
+      FormatarLinha(mmoTexto,COR_PADRAO, '');
+      FormatarLinha(mmoTexto,COR_TITULO, 'Cabeçalho', True);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Id: ' + Controller.Model.CDSCadastroAge_Id.AsString);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Data: ' + Controller.Model.CDSCadastroAge_Data.AsString
+        + ' - HORA: ' + FormatDateTime('hh:mm', Controller.Model.CDSCadastroAge_Hora.AsDateTime));
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Usuário: ' + Controller.Model.CDSCadastroUsu_Nome.AsString);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Cliente: ' + Controller.Model.CDSCadastroAge_NomeCliente.AsString);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Contato: ' + Controller.Model.CDSCadastroAge_Contato.AsString);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Tipo: ' + Controller.Model.CDSCadastroTip_Nome.AsString);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Status: ' + Controller.Model.CDSCadastroSta_Nome.AsString);
+      FormatarLinha(mmoTexto,COR_PADRAO, 'Programa: ' + sTipo);
+
+      FormatarLinha(mmoTexto,COR_PADRAO, StringOfChar('_', iComp));
+      mmoTexto.Lines.Add('');
+      FormatarLinha(mmoTexto,COR_TITULO, 'Descrição', True);
+      FormatarLinha(mmoTexto,COR_PADRAO, Controller.Model.CDSCadastroAge_Descricao.AsString);
+
+      if Controller.Model.CDSCadastroAge_Motivo.AsString <> '' then
+      begin
+        FormatarLinha(mmoTexto,COR_PADRAO, StringOfChar('_', iComp));
+        mmoTexto.Lines.Add('');
+        FormatarLinha(mmoTexto,COR_TITULO, 'Motivos', True);
+        FormatarLinha(mmoTexto,COR_PADRAO, Controller.Model.CDSCadastroAge_Motivo.AsString);
+      end;
+    end
+    else
+      mmoTexto.Text := Controller.Model.CDSCadastroAge_Motivo.AsString;
+  finally
+    FreeAndNil(Controller);
+  end;
+
+  if ADetalhe then
+    Self.Caption := 'Detalhes'
+  else
+    Self.Caption := 'Motivo';
+
+  btnConfirmar.Visible := False;
+  lblData.Visible := False;
+  lblHora.Visible := False;
+  edtData.Visible := False;
+  edtHora.Visible := False;
+  mmoTexto.ReadOnly := True;
+  lblMotivo.Caption := 'Descrição';
+
+end;
+
+procedure TfrmAgendamentoMotivo.Motivos;
+var
+  Controller: TAgendamentoController;
+begin
+  Controller := TAgendamentoController.Create;
+  try
+    if edtData.Text = DataEmBranco then
+      raise Exception.Create('Informe a Data!');
+
+    if edtHora.Text = HoraEmBranco then
+      raise Exception.Create('Informe a Hora!');
+
+    if Trim(mmoTexto.Text) = '' then
+      raise Exception.Create('Informe o Motivo!');
+
+    if FTipo = ageCancelamento then
+      Controller.Cancelamento(FIdAgendamento, StrToDate(edtData.Text), StrToTime(edtHora.Text), mmoTexto.Text)
+    else if FTipo = ageReagendamento then
+      Controller.Reagendamento(FIdAgendamento, StrToDate(edtData.Text), StrToTime(edtHora.Text), mmoTexto.Text);
+//    else
+//      Controller.Encerrar(FIdAgendamento, );
+  finally
+    FreeAndNil(Controller);
+  end;
+end;
+
+procedure TfrmAgendamentoMotivo.RichEdit1Enter(Sender: TObject);
+begin
+  Self.KeyPreview := False;
+end;
+
+procedure TfrmAgendamentoMotivo.RichEdit1Exit(Sender: TObject);
+begin
+  Self.KeyPreview := True;
+end;
+
+constructor TfrmAgendamentoMotivo.create(AIdAgendamento: integer; ATipo: TEnumAgendamento);
+begin
+  inherited create(nil);
+  FIdAgendamento := AIdAgendamento;
+  FTipo := ATipo;
+
+  if ATipo = ageCancelamento then
+    Self.Caption := 'Motivo do Cancelamento'
+  else if ATipo = ageReagendamento then
+    Self.Caption := 'Motivo do Reagendamento';
+end;
+
+procedure TfrmAgendamentoMotivo.FormatarLinha(var AMemo: TRichEdit;
+  ACor: Integer; ATexto: string; ANegrito: Boolean);
+begin
+  AMemo.SelAttributes.Color := ACor;
+  if ANegrito then
+    AMemo.SelAttributes.Style:=[fsBold];
+
+  AMemo.Lines.Add(ATexto);
+  AMemo.SelAttributes.Color:=Color;
+end;
+
+procedure TfrmAgendamentoMotivo.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+    Close;
+
+  if btnConfirmar.Visible then
+  begin
+    if Key = VK_F8 then
+      btnConfirmarClick(Self);
+  end;
+
+end;
+
+procedure TfrmAgendamentoMotivo.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  if key = #13 then
+  begin
+    key:=#0;
+    perform(Wm_NextDlgCtl,0,0);
+  end;
+end;
+
+procedure TfrmAgendamentoMotivo.FormShow(Sender: TObject);
+var
+  img: TfrmImagens;
+begin
+  img := TfrmImagens.Create(Self);
+  try
+    btnConfirmar.Glyph := img.btnConfirmar.Glyph;
+    btnCancelar.Glyph := img.btnCancelar.Glyph;
+  finally
+    FreeAndNil(img);
+  end;
+
+  edtData.Text := DateToStr(Date);
+  edtHora.Text := FormatDateTime('hh:mm', Time);
+end;
+
+end.

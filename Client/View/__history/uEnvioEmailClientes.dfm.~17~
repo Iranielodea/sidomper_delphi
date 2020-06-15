@@ -1,0 +1,695 @@
+inherited frmEnviarEmailCliente: TfrmEnviarEmailCliente
+  Caption = 'Envio de Email'
+  ClientHeight = 571
+  ClientWidth = 944
+  OnDestroy = FormDestroy
+  ExplicitWidth = 950
+  ExplicitHeight = 600
+  PixelsPerInch = 96
+  TextHeight = 14
+  inherited pgControl: TPageControl
+    Width = 944
+    Height = 571
+    ActivePage = tsFiltro
+    ExplicitWidth = 944
+    ExplicitHeight = 571
+    inherited tsPesquisa: TTabSheet
+      ExplicitLeft = 4
+      ExplicitTop = 25
+      ExplicitWidth = 936
+      ExplicitHeight = 542
+      inherited Panel1: TPanel
+        Width = 936
+        Height = 501
+        ExplicitWidth = 936
+        ExplicitHeight = 501
+        inherited GroupBox1: TGroupBox
+          Width = 934
+          ExplicitWidth = 934
+        end
+        inherited dbDados: TDBGrid
+          Width = 934
+          Height = 443
+          DataSource = dsPesquisa
+          PopupMenu = pmMarcarEmail
+          OnCellClick = dbDadosCellClick
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'C_Marcar'
+              Title.Caption = 'Marcar'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Cli_Id'
+              Visible = False
+            end
+            item
+              Expanded = False
+              FieldName = 'Cli_Codigo'
+              Width = 100
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Cli_Nome'
+              Width = 321
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Cli_Fantasia'
+              Width = 270
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Cli_Dcto'
+              Width = 133
+              Visible = True
+            end>
+        end
+      end
+      inherited Panel2: TPanel
+        Top = 501
+        Width = 936
+        ExplicitTop = 501
+        ExplicitWidth = 936
+        inherited btnNovo: TBitBtn
+          Left = 497
+          Width = 24
+          Visible = False
+          ExplicitLeft = 497
+          ExplicitWidth = 24
+        end
+        inherited btnEditar: TBitBtn
+          Left = 522
+          Width = 23
+          Visible = False
+          ExplicitLeft = 522
+          ExplicitWidth = 23
+        end
+        inherited btnExcluir: TBitBtn
+          Left = 548
+          Width = 22
+          Visible = False
+          ExplicitLeft = 548
+          ExplicitWidth = 22
+        end
+        inherited btnFiltrar: TBitBtn
+          Left = 138
+          ExplicitLeft = 138
+        end
+        inherited btnSair: TBitBtn
+          Left = 317
+          TabOrder = 7
+          ExplicitLeft = 317
+        end
+        inherited btnPrimeiro: TBitBtn
+          TabOrder = 8
+        end
+        inherited btnUltimo: TBitBtn
+          TabOrder = 9
+        end
+        object btnEnviar2: TBitBtn
+          Left = 227
+          Top = 6
+          Width = 90
+          Height = 25
+          Caption = '&Enviar'
+          TabOrder = 6
+          OnClick = btnEnviarClick
+        end
+      end
+    end
+    inherited tsEdicao: TTabSheet
+      ExplicitLeft = 4
+      ExplicitTop = 25
+      ExplicitWidth = 936
+      ExplicitHeight = 542
+      inherited Panel3: TPanel
+        Width = 936
+        Height = 501
+        ExplicitWidth = 936
+        ExplicitHeight = 501
+      end
+      inherited Panel4: TPanel
+        Top = 501
+        Width = 936
+        ExplicitTop = 501
+        ExplicitWidth = 936
+      end
+    end
+    inherited tsFiltro: TTabSheet
+      ExplicitLeft = 4
+      ExplicitTop = 25
+      ExplicitWidth = 936
+      ExplicitHeight = 542
+      inherited Panel5: TPanel
+        Width = 936
+        Height = 501
+        ExplicitWidth = 936
+        ExplicitHeight = 501
+        inherited PageControl2: TPageControl
+          Width = 934
+          Height = 499
+          ActivePage = tsEmail
+          ExplicitWidth = 934
+          ExplicitHeight = 499
+          inherited tsGeral: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 25
+            ExplicitWidth = 926
+            ExplicitHeight = 470
+            inherited pnlGeral: TPanel
+              Width = 926
+              Height = 470
+              ExplicitWidth = 926
+              ExplicitHeight = 470
+              object Label4: TLabel [1]
+                Left = 18
+                Top = 71
+                Width = 101
+                Height = 14
+                Caption = 'Enquadramento'
+              end
+              inherited cbbSituacao: TComboBox
+                Width = 166
+                ExplicitWidth = 166
+              end
+              object chkListaEnquadramento: TCheckListBox
+                Left = 17
+                Top = 91
+                Width = 166
+                Height = 134
+                Hint = 'Bot'#227'o Direito do Mouse para Op'#231#245'es'
+                CustomHint = BalloonHint1
+                ItemHeight = 14
+                Items.Strings = (
+                  '01 - Simples'
+                  '02 - Lucro Presumido'
+                  '03 - Lucro Real'
+                  '00 - N'#227'o Definido')
+                ParentShowHint = False
+                PopupMenu = pmFiltroEnquadramento
+                ShowHint = True
+                TabOrder = 1
+              end
+            end
+          end
+          object tsCliente: TTabSheet
+            Caption = 'Cliente'
+            ImageIndex = 1
+            object Panel7: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              inline FraCliente1: TFraCliente
+                Left = 1
+                Top = 1
+                Width = 924
+                Height = 468
+                Align = alClient
+                Font.Charset = ANSI_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -12
+                Font.Name = 'Verdana'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 924
+                ExplicitHeight = 468
+                inherited dbCliente: TDBGrid
+                  Width = 918
+                  Height = 428
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'Cli_Codigo'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'Cli_Nome'
+                      Width = 790
+                      Visible = True
+                    end>
+                end
+              end
+            end
+          end
+          object tsConsultor: TTabSheet
+            Caption = 'Consultor'
+            ImageIndex = 2
+            object Panel8: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              inline FraUsuario1: TFraUsuario
+                Left = 1
+                Top = 1
+                Width = 924
+                Height = 468
+                Align = alClient
+                Font.Charset = ANSI_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -12
+                Font.Name = 'Verdana'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 924
+                ExplicitHeight = 468
+                inherited dbTabela: TDBGrid
+                  Width = 918
+                  Height = 428
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'Codigo'
+                      Title.Caption = 'C'#243'digo'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'Nome'
+                      Width = 790
+                      Visible = True
+                    end>
+                end
+              end
+            end
+          end
+          object tsRevenda: TTabSheet
+            Caption = 'Revenda'
+            ImageIndex = 3
+            object Panel9: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              inline FraRevenda1: TFraRevenda
+                Left = 1
+                Top = 1
+                Width = 924
+                Height = 468
+                Align = alClient
+                Font.Charset = ANSI_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -12
+                Font.Name = 'Verdana'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 924
+                ExplicitHeight = 468
+                inherited dbTabela: TDBGrid
+                  Width = 918
+                  Height = 428
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'Codigo'
+                      Title.Caption = 'C'#243'digo'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'Nome'
+                      Width = 790
+                      Visible = True
+                    end>
+                end
+              end
+            end
+          end
+          object tsFiltroCidade: TTabSheet
+            Caption = 'Cidade'
+            ImageIndex = 7
+            object Panel13: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              inline FraCidade: TFraCidade
+                Left = 1
+                Top = 1
+                Width = 924
+                Height = 468
+                Align = alClient
+                TabOrder = 0
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 924
+                ExplicitHeight = 468
+                inherited edtCodigo: TEdit
+                  Height = 22
+                  ExplicitHeight = 22
+                end
+                inherited edtNome: TEdit
+                  Height = 22
+                  ExplicitHeight = 22
+                end
+                inherited dbTabela: TDBGrid
+                  Width = 918
+                  Height = 428
+                  TitleFont.Charset = ANSI_CHARSET
+                  TitleFont.Height = -12
+                  TitleFont.Name = 'Verdana'
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'Codigo'
+                      Title.Caption = 'C'#243'digo'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'Nome'
+                      Width = 790
+                      Visible = True
+                    end>
+                end
+                inherited edtId: TEdit
+                  Height = 22
+                  ExplicitHeight = 22
+                end
+              end
+            end
+          end
+          object tsModulo: TTabSheet
+            Caption = 'M'#243'dulo'
+            ImageIndex = 4
+            object Panel10: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              inline FraModulo1: TFraModulo
+                Left = 1
+                Top = 1
+                Width = 924
+                Height = 468
+                Align = alClient
+                Font.Charset = ANSI_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -12
+                Font.Name = 'Verdana'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 924
+                ExplicitHeight = 468
+                inherited dbTabela: TDBGrid
+                  Width = 918
+                  Height = 428
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'Codigo'
+                      Title.Caption = 'C'#243'digo'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'Nome'
+                      Width = 790
+                      Visible = True
+                    end>
+                end
+              end
+            end
+          end
+          object tsProduto: TTabSheet
+            Caption = 'Produto'
+            ImageIndex = 5
+            object Panel11: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              inline FraProduto1: TFraProduto
+                Left = 1
+                Top = 1
+                Width = 924
+                Height = 468
+                Align = alClient
+                Font.Charset = ANSI_CHARSET
+                Font.Color = clWindowText
+                Font.Height = -12
+                Font.Name = 'Verdana'
+                Font.Style = []
+                ParentFont = False
+                TabOrder = 0
+                ExplicitLeft = 1
+                ExplicitTop = 1
+                ExplicitWidth = 924
+                ExplicitHeight = 468
+                inherited dbTabela: TDBGrid
+                  Width = 918
+                  Height = 428
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'Codigo'
+                      Title.Caption = 'C'#243'digo'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'Nome'
+                      Width = 790
+                      Visible = True
+                    end>
+                end
+              end
+            end
+          end
+          object tsEmail: TTabSheet
+            Caption = 'Email'
+            ImageIndex = 6
+            OnShow = tsEmailShow
+            object Panel12: TPanel
+              Left = 0
+              Top = 0
+              Width = 926
+              Height = 470
+              Align = alClient
+              BevelOuter = bvLowered
+              TabOrder = 0
+              object Label5: TLabel
+                Left = 10
+                Top = 9
+                Width = 75
+                Height = 14
+                Caption = 'Conta Email'
+              end
+              object Label6: TLabel
+                Left = 12
+                Top = 57
+                Width = 51
+                Height = 14
+                Caption = 'Assunto'
+              end
+              object Label7: TLabel
+                Left = 12
+                Top = 105
+                Width = 34
+                Height = 14
+                Caption = 'Texto'
+              end
+              object Label8: TLabel
+                Left = 12
+                Top = 347
+                Width = 39
+                Height = 14
+                Caption = 'Anexo'
+              end
+              object btnContaEmail: TSpeedButton
+                Left = 819
+                Top = 29
+                Width = 23
+                Height = 22
+                Visible = False
+                OnClick = btnContaEmailClick
+              end
+              object edtCodContaEmail: TEdit
+                Left = 11
+                Top = 29
+                Width = 65
+                Height = 22
+                Hint = '[F9] - Pesquisar'
+                CustomHint = BalloonHint1
+                TabStop = False
+                Alignment = taCenter
+                Color = clSilver
+                NumbersOnly = True
+                ParentShowHint = False
+                ReadOnly = True
+                ShowHint = False
+                TabOrder = 0
+                OnExit = edtCodContaEmailExit
+              end
+              object edtNomeContaEmail: TEdit
+                Left = 82
+                Top = 29
+                Width = 735
+                Height = 22
+                TabStop = False
+                Color = clSilver
+                ReadOnly = True
+                TabOrder = 1
+              end
+              object edtAssunto: TEdit
+                Left = 12
+                Top = 77
+                Width = 805
+                Height = 22
+                TabOrder = 2
+              end
+              object mmoTexto: TMemo
+                Left = 12
+                Top = 120
+                Width = 805
+                Height = 225
+                TabOrder = 3
+                OnEnter = mmoTextoEnter
+                OnExit = mmoTextoExit
+                OnKeyDown = mmoTextoKeyDown
+              end
+              object lstAnexo: TListBox
+                Left = 12
+                Top = 367
+                Width = 805
+                Height = 102
+                ItemHeight = 14
+                TabOrder = 4
+              end
+              object btnAnexar: TBitBtn
+                Left = 823
+                Top = 413
+                Width = 90
+                Height = 25
+                Caption = 'Anexar'
+                TabOrder = 5
+                TabStop = False
+                OnClick = btnAnexarClick
+              end
+              object btnRemover: TBitBtn
+                Left = 823
+                Top = 444
+                Width = 90
+                Height = 25
+                Caption = 'Remover'
+                TabOrder = 6
+                TabStop = False
+                OnClick = btnRemoverClick
+              end
+              object edtIdContaEmail: TEdit
+                Left = 852
+                Top = 29
+                Width = 28
+                Height = 22
+                TabOrder = 7
+                Visible = False
+              end
+            end
+          end
+        end
+      end
+      inherited Panel6: TPanel
+        Top = 501
+        Width = 936
+        ExplicitTop = 501
+        ExplicitWidth = 936
+        inherited btnImprimir: TBitBtn
+          Left = 290
+          TabOrder = 2
+          Visible = False
+          ExplicitLeft = 290
+        end
+        inherited btnFecharFiltro: TBitBtn
+          Left = 98
+          TabOrder = 3
+          ExplicitLeft = 98
+        end
+        object btnEnviar: TBitBtn
+          Left = 187
+          Top = 6
+          Width = 90
+          Height = 25
+          Caption = '&Enviar'
+          TabOrder = 1
+          Visible = False
+          OnClick = btnEnviarClick
+        end
+      end
+    end
+  end
+  inherited dsPesquisa: TDataSource
+    DataSet = DMCliente.CDSConsulta
+    Left = 484
+    Top = 1
+  end
+  inherited dsCad: TDataSource
+    Left = 568
+    Top = 120
+  end
+  object OpenDialog: TOpenDialog
+    Left = 857
+    Top = 243
+  end
+  object pmFiltroEnquadramento: TPopupMenu
+    Left = 241
+    Top = 195
+    object MarcarTodos1: TMenuItem
+      Caption = 'Marcar Todos'
+      OnClick = MarcarTodos1Click
+    end
+    object DesmarcarTodos1: TMenuItem
+      Caption = 'Desmarcar Todos'
+      OnClick = DesmarcarTodos1Click
+    end
+  end
+  object pmMarcarEmail: TPopupMenu
+    Left = 116
+    Top = 185
+    object MarcarTodas1: TMenuItem
+      Caption = 'Marcar Todos'
+      OnClick = MarcarTodas1Click
+    end
+    object DesmarcarTodos2: TMenuItem
+      Caption = 'Desmarcar Todos'
+      OnClick = DesmarcarTodos2Click
+    end
+  end
+end

@@ -1,0 +1,555 @@
+inherited DMDepartamento: TDMDepartamento
+  OldCreateOrder = True
+  OnCreate = DataModuleCreate
+  Height = 248
+  Width = 249
+  inherited CDSConsulta: TClientDataSet
+    ProviderName = 'dspDepartamentoCons'
+    OnCalcFields = CDSConsultaCalcFields
+    object CDSConsultaDep_Id: TAutoIncField
+      FieldName = 'Dep_Id'
+      Origin = 'Dep_Id'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object CDSConsultaDep_Codigo: TIntegerField
+      Alignment = taCenter
+      DisplayLabel = 'C'#243'digo'
+      FieldName = 'Dep_Codigo'
+      Origin = 'Dep_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSConsultaDep_Nome: TWideStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'Dep_Nome'
+      Origin = 'Dep_Nome'
+      Required = True
+      Size = 50
+    end
+    object CDSConsultaDep_Ativo: TBooleanField
+      FieldName = 'Dep_Ativo'
+      Origin = 'Dep_Ativo'
+      Required = True
+    end
+    object CDSConsultaCAtivo: TStringField
+      FieldKind = fkInternalCalc
+      FieldName = 'CAtivo'
+      Size = 3
+    end
+  end
+  inherited CDSCadastro: TClientDataSet
+    ProviderName = 'dspDepartamentoCad'
+    RemoteServer = DM.DSPConexao
+    OnNewRecord = CDSCadastroNewRecord
+    OnReconcileError = CDSCadastroReconcileError
+    object CDSCadastroDep_Id: TAutoIncField
+      FieldName = 'Dep_Id'
+    end
+    object CDSCadastroDep_Ativo: TBooleanField
+      FieldName = 'Dep_Ativo'
+      Required = True
+    end
+    object CDSCadastroDep_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Dep_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSCadastroDep_Nome: TWideStringField
+      FieldName = 'Dep_Nome'
+      Required = True
+      Size = 50
+    end
+    object CDSCadastroDep_SolicitaAbertura: TBooleanField
+      FieldName = 'Dep_SolicitaAbertura'
+      Required = True
+    end
+    object CDSCadastroDep_SolicitaAnalise: TBooleanField
+      FieldName = 'Dep_SolicitaAnalise'
+      Required = True
+    end
+    object CDSCadastroDep_SolicitaOcorGeral: TBooleanField
+      FieldName = 'Dep_SolicitaOcorGeral'
+      Required = True
+    end
+    object CDSCadastroDep_SolicitaOcorTecnica: TBooleanField
+      FieldName = 'Dep_SolicitaOcorTecnica'
+      Required = True
+    end
+    object CDSCadastroDep_SolicitaQuadro: TBooleanField
+      FieldName = 'Dep_SolicitaQuadro'
+      Required = True
+    end
+    object CDSCadastroDep_SolicitaStatus: TBooleanField
+      FieldName = 'Dep_SolicitaStatus'
+      Required = True
+    end
+    object CDSCadastroDep_ChamadoAbertura: TBooleanField
+      FieldName = 'Dep_ChamadoAbertura'
+      Required = True
+    end
+    object CDSCadastroDep_ChamadoQuadro: TBooleanField
+      FieldName = 'Dep_ChamadoQuadro'
+      Required = True
+    end
+    object CDSCadastroDep_ChamadoStatus: TBooleanField
+      FieldName = 'Dep_ChamadoStatus'
+      Required = True
+    end
+    object CDSCadastroDep_ChamadoOcor: TBooleanField
+      FieldName = 'Dep_ChamadoOcor'
+      Required = True
+    end
+    object CDSCadastroDep_AtividadeAbertura: TBooleanField
+      FieldName = 'Dep_AtividadeAbertura'
+    end
+    object CDSCadastroDep_AtividadeStatus: TBooleanField
+      FieldName = 'Dep_AtividadeStatus'
+    end
+    object CDSCadastroDep_AtividadeQuadro: TBooleanField
+      FieldName = 'Dep_AtividadeQuadro'
+    end
+    object CDSCadastroDep_AtividadeOcor: TBooleanField
+      FieldName = 'Dep_AtividadeOcor'
+    end
+    object CDSCadastroDep_AgendamentoQuadro: TBooleanField
+      FieldName = 'Dep_AgendamentoQuadro'
+    end
+    object CDSCadastroDep_MostrarAnexos: TBooleanField
+      FieldName = 'Dep_MostrarAnexos'
+      ProviderFlags = [pfInUpdate]
+    end
+  end
+  object CDSItens: TClientDataSet
+    Aggregates = <>
+    IndexFieldNames = 'DepAc_Programa'
+    Params = <>
+    ProviderName = 'dspDepartamentoAcesso'
+    BeforePost = CDSItensBeforePost
+    Left = 152
+    Top = 80
+    object CDSItensDepAc_Id: TAutoIncField
+      FieldName = 'DepAc_Id'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object CDSItensDepAc_Acesso: TBooleanField
+      DisplayLabel = 'Acesso'
+      FieldName = 'DepAc_Acesso'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      OnGetText = CDSItensDepAc_AcessoGetText
+    end
+    object CDSItensDepAc_Departamento: TIntegerField
+      Alignment = taCenter
+      FieldName = 'DepAc_Departamento'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+    end
+    object CDSItensDepAc_Editar: TBooleanField
+      DisplayLabel = 'Editar'
+      FieldName = 'DepAc_Editar'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      OnGetText = CDSItensDepAc_EditarGetText
+    end
+    object CDSItensDepAc_Excluir: TBooleanField
+      DisplayLabel = 'Excluir'
+      FieldName = 'DepAc_Excluir'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      OnGetText = CDSItensDepAc_ExcluirGetText
+    end
+    object CDSItensDepAc_Incluir: TBooleanField
+      DisplayLabel = 'Incluir'
+      FieldName = 'DepAc_Incluir'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      OnGetText = CDSItensDepAc_IncluirGetText
+    end
+    object CDSItensDepAc_Programa: TIntegerField
+      Alignment = taCenter
+      DisplayLabel = 'Programa'
+      FieldName = 'DepAc_Programa'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      DisplayFormat = '000'
+    end
+    object CDSItensDepAc_Relatorio: TBooleanField
+      DisplayLabel = 'Relat'#243'rio'
+      FieldName = 'DepAc_Relatorio'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      OnGetText = CDSItensDepAc_RelatorioGetText
+    end
+    object CDSItensPrograma: TStringField
+      FieldName = 'Programa'
+      Size = 14
+    end
+    object CDSItensCAcesso: TBooleanField
+      DisplayLabel = 'Acesso'
+      FieldKind = fkInternalCalc
+      FieldName = 'CAcesso'
+    end
+    object CDSItensCEditar: TBooleanField
+      DisplayLabel = 'Editar'
+      FieldKind = fkInternalCalc
+      FieldName = 'CEditar'
+    end
+    object CDSItensCExcluir: TBooleanField
+      DisplayLabel = 'Excluir'
+      FieldKind = fkInternalCalc
+      FieldName = 'CExcluir'
+    end
+    object CDSItensCIncluir: TBooleanField
+      DisplayLabel = 'Incluir'
+      FieldKind = fkInternalCalc
+      FieldName = 'CIncluir'
+    end
+    object CDSItensCRelatorio: TBooleanField
+      DisplayLabel = 'Relat'#243'rio'
+      FieldKind = fkInternalCalc
+      FieldName = 'CRelatorio'
+    end
+  end
+  object Rel: TppReport
+    AutoStop = False
+    DataPipeline = DBConsulta
+    PassSetting = psTwoPass
+    PrinterSetup.BinName = 'Default'
+    PrinterSetup.DocumentName = 'Report'
+    PrinterSetup.PaperName = 'A4'
+    PrinterSetup.PrinterName = 'Default'
+    PrinterSetup.SaveDeviceSettings = False
+    PrinterSetup.mmMarginBottom = 6350
+    PrinterSetup.mmMarginLeft = 6350
+    PrinterSetup.mmMarginRight = 6350
+    PrinterSetup.mmMarginTop = 6350
+    PrinterSetup.mmPaperHeight = 297000
+    PrinterSetup.mmPaperWidth = 210000
+    PrinterSetup.PaperSize = 9
+    AllowPrintToFile = True
+    ArchiveFileName = '($MyDocuments)\ReportArchive.raf'
+    DeviceType = 'Screen'
+    DefaultFileDeviceType = 'PDF'
+    EmailSettings.ReportFormat = 'PDF'
+    LanguageID = 'Default'
+    OpenFile = False
+    OutlineSettings.CreateNode = True
+    OutlineSettings.CreatePageNodes = True
+    OutlineSettings.Enabled = True
+    OutlineSettings.Visible = True
+    ThumbnailSettings.Enabled = True
+    ThumbnailSettings.Visible = True
+    ThumbnailSettings.DeadSpace = 30
+    PDFSettings.EmbedFontOptions = [efUseSubset]
+    PDFSettings.EncryptSettings.AllowCopy = True
+    PDFSettings.EncryptSettings.AllowInteract = True
+    PDFSettings.EncryptSettings.AllowModify = True
+    PDFSettings.EncryptSettings.AllowPrint = True
+    PDFSettings.EncryptSettings.Enabled = False
+    PDFSettings.EncryptSettings.KeyLength = kl40Bit
+    PDFSettings.FontEncoding = feAnsi
+    PDFSettings.ImageCompressionLevel = 25
+    PreviewFormSettings.WindowState = wsMaximized
+    PreviewFormSettings.ZoomSetting = zs100Percent
+    RTFSettings.DefaultFont.Charset = DEFAULT_CHARSET
+    RTFSettings.DefaultFont.Color = clWindowText
+    RTFSettings.DefaultFont.Height = -13
+    RTFSettings.DefaultFont.Name = 'Arial'
+    RTFSettings.DefaultFont.Style = []
+    TextFileName = '($MyDocuments)\Report.pdf'
+    TextSearchSettings.DefaultString = '<Texto a localizar>'
+    TextSearchSettings.Enabled = True
+    XLSSettings.AppName = 'ReportBuilder'
+    XLSSettings.Author = 'ReportBuilder'
+    XLSSettings.Subject = 'Report'
+    XLSSettings.Title = 'Report'
+    Left = 56
+    Top = 144
+    Version = '15.03'
+    mmColumnWidth = 0
+    DataPipelineName = 'DBConsulta'
+    object ppHeaderBand1: TppHeaderBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 18785
+      mmPrintPosition = 0
+      object ppLabel1: TppLabel
+        UserName = 'Label1'
+        Caption = 'C'#243'digo'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 0
+        mmTop = 12700
+        mmWidth = 11113
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel2: TppLabel
+        UserName = 'Label2'
+        Caption = 'Nome'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 19315
+        mmTop = 12700
+        mmWidth = 7408
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLine1: TppLine
+        UserName = 'Line1'
+        Position = lpBottom
+        Weight = 0.750000000000000000
+        mmHeight = 2117
+        mmLeft = 0
+        mmTop = 16668
+        mmWidth = 196850
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel3: TppLabel
+        UserName = 'Label3'
+        AutoSize = False
+        Caption = 'Relat'#243'rio de Departamentos'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 14
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 6085
+        mmLeft = 32015
+        mmTop = 0
+        mmWidth = 133086
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable1: TppSystemVariable
+        UserName = 'SystemVariable1'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 18521
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable2: TppSystemVariable
+        UserName = 'SystemVariable2'
+        VarType = vtTime
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3968
+        mmLeft = 0
+        mmTop = 4763
+        mmWidth = 14817
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable3: TppSystemVariable
+        UserName = 'SystemVariable3'
+        VarType = vtPageSetDesc
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 170127
+        mmTop = 0
+        mmWidth = 24077
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel5: TppLabel
+        UserName = 'Label5'
+        Caption = 'Ativo'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 132292
+        mmTop = 12700
+        mmWidth = 9260
+        BandType = 0
+        LayerName = Foreground
+      end
+    end
+    object ppDetailBand1: TppDetailBand
+      Background1.Brush.Style = bsClear
+      Background2.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 4498
+      mmPrintPosition = 0
+      object ppDBText1: TppDBText
+        UserName = 'DBText1'
+        DataField = 'Dep_Codigo'
+        DataPipeline = DBConsulta
+        DisplayFormat = '0000'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        TextAlignment = taCentered
+        Transparent = True
+        DataPipelineName = 'DBConsulta'
+        mmHeight = 4498
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 13494
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText2: TppDBText
+        UserName = 'DBText2'
+        DataField = 'Dep_Nome'
+        DataPipeline = DBConsulta
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'DBConsulta'
+        mmHeight = 4498
+        mmLeft = 19315
+        mmTop = 0
+        mmWidth = 110067
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText3: TppDBText
+        UserName = 'DBText3'
+        DataField = 'CAtivo'
+        DataPipeline = DBConsulta
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'DBConsulta'
+        mmHeight = 4498
+        mmLeft = 132292
+        mmTop = 0
+        mmWidth = 17198
+        BandType = 4
+        LayerName = Foreground
+      end
+    end
+    object ppSummaryBand1: TppSummaryBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 13229
+      mmPrintPosition = 0
+      object ppLine2: TppLine
+        UserName = 'Line2'
+        Weight = 0.750000000000000000
+        mmHeight = 2381
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 196850
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppLabel4: TppLabel
+        UserName = 'Label4'
+        Caption = 'Total:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 0
+        mmTop = 4498
+        mmWidth = 11113
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppDBCalc1: TppDBCalc
+        UserName = 'DBCalc1'
+        DataField = 'Dep_Id'
+        DataPipeline = DBConsulta
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        DBCalcType = dcCount
+        DataPipelineName = 'DBConsulta'
+        mmHeight = 4498
+        mmLeft = 13758
+        mmTop = 4498
+        mmWidth = 17198
+        BandType = 7
+        LayerName = Foreground
+      end
+    end
+    object ppDesignLayers1: TppDesignLayers
+      object ppDesignLayer1: TppDesignLayer
+        UserName = 'Foreground'
+        LayerType = ltBanded
+        Index = 0
+      end
+    end
+    object ppParameterList1: TppParameterList
+    end
+  end
+  object CDSDepartamentoEmail: TClientDataSet
+    Aggregates = <>
+    Params = <
+      item
+        DataType = ftInteger
+        Name = 'IDDEPARTAMENTO'
+        ParamType = ptInput
+      end>
+    ProviderName = 'dspDepartamentoEmail'
+    BeforePost = CDSDepartamentoEmailBeforePost
+    OnReconcileError = CDSDepartamentoEmailReconcileError
+    Left = 152
+    Top = 136
+    object CDSDepartamentoEmailDepEm_Id: TAutoIncField
+      FieldName = 'DepEm_Id'
+      ProviderFlags = [pfInWhere, pfInKey]
+    end
+    object CDSDepartamentoEmailDepEm_Departamento: TIntegerField
+      FieldName = 'DepEm_Departamento'
+      Required = True
+    end
+    object CDSDepartamentoEmailDepEm_Email: TStringField
+      DisplayLabel = 'Email'
+      FieldName = 'DepEm_Email'
+      Required = True
+      Size = 80
+    end
+  end
+end

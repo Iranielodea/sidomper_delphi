@@ -1,0 +1,759 @@
+unit uFuncoesSIDomper;
+
+interface
+
+uses
+   SysUtils,
+   SqlExpr,
+   Windows,
+   Dialogs,
+   StdCtrls,
+   Forms,
+   MaskUtils,
+   Mask,
+   uDM,
+   FireDAC.Comp.Client,
+   Data.DB,
+   System.Generics.Collections,
+   uRegras,
+   uEnumerador,
+   Vcl.DBCtrls,
+   Vcl.Graphics,
+   Vcl.Buttons,
+   ShellAPI,
+   System.Classes,
+   Datasnap.DBClient,
+   Vcl.Controls,
+   Vcl.ComCtrls,
+   Winapi.TlHelp32;
+
+const
+  PROCESSO_TEMPO: string = 'ControleTempo.exe';
+
+type
+  TFuncoes = class
+
+
+  private
+    function IfThen(AExpressao: Boolean; ARetorno1, ARetorno2: string): string;
+    function TemAtributo(Attr, Val: Integer): Boolean;
+  public
+    class function Confirmar(Mensagem: PWideChar): boolean;
+    class procedure CriarFormulario(Formulario: TForm; Programa: Integer = 0);
+    class procedure CriarFormularioModal(Formulario: TForm);
+    class procedure ModoEdicaoInsercao(Tabela: TDataSet);
+    class function SomenteNumeros(Texto: string): string;
+    class procedure ValidaDatas(Sender: TField; const Text: string);
+    class procedure DataValida(Data: string);
+    class procedure ValidaIntervaloDatas(DataInicial, DataFinal: string);
+    class function MensagemBanco(Mensagem: string): string;
+    class procedure HabilitarCampo(Formulario: TForm; habilitar: Boolean);
+    class function FormularioEstaCriado(Formulario: TClass): Boolean;
+    class procedure VisualizarArquivo(NomeArquivo: string);
+    class procedure ValidaHora(Sender: TField; const Text: string);
+    class function DataEmBrancoNula(Data: string): Boolean;
+    class function FormatarMascara(Mascara, Valor: string): string;
+    class function HoraToDecimal(Hora: String): double;
+    class function DecimalToHora(Hora: double): string;
+    class function MostrarDescricaoPesquisaData(Campo: string): Boolean;
+    class procedure VincularConexaoClientDataSet(var DataModulo: TDataModule);
+    class procedure PosicaoCursorGrid(var DataSource: TDataSource; CampoId: string; IdValor: Integer);
+    class procedure OrdenarCamposGrid(DataSet: TClientDataSet; Campo: string);
+    class function FormatarMascaraCodigo4(Campo: double): string;
+    class function SenhaInterna(Senha: string): Boolean;
+    class procedure MensagemErroBanco(Mensagem: string; Metodo: string = '');
+    class function TelaSenha(Sigla: string; Id: Integer = 0): Boolean;
+    class procedure ControleGuias(var PageControle: TPageControl; var Sheet: TTabSheet;
+      var BotaoSalvar: TBitBtn; Mensagem: string; Nivel: Integer = 1);
+    class function DiferencaEntreDatas(ADataInicial, ADataFinal: TDate): Double;
+    class function TrocaCaracter(AValor, AOldCaracter, ANewCaracter: string): string;
+    class function ValorAmericano(AValor: string): string;
+    class procedure Excessao(var Excess: Exception; Metodo: string);
+    class function MascaraCnpjCpf(ADocumento: string): string;
+    class function ModoDesenvolvimento: Boolean;
+    class function ValidaEMail(const EMailIn: string):Boolean;
+    class function ProcessExists(exeFileName: string):Boolean;
+    class function ProcessDelete(ExeFileName: string): Integer;
+
+    // metodos para instanciar
+    function ListaArquivosDir(sDiretorio, sExtensao: string; bSubDir: Boolean): TStringList;
+  end;
+
+
+implementation
+
+{ TFuncoes }
+
+uses uErro, uUsuarioSenha;
+
+class procedure TFuncoes.VincularConexaoClientDataSet(var DataModulo: TDataModule);
+var
+  i: Integer;
+begin
+  for I := 0 to DataModulo.ComponentCount-1 do
+  begin
+    if DataModulo.Components[i] is TClientDataSet then
+      TClientDataSet(DataModulo.Components[i]).RemoteServer := dm.DSPConexao;
+  end;
+end;
+
+class procedure TFuncoes.VisualizarArquivo(NomeArquivo: string);
+begin
+  if Trim(NomeArquivo) = '' then
+    raise Exception.Create('Informe o Arquivo.');
+
+  if not FileExists(NomeArquivo) then
+    raise Exception.Create('Arquivo não Encontrado.');
+
+  shellexecute(0, 'OPEN', PWideChar(NomeArquivo), nil, nil, SW_SHOWNORMAL);
+end;
+
+class function TFuncoes.Confirmar(Mensagem: PWideChar): boolean;
+var
+   iResult: integer;
+begin
+  iResult := application.MessageBox(Mensagem,'Confirmação',mb_YesNo + mb_IconQuestion + mb_DefButton2);
+  if iResult = IDYES then
+    result:=true
+  else
+    result:=false;
+end;
+
+class procedure TFuncoes.ControleGuias(var PageControle: TPageControl;
+  var Sheet: TTabSheet; var BotaoSalvar: TBitBtn; Mensagem: string; Nivel: Integer);
+begin
+  if Nivel = 1 then
+  begin
+    if PageControle.ActivePage <> Sheet then
+    begin
+      if BotaoSalvar.Enabled then
+      begin
+        Sheet.Show;
+        raise Exception.Create('Salve ou Cancele ' + Mensagem);
+      end;
+    end;
+  end
+
+  else if Nivel = 2 then
+  begin
+    if PageControle.ActivePage = Sheet then
+    begin
+      if BotaoSalvar.Enabled then
+      begin
+        Sheet.Show;
+        raise Exception.Create('Salve ou Cancele ' + Mensagem);
+      end;
+    end;
+  end;
+
+end;
+
+class procedure TFuncoes.CriarFormulario(Formulario: TForm; Programa: Integer = 0);
+var
+  iTag: Integer;
+  Negocio: TServerMethods1Client;
+begin
+  dm.IdSelecionado := 0;
+  Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
+  try
+    try
+      if Programa > 0 then
+        iTag := Programa
+      else
+        iTag := Formulario.Tag;
+
+      if Formulario.Name = 'frmVisita' then
+        Negocio.UsuarioHorarioAcessoSistema('','',dm.IdUsuario);
+
+      Negocio.PermissaoAcessar(iTag, dm.IdUsuario);
+    except
+      On E: Exception do
+      begin
+        FreeAndNil(Formulario);
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+
+  Formulario.Show;
+end;
+
+class procedure TFuncoes.CriarFormularioModal(Formulario: TForm);
+var
+  iTag: Integer;
+  Negocio: TServerMethods1Client;
+begin
+  dm.IdSelecionado := 0;
+  dm.IdCadastro := 0;
+  Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
+  try
+    try
+      iTag := Formulario.Tag;
+      Negocio.PermissaoAcessar(iTag, dm.IdUsuario);
+    except
+      On E: Exception do
+      begin
+        FreeAndNil(Formulario);
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+  Formulario.ShowModal;
+end;
+
+class function TFuncoes.DataEmBrancoNula(Data: string): Boolean;
+begin
+  Result := False;
+  if Trim(Data) = DataEmBranco then
+    Result := True;
+
+  if Data = '' then
+    Result := True;
+end;
+
+class procedure TFuncoes.DataValida(Data: string);
+begin
+  if Trim(Data) <> DataEmBranco then
+  begin
+    try
+      StrToDate(Data);
+      if StrToDate(Data) < StrToDate('01/01/1900') then
+        raise Exception.Create('Data Inválida');
+
+      if StrToDate(Data) > StrToDate('01/01/2099') then
+        raise Exception.Create('Data Inválida');
+
+    except
+      raise Exception.Create('Data Inválida.');
+    end;
+  end;
+end;
+
+class function TFuncoes.DecimalToHora(Hora: double): string;
+var
+  a,b,c: double;
+  d,e,f: string;
+begin
+  try
+    a := frac(Hora);
+    b := int(hora);
+    c := (a * 60);
+
+    f := FormatFloat('00', c);
+    if (f = '60') then
+    begin
+      c := 0;
+      b := b + 1;
+    end;
+
+    d := formatfloat('00', b);
+    e := formatfloat('00', c);
+    f := d + ':' + e;
+  except
+    f := '00:00';
+  end;
+  result := f;
+end;
+
+class function TFuncoes.DiferencaEntreDatas(ADataInicial,
+  ADataFinal: TDate): Double;
+begin
+  Result := ADataFinal - ADataInicial;
+end;
+
+class procedure TFuncoes.Excessao(var Excess: Exception; Metodo: string);
+begin
+//  MensagemErroBanco(Excess.Message, 'Método: ' + Metodo);
+//  Abort;
+  raise Exception.Create(Excess.Message
+                        + sLineBreak
+                        + sLineBreak
+                        + sLineBreak
+                        + sLineBreak
+                        +  'Método: ' + Metodo);
+end;
+
+class function TFuncoes.FormatarMascara(Mascara, Valor: string): string;
+var
+  i: Integer;
+  sValor: string;
+  sMascara: string;
+  sVal: string;
+begin
+  sValor := SomenteNumeros(Valor);
+  sMascara := FormatMaskText(Mascara + ';0;_', sValor);
+  sVal := '';
+
+  for I := 1 to Length(sMascara) do
+    sVal := sVal + Copy(sMascara, i, 1);
+
+  Result := sVal;
+end;
+
+class function TFuncoes.FormatarMascaraCodigo4(Campo: double): string;
+begin
+  if Campo > 0 then
+    Result := FormatFloat('0000', Campo)
+  else
+    Result := '';
+end;
+
+class function TFuncoes.FormularioEstaCriado(Formulario: TClass): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := 0 to Screen.FormCount -1 do
+  begin
+    if Screen.Forms[i] is Formulario then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+class procedure TFuncoes.HabilitarCampo(Formulario: TForm; habilitar: Boolean);
+var
+  i: Integer;
+begin
+  if Formulario = nil then
+    Exit;
+
+  for I := 0 to Formulario.ComponentCount -1 do
+  begin
+    if Formulario.Components[i] is TDBEdit then
+    begin
+      if habilitar then
+      begin
+        TDBEdit(Formulario.Components[i]).Enabled := True;
+//        TDBEdit(Formulario.Components[i]).Color := clWindow;
+//        TDBEdit(Formulario.Components[i]).ReadOnly := False;
+      end
+      else begin
+        TDBEdit(Formulario.Components[i]).Enabled := False;
+//        TDBEdit(Formulario.Components[i]).Color := clSilver;
+//        TDBEdit(Formulario.Components[i]).ReadOnly := True;
+      end;
+    end;
+
+    if Formulario.Components[i] is TSpeedButton then
+    begin
+      if habilitar then
+        TSpeedButton(Formulario.Components[i]).Enabled := True
+      else
+        TSpeedButton(Formulario.Components[i]).Enabled := False;
+    end;
+
+    if Formulario.Components[i] is TDBCheckBox then
+    begin
+      if habilitar then
+        TDBCheckBox(Formulario.Components[i]).Enabled := True
+      else
+        TDBCheckBox(Formulario.Components[i]).Enabled := False;
+    end;
+
+    if Formulario.Components[i] is TDBMemo then
+    begin
+      if habilitar then
+        TDBMemo(Formulario.Components[i]).Enabled := True
+      else
+        TDBMemo(Formulario.Components[i]).Enabled := False;
+    end;
+
+    if Formulario.Components[i] is TDBRadioGroup then
+    begin
+      if habilitar then
+        TDBRadioGroup(Formulario.Components[i]).Enabled := True
+      else
+        TDBRadioGroup(Formulario.Components[i]).Enabled := False;
+    end;
+
+    if Formulario.Components[i] is TDBRichEdit then
+    begin
+      if habilitar then
+        TDBRichEdit(Formulario.Components[i]).Enabled := True
+      else
+        TDBRichEdit(Formulario.Components[i]).Enabled := False;
+    end;
+
+
+//    if Formulario.Components[i] is TBitBtn then
+//    begin
+//      if habilitar then
+//        TBitBtn(Formulario.Components[i]).Enabled := True
+//      else
+//        TBitBtn(Formulario.Components[i]).Enabled := False;
+//    end;
+
+  end;
+end;
+
+class function TFuncoes.HoraToDecimal(Hora: String): double;
+var a,b,c,d: double;
+begin
+  try
+    a := StrToFloat(copy(Hora, 4, 2));
+    b := a / 60;
+    c := int(StrToFloat(copy(Hora, 1, 2)));
+    d := c + b;
+  except
+    d := 0;
+  end;
+  result := d;
+end;
+
+function TFuncoes.TemAtributo(Attr, Val: Integer): Boolean;
+begin
+  Result := Attr and Val = Val;
+end;
+
+function TFuncoes.IfThen(AExpressao: Boolean; ARetorno1,
+  ARetorno2: string): string;
+begin
+  if AExpressao then
+    Result := ARetorno1
+  else
+    Result := ARetorno2;
+end;
+
+function TFuncoes.ListaArquivosDir(sDiretorio, sExtensao: string;
+  bSubDir: Boolean): TStringList;
+var
+  FSearch: TSearchRec;
+  Ret: Integer;
+  TempNome: string;
+  sStringList: TStringList;
+begin
+  Ret := FindFirst(sDiretorio + '\' + IfThen(sExtensao = '', '*.*', sExtensao), faAnyFile, FSearch);
+  try
+      sStringList := TStringList.Create;
+      while Ret = 0 do
+      begin
+          if TemAtributo(FSearch.Attr, faDirectory) then
+          begin
+              if (FSearch.Name <> '.') And (FSearch.Name <> '..') then
+              begin
+                  if bSubDir = True then
+                  begin
+                      TempNome := sDiretorio + '\' + FSearch.Name;
+                      ListaArquivosDir(TempNome, sExtensao, True);
+                  end;
+              end;
+          end
+          else
+              sStringList.Add(StringReplace(ExtractFileName(FSearch.Name), ExtractFileExt(FSearch.Name), '', [rfReplaceAll, rfIgnoreCase]));
+          Ret := FindNext(FSearch);
+      end;
+      Result := sStringList;
+  finally
+//      sStringList := nil;
+  end;
+end;
+
+class function TFuncoes.MascaraCnpjCpf(ADocumento: string): string;
+var
+  iDoc: Integer;
+  sDoc: string;
+begin
+  sDoc := TFuncoes.SomenteNumeros(ADocumento);
+  iDoc := Length(sDoc);
+  if iDoc > 0 then
+  begin
+    if iDoc = 11 then
+      sDoc := TFuncoes.FormatarMascara('###.###.###-##', sDoc)
+    else
+      sDoc := TFuncoes.FormatarMascara('##.###.###/####-##', sDoc);
+
+    Result := sDoc;
+  end
+  else
+    Result := '';
+end;
+
+class function TFuncoes.MensagemBanco(Mensagem: string): string;
+var
+  iPosicao: Integer;
+begin
+  iPosicao := Pos('[SQL Server]', Mensagem);
+
+  if iPosicao > 0 then
+  begin
+    Mensagem := Copy(Mensagem, iPosicao + 12, Length(Mensagem));
+    Result := Mensagem;
+  end
+  else
+    Result := Mensagem;
+end;
+
+class procedure TFuncoes.MensagemErroBanco(Mensagem: string; Metodo: string);
+begin
+  frmErro := TfrmErro.Create(Mensagem, Metodo);
+  frmErro.ShowModal;
+  FreeAndNil(frmErro);
+end;
+
+class function TFuncoes.ModoDesenvolvimento: Boolean;
+var
+  sCaminho: string;
+  sArquivo: string;
+begin
+  sCaminho := ExtractFilePath(Application.ExeName);
+  sArquivo := sCaminho + 'DomperLogin.txt';
+  Result := FileExists(sArquivo);
+end;
+
+class procedure TFuncoes.ModoEdicaoInsercao(Tabela: TDataSet);
+begin
+  if Tabela.Active then
+  begin
+    if not (Tabela.State in [dsEdit, dsInsert]) then
+      Tabela.Edit;
+  end;
+end;
+
+class function TFuncoes.MostrarDescricaoPesquisaData(Campo: string): Boolean;
+begin
+  Result := (Pos('DATA', UpperCase(Campo)) > 0);
+end;
+
+class procedure TFuncoes.OrdenarCamposGrid(DataSet: TClientDataSet; Campo: string);
+begin
+  DataSet.IndexFieldNames := Campo;
+end;
+
+class procedure TFuncoes.PosicaoCursorGrid(var DataSource: TDataSource;
+  CampoId: string; IdValor: Integer);
+var
+  iRegistro: Integer;
+  iId: Integer;
+begin
+  iId := 0;
+  iRegistro := 0;
+  DataSource.DataSet.DisableControls;
+  try
+    DataSource.DataSet.First;
+    while not DataSource.DataSet.Eof do
+    begin
+
+      if IdValor = 0 then
+      begin
+        if DataSource.DataSet.FieldByName(CampoId).AsInteger > iId then
+        begin
+          iRegistro := DataSource.DataSet.RecNo;
+          iId := DataSource.DataSet.FieldByName(CampoId).AsInteger;
+        end;
+      end
+      else begin
+        if DataSource.DataSet.FieldByName(CampoId).AsInteger = IdValor then
+        begin
+          iRegistro := DataSource.DataSet.RecNo;
+          Break;
+        end;
+      end;
+      DataSource.DataSet.Next;
+    end;
+
+    if iRegistro > 0 then
+      DataSource.DataSet.RecNo := iRegistro;
+
+  finally
+    DataSource.DataSet.EnableControls;
+  end;
+end;
+
+class function TFuncoes.ProcessDelete(ExeFileName: string): Integer;
+const
+  PROCESS_TERMINATE = $0001;
+var
+  ContinueLoop: BOOL;
+  FSnapshotHandle: THandle;
+  FProcessEntry32: TProcessEntry32;
+begin
+  Result := 0;
+  FSnapshotHandle := CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  FProcessEntry32.dwSize := SizeOf(FProcessEntry32);
+  ContinueLoop := Process32First(FSnapshotHandle, FProcessEntry32);
+
+  while Integer(ContinueLoop) <> 0 do
+  begin
+    if ((UpperCase(ExtractFileName(FProcessEntry32.szExeFile)) =
+      UpperCase(ExeFileName)) or (UpperCase(FProcessEntry32.szExeFile) =
+      UpperCase(ExeFileName))) then
+      Result := Integer(TerminateProcess(
+                        OpenProcess(PROCESS_TERMINATE,
+                                    BOOL(0),
+                                    FProcessEntry32.th32ProcessID),
+                                    0));
+     ContinueLoop := Process32Next(FSnapshotHandle, FProcessEntry32);
+  end;
+  CloseHandle(FSnapshotHandle);
+end;
+
+class function TFuncoes.ProcessExists(exeFileName: string): Boolean;
+var
+  ContinueLoop: BOOL;
+  FSnapshotHandle: THandle;
+  FProcessEntry32: TProcessEntry32;
+begin
+  FSnapshotHandle := CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  FProcessEntry32.dwSize := SizeOf(FProcessEntry32);
+  ContinueLoop := Process32First(FSnapshotHandle, FProcessEntry32);
+  Result := False;
+  while Integer(ContinueLoop) <> 0 do
+  begin
+    if ((UpperCase(ExtractFileName(FProcessEntry32.szExeFile)) =
+      UpperCase(ExeFileName)) or (UpperCase(FProcessEntry32.szExeFile) =
+      UpperCase(ExeFileName))) then
+    begin
+      Result := True;
+    end;
+    ContinueLoop := Process32Next(FSnapshotHandle, FProcessEntry32);
+  end;
+  CloseHandle(FSnapshotHandle);
+end;
+
+class function TFuncoes.SenhaInterna(Senha: string): Boolean;
+var
+  sDia: string;
+  sMes: string;
+  sHora: string;
+  sResultado: string;
+begin
+  sDia := FormatDateTime('dd', Now);
+  sHora := FormatDateTime('hh', Now);
+  sMes := FormatDateTime('mm', Now);
+  sResultado := 'sa' + sDia + sHora + (IntToStr(StrToInt(sMes) + StrToInt(sHora)));
+
+  Result := (Senha = sResultado);
+end;
+
+class function TFuncoes.SomenteNumeros(Texto: string): string;
+var
+  i: Integer;
+  Resultado: string;
+begin
+  Resultado := '';
+  for I := 1 to Length(Texto) do
+  begin
+    if Texto[i] in ['0','1','2','3','4','5','6','7','8','9'] then
+      Resultado := Resultado + Texto[i];
+  end;
+  Result := Resultado;
+end;
+
+class function TFuncoes.TelaSenha(Sigla: string; Id: Integer = 0): Boolean;
+var
+  Formulario: TfrmUsuarioSenha;
+begin
+  Formulario := TfrmUsuarioSenha.Create(Sigla, Id);
+  try
+    Result := (Formulario.ShowModal = mrOk);
+  finally
+    FreeAndNil(Formulario);
+  end;
+end;
+
+
+class function TFuncoes.TrocaCaracter(AValor, AOldCaracter,
+  ANewCaracter: string): string;
+begin
+  Result := StringReplace(AValor, AOldCaracter, ANewCaracter, [rfReplaceAll]);
+end;
+
+class procedure TFuncoes.ValidaDatas(Sender: TField; const Text: string);
+begin
+  if Trim(Text) = DataEmBranco then
+    Sender.Clear
+  else begin
+    DataValida(Text);
+    Sender.AsString := Text;
+  end;
+end;
+
+class function TFuncoes.ValidaEMail(const EMailIn: string): Boolean;
+const
+  CaraEsp: array[1..40] of string[1] =
+  ( '!','#','$','%','¨','&','*',
+  '(',')','+','=','§','¬','¢','¹','²',
+  '³','£','´','`','ç','Ç',',',';',':',
+  '<','>','~','^','?','/','','|','[',']','{','}',
+  'º','ª','°');
+var
+  i,cont   : integer;
+  EMail    : ShortString;
+begin
+  EMail := EMailIn.Trim();
+  Result := True;
+  cont := 0;
+  if EMail <> '' then
+    if (Pos('@', EMail)<>0) and (Pos('.', EMail)<>0) then    // existe @ .
+    begin
+      if (Pos('@', EMail)=1) or (Pos('@', EMail)= Length(EMail)) or (Pos('.', EMail)=1) or (Pos('.', EMail)= Length(EMail)) or (Pos(' ', EMail)<>0) then
+        Result := False
+      else                                   // @ seguido de . e vice-versa
+        if (abs(Pos('@', EMail) - Pos('.', EMail)) = 1) then
+          Result := False
+        else
+          begin
+            for i := 1 to 40 do            // se existe Caracter Especial
+              if Pos(CaraEsp[i], EMail)<>0 then
+                Result := False;
+            for i := 1 to length(EMail) do
+            begin                                 // se existe apenas 1 @
+              if EMail[i] = '@' then
+                cont := cont + 1;                    // . seguidos de .
+              if (EMail[i] = '.') and (EMail[i+1] = '.') then
+                Result := false;
+            end;
+                                   // . no f, 2ou+ @, . no i, - no i, _ no i
+            if (cont >=2) or ( EMail[length(EMail)]= '.' )
+              or ( EMail[1]= '.' ) or ( EMail[1]= '_' )
+              or ( EMail[1]= '-' )  then
+                Result := false;
+                                            // @ seguido de COM e vice-versa
+            if (abs(Pos('@', EMail) - Pos('com', EMail)) = 1) then
+              Result := False;
+                                              // @ seguido de - e vice-versa
+            if (abs(Pos('@', EMail) - Pos('-', EMail)) = 1) then
+              Result := False;
+                                              // @ seguido de _ e vice-versa
+            if (abs(Pos('@', EMail) - Pos('_', EMail)) = 1) then
+              Result := False;
+          end;
+    end
+    else
+      Result := False;
+end;
+
+class procedure TFuncoes.ValidaHora(Sender: TField; const Text: string);
+begin
+  if Text = '  :  ' then
+    Sender.Clear
+  else
+    Sender.Value := FormatDateTime('hh:mm', StrToDateTime(Text));
+end;
+
+class procedure TFuncoes.ValidaIntervaloDatas(DataInicial, DataFinal: string);
+begin
+
+  DataValida(DataInicial);
+  DataValida(DataFinal);
+
+  if (Trim(DataInicial) <> DataEmBranco) and (Trim(DataFinal) <> DataEmBranco) then
+  begin
+    if StrToDate(DataInicial) > StrToDate(DataFinal) then
+      raise Exception.Create('Data Inicial Maior que Data Final.');
+  end;
+end;
+
+class function TFuncoes.ValorAmericano(AValor: string): string;
+begin
+  Result := TrocaCaracter(AValor, ',','.');
+end;
+
+end.

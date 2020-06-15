@@ -1,0 +1,13 @@
+object dmSolicitacao: TdmSolicitacao
+  OldCreateOrder = False
+  Height = 214
+  Width = 333
+  object cdsCadastro: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspSolicitacaoCad'
+    RemoteServer = DM.DSPConexao
+    Left = 32
+    Top = 16
+  end
+end

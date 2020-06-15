@@ -1,0 +1,796 @@
+unit uCliente;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, uFiltroCliente,
+  uClienteVO, uFireDAC, uChamadoOcorrenciaVO, System.Generics.Collections, System.DateUtils,
+  uGenericDAO, uContato, uContatoVO, uClienteModulo, uClienteModuloVO,
+  uClienteEmail, System.MaskUtils;
+
+  const CConsulta: string =
+    ' SELECT '+
+    '  Cli_Id, '+
+    '  Cli_Codigo,'+
+    '  Cli_Nome,'+
+    '  Cli_Fantasia,'+
+    '  Cli_Dcto,'+
+    '  Cli_Telefone,'+
+    '  Cli_Versao,'+
+    '  Cli_Ativo,'+
+    '  Cli_Fone1,'+
+    '  Cli_Fone2,'+
+    '  Cli_Celular,'+
+    '  Cli_FoneOutro,'+
+    '  CASE Cli_Enquadramento'+
+    '    WHEN ''00'' THEN ''00-Não Definido''' +
+    '    WHEN ''01'' THEN ''01-Simples''' +
+    '    WHEN ''02'' THEN ''02-Lucro Presumido'''+
+    '    WHEN ''03'' THEN ''03-Lucro Real'''+
+    '  END AS Cli_Enquadramento,'+
+    '  Usu_Nome,'+
+    '  Rev_Nome '+
+    ' FROM Cliente'+
+    '  LEFT JOIN Usuario ON Cli_Usuario = Usu_Id'+
+    '  LEFT JOIN Revenda ON Cli_Revenda = Rev_Id'+
+    '  LEFT JOIN Cidade ON Cli_Cidade = Cid_Id';
+
+type
+  TCliente = class(TInterfacedObject, ICadastroInterface)
+  private
+//    procedure SalvarEmail(ACliente: TClienteVO);
+    procedure ExcluirContatos(ACliente: TClienteVO);
+    procedure ExcluirEmail(ACliente: TClienteVO);
+    procedure GravarContato(ACliente: TClienteVO);
+    procedure GravarEmail(ACliente: TClienteVO);
+    function Filtro(AFiltro: TFiltroCliente; AIdUsuario, AModelo: Integer): string;
+    function RelatorioModelo2(AIdUsuario: Integer; AFiltro: TFiltroCliente): string;
+
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string; overload;
+    function FiltrarCodigo(Codigo: integer): string;
+    function FiltrarUsuario(AFiltro: TFiltroCliente; Campo, Texto, Ativo: string; IdUsuario: Integer; Contem: Boolean = True): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean; overload;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    procedure LocalizarCodigoCliente(var Qry: TFDQuery; Codigo, IdUsuario: integer);
+    procedure Salvar(Programa, IdUsuario: Integer); overload;
+    function Salvar(ACliente: TClienteVO): Integer; overload;
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+    function LocalizarIdObj(var Qry: TFDQuery; AId: Integer): TClienteVO; overload;
+    function HistoricoCliente(AIdCliente: Integer): TObjectList<TChamadoOcorrenciaVO>;
+    function LocalizarPorDoct(ADoc: string): TClienteVO;
+    procedure AtualizaVersao(AIdCliente: Integer; AVersao: string);
+
+    function Relatorios(AModelo, AIdUsuario: Integer; AFiltro: TFiltroCliente): string;
+  end;
+
+implementation
+
+{ TCliente }
+
+uses uUsuario, uFuncoesServidor, uClienteEmailVO;
+
+procedure TCliente.AtualizaVersao(AIdCliente: Integer; AVersao: string);
+var
+  obj: TFireDAC;
+begin
+  if Trim(AVersao) <> '' then
+  begin
+    obj := TFireDAC.create;
+    try
+      obj.ExecutarSQL('UPDATE Cliente SET Cli_Versao = ' + QuotedStr(AVersao) + '  WHERE Cli_Id = ' + IntToStr(AIdCliente));
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+function TCliente.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TCliente.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+  obj: TFireDAC;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  obj := TFireDAC.create;
+  try
+    obj.ExecutarSQL('DELETE FROM Cliente WHERE Cli_Id = ' + IntToStr(Id));
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TCliente.ExcluirContatos(ACliente: TClienteVO);
+var
+  Id: Integer;
+  Item: TContatoVO;
+  achou: Boolean;
+  obj: TFireDAC;
+  objContato: TContato;
+begin
+// se na lista de objetos não tiver registro e no banco de dados sim
+// então excluir do banco de dados o registro da lista de objectos
+
+  objContato := TContato.Create;
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT Cont_Id FROM Contato WHERE Cont_Cliente = ' + IntToStr(ACliente.Id));
+
+    while not obj.Model.Eof do
+    begin
+      id := obj.Model.Fields[0].AsInteger;
+      achou := False;
+
+      for Item in ACliente.ListaContatoVO do
+      begin
+        if Item.Id = id then
+          achou := True;
+      end;
+
+      if achou = False then
+        objContato.Excluir(id);
+
+      obj.Model.Next;
+    end;
+
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(objContato);
+  end;
+end;
+
+procedure TCliente.ExcluirEmail(ACliente: TClienteVO);
+var
+//  lQry: TFDQuery;
+  Id: Integer;
+  Item: TClienteEmailVO;
+  achou: Boolean;
+  obj: TFireDAC;
+  objEmail: TClienteEmail;
+begin
+// se na lista de objetos não tiver registro e no banco de dados sim
+// então excluir do banco de dados o registro da lista de objectos
+
+  objEmail := TClienteEmail.Create;
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT CliEm_Id FROM Cliente_Email WHERE CliEm_Cliente = ' + IntToStr(ACliente.Id));
+
+    while not obj.Model.Eof do
+    begin
+      id := obj.Model.Fields[0].AsInteger;
+      achou := False;
+
+      for Item in ACliente.ClienteEmail do
+      begin
+        if Item.Id = id then
+          achou := True;
+      end;
+
+      if achou = False then
+        objEmail.Excluir(Id);
+
+      obj.Model.Next;
+    end;
+
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(objEmail);
+  end;
+end;
+
+function TCliente.Filtrar(Campo, Texto, Ativo: string; Contem: Boolean): string;
+begin
+  Result := '';
+end;
+
+function TCliente.FiltrarCodigo(Codigo: integer): string;
+begin
+  Result := CConsulta + ' WHERE Cli_Codigo = ' + Codigo.ToString();
+end;
+
+function TCliente.FiltrarUsuario(AFiltro: TFiltroCliente; Campo, Texto, Ativo: string; IdUsuario: Integer;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+  Usuario: TUsuario;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+
+  AFiltro.Ativo := Ativo;
+  sConsulta := sConsulta + Filtro(AFiltro, IdUsuario, 0);
+  Result := sConsulta;
+end;
+
+function TCliente.Filtro(AFiltro: TFiltroCliente; AIdUsuario, AModelo: Integer): string;
+var
+  sConsulta: string;
+  Usuario: TUsuario;
+begin
+  if AFiltro.Ativo <> 'T' then
+  begin
+    if AFiltro.Ativo = 'A' then
+      sConsulta := sConsulta + ' AND Cli_Ativo = 1'
+    else
+      sConsulta := sConsulta + ' AND Cli_Ativo = 0';
+  end;
+
+  Usuario := TUsuario.Create;
+  try
+    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario);
+  finally
+    FreeAndNil(Usuario);
+  end;
+
+  if AFiltro.IdUsuario <> '' then
+    sConsulta := sConsulta + ' AND Cli_Usuario IN' + AFiltro.IdUsuario;
+
+  if AFiltro.IdRevenda <> '' then
+    sConsulta := sConsulta + ' AND Cli_Revenda IN' + AFiltro.IdRevenda;
+
+  if AFiltro.Restricao = 0 then // sim
+    sConsulta := sConsulta + ' AND Cli_Restricao = 1';
+
+  if AFiltro.Restricao = 1 then // nao
+    sConsulta := sConsulta + ' AND Cli_Restricao = 0';
+
+  if AFiltro.Id <> '' then
+    sConsulta := sConsulta + ' AND Cli_Id IN ' + AFiltro.Id;
+
+  if AFiltro.Enquadramento <> '' then
+    sConsulta := sConsulta + ' AND Cli_Enquadramento IN ' + AFiltro.Enquadramento;
+
+  if AFiltro.IdCidade <> '' then
+    sConsulta := sConsulta + ' AND Cli_Cidade IN ' + AFiltro.IdCidade;
+
+  if AFiltro.Versao.Trim() <> '' then
+    sConsulta := sConsulta + ' AND Cli_Versao = ' + QuotedStr(AFiltro.Versao);
+
+  if AFiltro.sEmpresaVinculada = 'S' then
+    sConsulta := sConsulta + ' AND Cli_EmpresaVinculada > 0';
+
+  if AFiltro.sEmpresaVinculada = 'N' then
+    sConsulta := sConsulta + ' AND ((Cli_EmpresaVinculada = 0) OR (Cli_EmpresaVinculada IS NULL))';
+
+  if AModelo = 2 then
+  begin
+    if AFiltro.IdModulo <> '' then
+      sConsulta := sConsulta + ' AND CliMod_Modulo in ' + AFiltro.IdModulo;
+
+    if AFiltro.IdProduto <> '' then
+      sConsulta := sConsulta + ' AND CliMod_Produto in ' + AFiltro.IdProduto;
+  end
+  else begin
+    if AFiltro.IdModulo <> '' then
+    begin
+      sConsulta := sConsulta + ' AND EXISTS(SELECT 1 FROM Cliente_Modulo' +
+                               ' WHERE Cli_Id = CliMod_Cliente' +
+                               ' AND CliMod_Modulo IN ' + AFiltro.IdModulo + ')';
+    end;
+
+    if AFiltro.IdProduto <> '' then
+    begin
+      sConsulta := sConsulta + ' AND EXISTS(SELECT 1 FROM Cliente_Modulo' +
+                               ' WHERE Cli_Id = CliMod_Cliente' +
+                               ' AND CliMod_Produto IN ' + AFiltro.IdProduto + ')';
+    end;
+  end;
+  Result := sConsulta;
+end;
+
+procedure TCliente.GravarContato(ACliente: TClienteVO);
+var
+  objContato: TContato;
+  model: TContatoVO;
+begin
+  ExcluirContatos(ACliente);
+
+  objContato := TContato.Create;
+  try
+    for model in ACliente.ListaContatoVO do
+    begin
+      model.IdCliente := ACliente.Id;
+      objContato.Salvar(model);
+    end;
+  finally
+    FreeAndNil(objContato);
+  end;
+end;
+
+procedure TCliente.GravarEmail(ACliente: TClienteVO);
+var
+  objEmail: TClienteEmail;
+  model: TClienteEmailVO;
+begin
+  ExcluirEmail(ACliente);
+
+  objEmail := TClienteEmail.Create;
+  try
+    for model in ACliente.ClienteEmail do
+    begin
+      model.IdCliente := ACliente.Id;
+      objEmail.Salvar(model);
+    end;
+  finally
+    FreeAndNil(objEmail);
+  end;
+end;
+
+function TCliente.HistoricoCliente(
+  AIdCliente: Integer): TObjectList<TChamadoOcorrenciaVO>;
+var
+  obj: TFireDAC;
+  model: TChamadoOcorrenciaVO;
+  Lista: TObjectList<TChamadoOcorrenciaVO>;
+  sIdCliente: string;
+  sData: string;
+  Usuario: TUsuario;
+begin
+  sIdCliente := IntToStr(AIdCliente);
+
+  sData := FormatDateTime('yyyymmdd', TFuncoes.UltimoDiaMes(date));
+
+  Usuario := TUsuario.Create;
+  obj := TFireDAC.create;
+  try
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''CHA'' AS TIPO,');
+    obj.Lista.Add(' 	RIGHT (''0'' + (CONVERT (VARCHAR, MONTH (ChOco_Data))), 2)');
+    obj.Lista.Add('   + ''/'' + RIGHT (''0'' + (CONVERT (VARCHAR, YEAR (ChOco_Data))), 4) AS Meses,');
+    obj.Lista.Add(' 	COUNT(Cha_Id) AS Qtde,');
+    obj.Lista.Add(' 	ISNULL(SUM(ChOco_TotalHoras),0) AS TotalHoras,');
+    obj.Lista.Add(' 	0 AS Valor');
+    obj.Lista.Add(' FROM Chamado_Ocorrencia');
+    obj.Lista.Add(' 	INNER JOIN Chamado ON ChOco_Chamado = Cha_Id');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Cha_Cliente = Cli_Id');
+    obj.Lista.Add(' WHERE Cha_TipoMovimento = 1');
+    obj.Lista.Add(' AND Cli_Id = ' + sIdCliente);
+    obj.Lista.Add(' AND ChOco_Data <= ' +  QuotedStr(sData));
+    obj.Lista.Add( Usuario.RetornaPermissaoUsuarioDepartamento(1));
+//    obj.Lista.Add(' AND ChOco_Data <= DATEADD(month, -1,' +  QuotedStr(sData)+ ')');
+    obj.Lista.Add(' GROUP BY MONTH(ChOco_Data), YEAR(ChOco_Data)');
+
+    obj.Lista.Add(' UNION');
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''CCO'' AS TIPO,');
+    obj.Lista.Add(' 	''00'' AS Meses,');
+    obj.Lista.Add(' 	0 AS Qtde,');
+    obj.Lista.Add(' 	SUM(ChaOCol_TotalHoras) AS TotalHoras,');
+    obj.Lista.Add(' 	0 AS Valor');
+    obj.Lista.Add(' FROM Chamado_Ocorr_Colaborador');
+    obj.Lista.Add(' 	INNER JOIN Chamado_Ocorrencia ON ChaOCol_ChamadoOcorrencia = ChOco_Id');
+    obj.Lista.Add(' 	INNER JOIN Chamado ON ChOco_Chamado = Cha_Id');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Cha_Cliente = Cli_Id');
+    obj.Lista.Add(' WHERE Cli_Codigo = ' + sIdCliente);
+//    obj.Lista.Add(' AND ChOco_Data <= DATEADD(month, -1,' +  QuotedStr(sData)+ ')');
+    obj.Lista.Add(' AND ChOco_Data <= ' +  QuotedStr(sData));
+    obj.Lista.Add(' AND Cha_TipoMovimento = 1');
+
+    // Atividades
+    obj.Lista.Add(' UNION');
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''ATI'' AS TIPO,');
+    obj.Lista.Add(' 	RIGHT (''0'' + (CONVERT (VARCHAR, MONTH (ChOco_Data))), 2)');
+    obj.Lista.Add('   + ''/'' + RIGHT (''0'' + (CONVERT (VARCHAR, YEAR (ChOco_Data))), 4) AS Meses,');
+    obj.Lista.Add(' 	COUNT(Cha_Id) AS Qtde,');
+    obj.Lista.Add(' 	ISNULL(SUM(ChOco_TotalHoras),0) AS TotalHoras,');
+    obj.Lista.Add(' 	0 AS Valor');
+    obj.Lista.Add(' FROM Chamado_Ocorrencia');
+    obj.Lista.Add(' 	INNER JOIN Chamado ON ChOco_Chamado = Cha_Id');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Cha_Cliente = Cli_Id');
+    obj.Lista.Add(' WHERE Cha_TipoMovimento = 2');
+    obj.Lista.Add(' AND Cli_Id = ' + sIdCliente);
+//    obj.Lista.Add(' AND ChOco_Data <= DATEADD(month, -1,' +  QuotedStr(sData)+ ')');
+    obj.Lista.Add(' AND ChOco_Data <= ' +  QuotedStr(sData));
+    obj.Lista.Add(' GROUP BY MONTH(ChOco_Data), YEAR(ChOco_Data)');
+
+    obj.Lista.Add(' UNION');
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''CAT'' AS TIPO,');
+    obj.Lista.Add(' 	''00'' AS Meses,');
+    obj.Lista.Add(' 	0 AS Qtde,');
+    obj.Lista.Add(' 	ISNULL(SUM(ChaOCol_TotalHoras),0) AS TotalHoras,');
+    obj.Lista.Add(' 	0 AS Valor');
+    obj.Lista.Add(' FROM Chamado_Ocorr_Colaborador');
+    obj.Lista.Add(' 	INNER JOIN Chamado_Ocorrencia ON ChaOCol_ChamadoOcorrencia = ChOco_Id');
+    obj.Lista.Add(' 	INNER JOIN Chamado ON ChOco_Chamado = Cha_Id');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Cha_Cliente = Cli_Id');
+    obj.Lista.Add(' WHERE Cli_Id = ' + sIdCliente);
+    obj.Lista.Add(' AND Cha_TipoMovimento = 2');
+    obj.Lista.Add(' AND ChOco_Data <= ' +  QuotedStr(sData));
+    // Visitas
+    obj.Lista.Add(' UNION');
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''VIS'' AS TIPO,');
+    obj.Lista.Add(' 	RIGHT (''0'' + (CONVERT (VARCHAR, MONTH (Vis_Data))), 2)');
+    obj.Lista.Add('    + ''/'' + RIGHT (''0'' + (CONVERT (VARCHAR, YEAR (Vis_Data))), 4) AS Meses,');
+    obj.Lista.Add(' 	COUNT(Vis_Id) AS Qtde,');
+    obj.Lista.Add(' 	ISNULL(SUM(Vis_TotalHoras),0) AS TotalHoras,');
+    obj.Lista.Add(' 	SUM(Vis_Valor) AS Valor');
+    obj.Lista.Add(' FROM Visita');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Vis_Cliente = Cli_Id');
+    obj.Lista.Add(' WHERE Cli_Id = ' + sIdCliente);
+    obj.Lista.Add(' AND Vis_Data <= ' +  QuotedStr(sData));
+    obj.Lista.Add(' GROUP BY MONTH(Vis_Data), YEAR(Vis_Data)');
+
+    // Solicitacao
+    obj.Lista.Add(' UNION');
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''SOL'' AS TIPO,');
+    obj.Lista.Add(' 	RIGHT (''0'' + (CONVERT (VARCHAR, MONTH (Sol_Data))), 2)');
+    obj.Lista.Add('   + ''/'' + RIGHT (''0'' + (CONVERT (VARCHAR, YEAR (Sol_Data))), 4) AS Meses,');
+    obj.Lista.Add(' 	COUNT(DISTINCT Sol_Id) AS Qtde,');
+    obj.Lista.Add(' 	SUM(ISNULL(STemp_TotalHoras,0)) AS TotalHoras,');
+    obj.Lista.Add(' 	0 AS Valor');
+    obj.Lista.Add(' FROM Solicitacao');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Sol_Cliente = Cli_Id');
+    obj.Lista.Add(' 	LEFT JOIN Solicitacao_Tempo ON Sol_Id = STemp_Solicitacao');
+    obj.Lista.Add(' WHERE Cli_Id = ' + sIdCliente);
+    obj.Lista.Add(' AND Sol_Data <= ' +  QuotedStr(sData));
+    obj.Lista.Add(' GROUP BY MONTH(Sol_Data), YEAR(Sol_Data)');
+
+    obj.Lista.Add(' UNION');
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add(' 	''CSO'' AS TIPO,');
+    obj.Lista.Add(' 	RIGHT (''0'' + (CONVERT (VARCHAR, MONTH (Sol_Data))), 2)+ ''/'' + RIGHT (''0'' + (CONVERT (VARCHAR, YEAR (Sol_Data))), 4) AS Meses,');
+    obj.Lista.Add(' 	0 AS Qtde,');
+    obj.Lista.Add(' 	SUM(STemp_TotalHoras) AS TotalHoras,');
+    obj.Lista.Add(' 	0 as Valor');
+    obj.Lista.Add(' FROM Solicitacao_Tempo');
+    obj.Lista.Add(' 	INNER JOIN Solicitacao ON STemp_Solicitacao = Sol_Id');
+    obj.Lista.Add(' 	INNER JOIN Cliente ON Sol_Cliente = Cli_Id');
+    obj.Lista.Add(' 	AND Cli_Id = ' + sIdCliente);
+    obj.Lista.Add(' 	AND STemp_Data <= ' + QuotedStr(sData));
+    obj.Lista.Add(' GROUP BY MONTH (Sol_Data), YEAR (Sol_Data)');
+
+    obj.OpenSQL();
+
+    Lista := TObjectList<TChamadoOcorrenciaVO>.Create();
+
+    while not obj.Model.Eof do
+    begin
+      if obj.Model.FieldByName('Qtde').AsInteger > 0 then
+      begin
+        Model := TChamadoOcorrenciaVO.Create;
+        model.Docto       := obj.Model.FieldByName('TIPO').AsString;
+        model.Data        := StrToDate('01/' + obj.Model.FieldByName('Meses').AsString);
+        model.Qtde        := obj.Model.FieldByName('Qtde').AsInteger;
+        model.TotalHoras  := obj.Model.FieldByName('TotalHoras').AsFloat;
+        model.Valor       := obj.Model.FieldByName('Valor').AsFloat;
+        Lista.Add(model);
+      end;
+      obj.Model.Next;
+    end;
+
+    Result := Lista;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Usuario);
+  end;
+end;
+
+procedure TCliente.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT Cli_Id, Cli_Ativo FROM Cliente WHERE Cli_Codigo = ' + IntToStr(Codigo));
+    if Codigo > 0 then
+    begin
+      if (obj.Model.IsEmpty) then
+        raise Exception.Create(CRegistroNaoEncontrado);
+
+      LocalizarId(Qry, obj.Model.Fields[0].AsInteger);
+      if obj.Model.FieldByName('Cli_Ativo').AsBoolean = False then
+      begin
+        LocalizarId(Qry, 0);
+        raise Exception.Create(CRegistroInativo);
+      end;
+    end
+    else
+      LocalizarId(Qry, 0);
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TCliente.LocalizarCodigoCliente(var Qry: TFDQuery; Codigo,
+  IdUsuario: integer);
+var
+  sConsulta: string;
+  obj: TFireDAC;
+begin
+  sConsulta := 'SELECT Cli_Id, Cli_Ativo FROM Cliente WHERE Cli_Codigo = ' + IntToStr(Codigo);
+  sConsulta := sConsulta + ' AND EXISTS(';
+	sConsulta := sConsulta + ' 	  SELECT 1 FROM Usuario WHERE ((Cli_Revenda = Usu_Revenda) OR (Usu_Revenda IS NULL))';
+	sConsulta := sConsulta + ' 	  AND Usu_Id = ' + IntToStr(IdUsuario);
+	sConsulta := sConsulta + ' )';
+
+  sConsulta := sConsulta + ' AND EXISTS(';
+	sConsulta := sConsulta + ' 	  SELECT 1 FROM Usuario WHERE ((Cli_Id = Usu_Cliente) OR (Usu_Cliente IS NULL))';
+	sConsulta := sConsulta + ' 	  AND Usu_Id = ' + IntToStr(IdUsuario);
+	sConsulta := sConsulta + ' )';
+
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(sConsulta);
+
+    if Codigo > 0 then
+    begin
+      if (obj.Model.IsEmpty) then
+        raise Exception.Create(CRegistroNaoEncontrado);
+
+      LocalizarId(Qry, obj.Model.Fields[0].AsInteger);
+      if obj.Model.FieldByName('Cli_Ativo').AsBoolean = False then
+      begin
+        LocalizarId(Qry, 0);
+        raise Exception.Create(CRegistroInativo);
+      end;
+    end
+    else
+      LocalizarId(Qry, 0);
+
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TCliente.LocalizarIdObj(var Qry: TFDQuery; AId: Integer): TClienteVO;
+var
+  Cliente: TClienteVO;
+begin
+  LocalizarId(Qry, AId);
+  try
+    Cliente := TClienteVO.create;
+    Cliente.Id            := Qry.FieldByName('Cli_Id').AsInteger;
+    Cliente.Codigo        := Qry.FieldByName('Cli_Codigo').AsInteger;
+    Cliente.RazaoSocial   := Qry.FieldByName('Cli_Nome').AsString;
+    Cliente.NomeFantasia  := Qry.FieldByName('Cli_Fantasia').AsString;
+    Cliente.CNPJ          := Qry.FieldByName('Cli_Dcto').AsString;
+    Cliente.Enquadramento := Qry.FieldByName('Cli_Enquadramento').AsString;
+    Cliente.Endereco      := Qry.FieldByName('Cli_Endereco').AsString;
+    Cliente.Telefone      := Qry.FieldByName('Cli_Telefone').AsString;
+    Cliente.Contato       := Qry.FieldByName('Cli_Contato').AsString;
+    Cliente.RevendaVO.Id  := Qry.FieldByName('Cli_Revenda').AsInteger;
+    Cliente.Ativo         := Qry.FieldByName('Cli_Ativo').AsBoolean;
+    Cliente.Restricao     := Qry.FieldByName('Cli_Restricao').AsBoolean;
+    Cliente.UsuarioVO.Id  := Qry.FieldByName('Cli_Usuario').AsInteger;
+    Cliente.Versao        := Qry.FieldByName('Cli_Versao').AsString;
+    Cliente.RevendaVO.Codigo  := Qry.FieldByName('Rev_Codigo').AsInteger;
+    Cliente.RevendaVO.Nome    := Qry.FieldByName('Rev_Nome').AsString;
+    Cliente.UsuarioVO.Codigo  := Qry.FieldByName('Usu_Codigo').AsInteger;
+    Cliente.UsuarioVO.Nome    := Qry.FieldByName('Usu_Nome').AsString;
+
+//    raise Exception.Create('Cliente Inativo');
+  except
+    On E: Exception do
+    begin
+      FreeAndNil(Cliente);
+      raise Exception.Create(E.Message);
+    end;
+  end;
+
+  Result := Cliente;
+end;
+
+function TCliente.LocalizarPorDoct(ADoc: string): TClienteVO;
+var
+  obj: TFireDAC;
+  model: TClienteVO;
+  sDoc: string;
+begin
+  model := TClienteVO.create;
+  obj := TFireDAC.create;
+  if length(ADoc) = 14 then
+    sDoc := FormatMaskText('##.###.###/####-##;0;_', ADoc)
+  else
+    sDoc := FormatMaskText('###.###.###-##;0;_', ADoc);
+  try
+    obj.OpenSQL('SELECT Cli_Id, Cli_Revenda, Cli_Nome FROM Cliente WHERE Cli_Dcto = ' + QuotedStr(SDoc) );
+    model.Id := obj.Model.FieldByName('Cli_Id').AsInteger;
+    model.IdRevenda := obj.Model.FieldByName('Cli_Revenda').AsInteger;
+    model.RazaoSocial := obj.Model.FieldByName('Cli_Nome').AsString;
+    Result := model;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TCliente.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+procedure TCliente.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TCliente.ProximoCodigo: Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT MAX(Cli_Codigo) FROM Cliente');
+    Result := obj.Model.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TCliente.ProximoId: Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT IDENT_CURRENT(''Cliente'')');
+    Result := obj.Model.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TCliente.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TCliente.RelatorioModelo2(AIdUsuario: Integer; AFiltro: TFiltroCliente): string;
+var
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    sb.AppendLine(' SELECT DISTINCT');
+    sb.AppendLine(' 	Cli_Codigo,');
+    sb.AppendLine(' 	Cli_Nome,');
+    sb.AppendLine(' 	Cli_Fantasia,');
+    sb.AppendLine(' 	Cli_Fone1,');
+    sb.AppendLine(' 	Cli_Versao,');
+    sb.AppendLine(' 	CliMod_Produto,');
+    sb.AppendLine(' 	Prod_Codigo,');
+    sb.AppendLine(' 	Prod_Nome ');
+    sb.AppendLine(' FROM Cliente ');
+    sb.AppendLine(' 	LEFT JOIN Cliente_Modulo ON Cli_Id = CliMod_Cliente ');
+    sb.AppendLine(' 	LEFT JOIN Produto ON CliMod_Produto = Prod_Id ');
+    sb.AppendLine(' WHERE Cli_Id IS NOT NULL ');
+    sb.AppendLine(Filtro(AFiltro, AIdUsuario, 2));
+    sb.Append(' ORDER BY Prod_Nome, CliMod_Produto, Cli_Nome');
+
+    Result := sb.ToString();
+  finally
+    FreeAndNil(sb);
+  end;
+end;
+
+function TCliente.Relatorios(AModelo, AIdUsuario: Integer;
+  AFiltro: TFiltroCliente): string;
+begin
+  if AModelo = 2 then
+    Result := RelatorioModelo2(AIdUsuario, AFiltro)
+  else
+    Result := '';
+end;
+
+function TCliente.Salvar(ACliente: TClienteVO): Integer;
+begin
+  if ACliente.Codigo <= 0 then
+    raise Exception.Create('Informe o Código do Cliente!');
+  if ACliente.RazaoSocial.Trim = '' then
+    raise Exception.Create('Infome a Razão Social do Cliente!');
+  if ACliente.CNPJ.Trim = '' then
+    raise Exception.Create('Informe o CNPJ/CPF do Cliente!');
+  if ACliente.Revenda = 0 then
+    raise Exception.Create('Informe a Revenda do Cliente!');
+
+//------------------------------------------------------------------------------
+// gravar cliente
+  ACliente.Id := TGenericDAO.Save<TClienteVO>(ACliente);
+
+// gravar contatos
+  GravarContato(ACliente);
+
+// Email
+  GravarEmail(ACliente);
+
+  Result := ACliente.Id;
+end;
+
+//procedure TCliente.SalvarEmail(ACliente: TClienteVO);
+//var
+//  sb: TStringBuilder;
+//  Item: TClienteEmailVO;
+//begin
+//  sb := TStringBuilder.Create;
+//  try
+//    for Item in ACliente.ClienteEmail do
+//    begin
+//      sb.Clear;
+//      if Item.Id <= 0 then
+//      begin
+//        sb.Append('INSERT INTO Cliente_Email(');
+//        sb.Append('    CliEm_Cliente');
+//        sb.Append('   ,CliEm_Email');
+//        sb.Append('   ,CliEm_Notificar');
+//        sb.Append(')VALUES(');
+//        sb.Append(    Item.IdCliente.ToString());
+//        sb.Append(    ',' + QuotedStr(Item.Email));
+//        sb.Append(    ',' + TFuncoes.BolToString(Item.Notificar));
+//        sb.Append(')');
+//      end
+//      else begin
+//        sb.Append('UPDATE Cliente_Email SET');
+//        sb.Append('    CliEm_Email      = ' + QuotedStr(Item.Email) );
+//        sb.Append('   ,CliEm_Notificar  = ' + TFuncoes.BolToString(Item.Notificar));
+//        sb.Append(' WHERE CliEm_Id      = ' + Item.Id.ToString );
+//      end;
+//      dm.ExecutarSQL(sb.ToString);
+//    end;
+//  finally
+//    FreeAndNil(sb);
+//  end;
+//end;
+
+procedure TCliente.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+end.

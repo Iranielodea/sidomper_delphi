@@ -1,0 +1,23 @@
+unit uExportarStatus;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uArquivoTexto, uDM, uFireDAC,
+  uTipoVO, System.Generics.Collections, uGenericDAO;
+
+type
+  TExportarTipo = class
+  private
+    FArquivo: string;
+
+  public
+    procedure Exportar();
+    function Importar(): TObjectList<TTipoVO>;
+
+    constructor Create(); overload;
+  end;
+
+implementation
+
+end.

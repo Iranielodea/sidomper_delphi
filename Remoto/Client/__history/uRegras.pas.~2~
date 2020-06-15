@@ -1,0 +1,123 @@
+//
+// Created by the DataSnap proxy generator.
+// 20/11/2018 11:06:17
+//
+
+unit uRegras;
+
+interface
+
+uses Data.DBXCommon, Data.DBXClient, Data.DBXDataSnap, Data.DBXJSON, Datasnap.DSProxy, System.Classes, System.SysUtils, Data.DB, Data.SqlExpr, Data.DBXDBReaders, Data.DBXCDSReaders, Data.DBXJSONReflect;
+
+type
+  TServerMethods1Client = class(TDSAdminClient)
+  private
+    FEchoStringCommand: TDBXCommand;
+    FReverseStringCommand: TDBXCommand;
+    FFBLicencasListarCommand: TDBXCommand;
+    FFBLicencasListarItensCommand: TDBXCommand;
+    FListarLicencasItensCommand: TDBXCommand;
+  public
+    constructor Create(ADBXConnection: TDBXConnection); overload;
+    constructor Create(ADBXConnection: TDBXConnection; AInstanceOwner: Boolean); overload;
+    destructor Destroy; override;
+    function EchoString(Value: string): string;
+    function ReverseString(Value: string): string;
+    function FBLicencasListar: TJSONValue;
+    function FBLicencasListarItens: TJSONValue;
+    procedure ListarLicencasItens;
+  end;
+
+implementation
+
+function TServerMethods1Client.EchoString(Value: string): string;
+begin
+  if FEchoStringCommand = nil then
+  begin
+    FEchoStringCommand := FDBXConnection.CreateCommand;
+    FEchoStringCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FEchoStringCommand.Text := 'TServerMethods1.EchoString';
+    FEchoStringCommand.Prepare;
+  end;
+  FEchoStringCommand.Parameters[0].Value.SetWideString(Value);
+  FEchoStringCommand.ExecuteUpdate;
+  Result := FEchoStringCommand.Parameters[1].Value.GetWideString;
+end;
+
+function TServerMethods1Client.ReverseString(Value: string): string;
+begin
+  if FReverseStringCommand = nil then
+  begin
+    FReverseStringCommand := FDBXConnection.CreateCommand;
+    FReverseStringCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FReverseStringCommand.Text := 'TServerMethods1.ReverseString';
+    FReverseStringCommand.Prepare;
+  end;
+  FReverseStringCommand.Parameters[0].Value.SetWideString(Value);
+  FReverseStringCommand.ExecuteUpdate;
+  Result := FReverseStringCommand.Parameters[1].Value.GetWideString;
+end;
+
+function TServerMethods1Client.FBLicencasListar: TJSONValue;
+begin
+  if FFBLicencasListarCommand = nil then
+  begin
+    FFBLicencasListarCommand := FDBXConnection.CreateCommand;
+    FFBLicencasListarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FFBLicencasListarCommand.Text := 'TServerMethods1.FBLicencasListar';
+    FFBLicencasListarCommand.Prepare;
+  end;
+  FFBLicencasListarCommand.ExecuteUpdate;
+  Result := TJSONValue(FFBLicencasListarCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
+end;
+
+function TServerMethods1Client.FBLicencasListarItens: TJSONValue;
+begin
+  if FFBLicencasListarItensCommand = nil then
+  begin
+    FFBLicencasListarItensCommand := FDBXConnection.CreateCommand;
+    FFBLicencasListarItensCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FFBLicencasListarItensCommand.Text := 'TServerMethods1.FBLicencasListarItens';
+    FFBLicencasListarItensCommand.Prepare;
+  end;
+  FFBLicencasListarItensCommand.ExecuteUpdate;
+  Result := TJSONValue(FFBLicencasListarItensCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
+end;
+
+procedure TServerMethods1Client.ListarLicencasItens;
+begin
+  if FListarLicencasItensCommand = nil then
+  begin
+    FListarLicencasItensCommand := FDBXConnection.CreateCommand;
+    FListarLicencasItensCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FListarLicencasItensCommand.Text := 'TServerMethods1.ListarLicencasItens';
+    FListarLicencasItensCommand.Prepare;
+  end;
+  FListarLicencasItensCommand.ExecuteUpdate;
+end;
+
+
+constructor TServerMethods1Client.Create(ADBXConnection: TDBXConnection);
+begin
+  inherited Create(ADBXConnection);
+end;
+
+
+constructor TServerMethods1Client.Create(ADBXConnection: TDBXConnection; AInstanceOwner: Boolean);
+begin
+  inherited Create(ADBXConnection, AInstanceOwner);
+end;
+
+
+destructor TServerMethods1Client.Destroy;
+begin
+  FEchoStringCommand.DisposeOf;
+  FReverseStringCommand.DisposeOf;
+  FFBLicencasListarCommand.DisposeOf;
+  FFBLicencasListarItensCommand.DisposeOf;
+  FListarLicencasItensCommand.DisposeOf;
+  inherited;
+end;
+
+end.
+

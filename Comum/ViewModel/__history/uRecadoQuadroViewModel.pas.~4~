@@ -1,0 +1,24 @@
+unit uRecadoQuadroViewModel;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TRecadoQuadroViewModel = class
+  public
+    property TipoL: string;
+    property Id: Integer;
+    property Data: Date;
+    property Nivel: Integer;
+    property RazaoSocial: string;
+    property Telefone: string;
+    property Hora: TTime;
+    property UsuarioLcto: string;
+    property UsuarioDestino: string;
+  end;
+
+implementation
+
+end.

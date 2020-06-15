@@ -1,0 +1,219 @@
+unit uModeloRelatorio;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, uModeloRelatorioVO;
+
+  const CConsulta: string =
+    'SELECT ModR_Id, ModR_Codigo, ModR_Descricao, ModR_Arquivo FROM Modelo_Relatorio ';
+
+type
+  TModeloRelatorio = class(TInterfacedObject, ICadastroInterface)
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string;
+    function FiltrarCodigo(Codigo: Integer): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    procedure Salvar(Programa, IdUsuario: Integer); overload;
+    function Salvar(AModelo: TModeloRelatorioVO): Integer; overload;
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+  end;
+
+implementation
+
+{ TModeloRelatorio }
+
+uses uUsuario;
+
+function TModeloRelatorio.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TModeloRelatorio.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  DM.ExecutarSQL('DELETE FROM Modelo_Relatorio WHERE ModR_Id = ' + IntToStr(Id));
+end;
+
+function TModeloRelatorio.Filtrar(Campo, Texto, Ativo: string;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+  sConsulta := sConsulta + ' ORDER BY ' + Campo;
+
+  Result := sConsulta;
+end;
+
+function TModeloRelatorio.FiltrarCodigo(Codigo: Integer): string;
+begin
+  Result := CConsulta + ' WHERE ModR_Codigo = ' + Codigo.ToString();
+end;
+
+procedure TModeloRelatorio.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT ModR_Id FROM Modelo_Relatorio WHERE ModR_Codigo = ' + IntToStr(Codigo);
+    lQry.Open();
+
+    if Codigo > 0 then
+    begin
+      if (lQry.IsEmpty) then
+        raise Exception.Create(CRegistroNaoEncontrado);
+
+      LocalizarId(Qry, lQry.Fields[0].AsInteger);
+    end
+    else
+      LocalizarId(Qry, 0);
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TModeloRelatorio.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+procedure TModeloRelatorio.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TModeloRelatorio.ProximoCodigo: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT MAX(ModR_Codigo) FROM Modelo_Relatorio';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TModeloRelatorio.ProximoId: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT IDENT_CURRENT(''Modelo_Relatorio'')';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TModeloRelatorio.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TModeloRelatorio.Salvar(AModelo: TModeloRelatorioVO): Integer;
+var
+  sb: TStringBuilder;
+begin
+  if AModelo.Id = 0 then
+  begin
+    sb := TStringBuilder.Create;
+    sb.AppendLine(' INSERT INTO Modelo_Relatorio(');
+    sb.AppendLine(' ModR_Codigo, ModR_Descricao, ModR_Arquivo, ModR_Revenda');
+    sb.AppendLine(' ) VALUES (');
+    sb.AppendLine(AModelo.Codigo.ToString());
+    sb.AppendLine(',' + QuotedStr(AModelo.Descricao));
+    sb.AppendLine(',' + QuotedStr(AModelo.Arquivo));
+    sb.AppendLine('); SELECT SCOPE_IDENTITY();');
+    try
+      Result := dm.Conexao.ExecSQLScalar(sb.ToString);
+    finally
+      FreeAndNil(sb);
+    end;
+  end
+  else begin
+    sb := TStringBuilder.Create;
+    sb.AppendLine(' UPDATE Modelo_Relatorio SET');
+    sb.AppendLine('    ModR_Codigo = ' + AModelo.Codigo.ToString());
+    sb.AppendLine('   ,ModR_Descricao = ' + QuotedStr(AModelo.Descricao));
+    sb.AppendLine('   ,ModR_Arquivo = ' + QuotedStr(AModelo.Arquivo));
+    sb.AppendLine(' WHERE ModR_Id = ' + AModelo.Id.ToString());
+    try
+      dm.ExecutarSQL(sb.ToString);
+    finally
+      FreeAndNil(sb);
+    end;
+    Result := AModelo.Id;
+  end;
+end;
+
+procedure TModeloRelatorio.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+end.

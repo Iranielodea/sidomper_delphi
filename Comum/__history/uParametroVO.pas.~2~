@@ -1,0 +1,23 @@
+unit uParametroVO;
+
+interface
+
+uses
+  System.SysUtils, uKeyField, uTableName;
+
+type
+  TParametroVO = class
+  private
+
+  public
+    property Id: Integer;
+    property Codigo: Integer;
+    property Programa: Integer;
+    property Nome: string;
+    property Valor: string;
+    property Obs: string;
+  end;
+
+implementation
+
+end.

@@ -1,0 +1,21 @@
+unit uChamadoQuadroViewModel;
+
+interface
+
+uses System.Classes, ;
+
+type
+  TChamadoQuadroViewModel = class
+  public
+    property Quadro: string;
+    property IdChamado: Integer;
+    property DataAbertura: TDateTime;
+    property HoraAbertura: TTime;
+    property Nivel: Integer;
+    property Cha_Nivel: string;
+//    property Cliente:
+  end;
+
+implementation
+
+end.

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/05/29 10:42:00.000.996,=C:\Users\ielodea\Documents\RAD Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/07/10 13:40:14.000.050,=C:\Users\ielodea\Documents\RAD Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/07/10 13:40:15.000.033,=C:\Users\ielodea\Documents\RAD Studio\Projects\ServerMethodsUnit1.pas</Transaction>
+    <Transaction>2017/07/10 13:40:17.000.748,=C:\Users\ielodea\Documents\RAD Studio\Projects\ServerContainerUnit1.pas</Transaction>
+    <Transaction>2017/07/10 13:42:44.000.274,D:\DOMPER\SIDomper\Remoto\Server\uServidor.pas=C:\Users\ielodea\Documents\RAD Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/07/10 13:42:44.000.274,D:\DOMPER\SIDomper\Remoto\Server\uServidor.dfm=C:\Users\ielodea\Documents\RAD Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2017/07/10 13:42:47.000.776,D:\DOMPER\SIDomper\Remoto\Server\ServerContainerUnit1.pas=C:\Users\ielodea\Documents\RAD Studio\Projects\ServerContainerUnit1.pas</Transaction>
+    <Transaction>2017/07/10 13:42:47.000.776,D:\DOMPER\SIDomper\Remoto\Server\ServerContainerUnit1.dfm=C:\Users\ielodea\Documents\RAD Studio\Projects\ServerContainerUnit1.dfm</Transaction>
+    <Transaction>2017/07/10 13:42:51.000.122,D:\DOMPER\SIDomper\Remoto\Server\ServerMethodsUnit1.pas=C:\Users\ielodea\Documents\RAD Studio\Projects\ServerMethodsUnit1.pas</Transaction>
+    <Transaction>2017/07/10 13:42:51.000.122,D:\DOMPER\SIDomper\Remoto\Server\ServerMethodsUnit1.dfm=C:\Users\ielodea\Documents\RAD Studio\Projects\ServerMethodsUnit1.dfm</Transaction>
+    <Transaction>2017/07/10 13:43:04.000.334,D:\DOMPER\SIDomper\Remoto\Server\Servidor.dproj=C:\Users\ielodea\Documents\RAD Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2017/07/10 13:58:58.000.146,=D:\DOMPER\SIDomper\Comum\DAO\uTableName.pas</Transaction>
+    <Transaction>2017/07/10 13:58:58.000.130,=D:\DOMPER\SIDomper\Comum\DAO\uKeyField.pas</Transaction>
+    <Transaction>2017/07/10 13:58:58.000.117,=D:\DOMPER\SIDomper\Comum\DAO\uGenericDAO.pas</Transaction>
+    <Transaction>2017/07/10 13:59:37.000.695,D:\DOMPER\SIDomper\Comum\DAO\uGenericDAO.pas=</Transaction>
+    <Transaction>2017/07/10 14:00:22.000.891,=D:\DOMPER\SIDomper\Remoto\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/10 14:01:48.000.747,=D:\DOMPER\SIDomper\Remoto\Server\Unit2.pas</Transaction>
+    <Transaction>2017/07/10 14:02:00.000.849,D:\DOMPER\SIDomper\Remoto\Server\uDM.pas=D:\DOMPER\SIDomper\Remoto\Server\Unit2.pas</Transaction>
+    <Transaction>2017/07/10 14:02:00.000.849,D:\DOMPER\SIDomper\Remoto\Server\uDM.dfm=D:\DOMPER\SIDomper\Remoto\Server\Unit2.dfm</Transaction>
+    <Transaction>2017/07/10 14:02:59.000.064,D:\DOMPER\SIDomper\Remoto\Server\Negocio\uGenericDAO.pas=D:\DOMPER\SIDomper\Remoto\Server\Unit1.pas</Transaction>
+    <Transaction>2017/07/10 14:09:03.000.848,=D:\DOMPER\SIDomper\Remoto\Comum\uConfig.pas</Transaction>
+    <Transaction>2017/07/10 14:27:46.000.111,=D:\DOMPER\SIDomper\Remoto\Comum\uLicencaItensVO.pas</Transaction>
+    <Transaction>2017/07/10 14:27:46.000.121,=D:\DOMPER\SIDomper\Remoto\Comum\ULicencaVO.pas</Transaction>
+    <Transaction>2017/07/10 14:29:37.000.557,=D:\DOMPER\SIDomper\Server\Negocio\ULicenca.pas</Transaction>
+    <Transaction>2017/07/10 14:29:51.000.552,D:\DOMPER\SIDomper\Server\Negocio\ULicenca.pas=</Transaction>
+    <Transaction>2017/07/10 14:30:37.000.971,=D:\DOMPER\SIDomper\Remoto\Server\Negocio\ULicenca.pas</Transaction>
+    <Transaction>2017/07/10 14:44:11.000.447,=D:\DOMPER\SIDomper\Remoto\Server\Negocio\uFireDAC.pas</Transaction>
+    <Transaction>2017/07/10 14:53:58.000.720,=D:\DOMPER\SIDomper\Remoto\Comum\uConverter.pas</Transaction>
+  </Transactions>
+</BorlandProject>

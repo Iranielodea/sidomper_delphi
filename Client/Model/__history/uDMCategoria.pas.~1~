@@ -1,0 +1,26 @@
+unit uDMCategoria;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient;
+
+type
+  TDMCategoria = class(TDMBase)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMCategoria: TDMCategoria;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

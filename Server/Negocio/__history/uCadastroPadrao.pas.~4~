@@ -1,0 +1,173 @@
+unit uCadastroPadrao;
+
+interface
+
+uses
+  uDM, uRevenda, uUsuario,
+  System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uDepartamento, uCadastroInterface,
+  uDepartamentoAcesso, uRamal, uRecado, uEscala, uCidade, uFeriado, uCategoria;
+
+
+type
+  TCadastroPadrao = class
+  private
+    function CriarFactory(Programa: Integer): ICadastroInterface;
+  public
+//------------------------------------------------------------------------------
+// Cadastro Padrao
+//------------------------------------------------------------------------------
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Programa: Integer; Campo, Texto, Ativo:
+      string; Contem: Boolean = True): string;
+    function FiltrarCodigo(Programa, Codigo: integer): string;
+    procedure LocalizarId(Programa: Integer; var Qry: TFDQuery; Id: integer);
+    procedure LocalizarCodigo(Programa: Integer; var Qry: TFDQuery; Codigo: integer);
+    procedure Salvar(Programa, IdUsuario: Integer);
+    function ProximoId(Programa: Integer): Integer;
+    function ProximoCodigo(Programa: Integer): Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+  end;
+
+implementation
+
+{ TCadastroPadrao }
+
+uses uProduto, uModulo, uTipo, uStatus, uCliente, uClienteEmail,
+  uClienteEspecificacao, uClienteModulo, uSolicitacao, uVisita, uBaseConhecimento,
+  uParametros, uVersao, uChamado, uContaEmail, uProspect, uOrcamento,
+  uObservacao, uFormaPagto, uModeloRelatorio;
+
+function TCadastroPadrao.CriarFactory(Programa: Integer): ICadastroInterface;
+begin
+  case Programa of
+      1: Result := TChamado.Create;
+      2: Result := TVisita.Create;
+      3: Result := TSolicitacao.Create;
+      4: Result := TVersao.Create;
+      6: Result := TBaseConhecimento.Create;
+    100: Result := TRevenda.Create;
+    101: Result := TProduto.Create;
+    102: Result := TModulo.Create;
+    103: Result := TCliente.Create;
+   1031: Result := TClienteEmail.Create;
+   1033: Result := TClienteModulo.Create;
+    104: Result := TUsuario.Create;
+    105: Result := TDepartamento.Create;
+   1051: Result := TDepartamentoAcesso.Create;
+    106: Result := TTipo.Create;
+    107: Result := TStatus.Create;
+    108: Result := TClienteEspecificacao.Create;
+    109: Result := TParametros.Create;
+    110: Result := TContaEmail.Create;
+    111: Result := TChamado.Create; // atividade
+    113: Result := TProspect.Create;
+    114: Result := TOrcamento.Create;
+    115: Result := TFormaPagto.Create;
+    116: Result := TObservacao.Create;
+    117: Result := TModeloRelatorio.Create;
+    118: Result := TRamal.Create;
+    119: Result := TRecado.Create;
+    120: Result := TEscala.create;
+    121: Result := TCidade.create;
+    123: Result := TFeriado.Create;
+    124: Result := TCategoria.Create;
+  end;
+end;
+
+function TCadastroPadrao.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  Result := obj.Editar(Programa, IdUsuario);
+end;
+
+procedure TCadastroPadrao.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  obj.Excluir(Programa, IdUsuario, Id);
+end;
+
+function TCadastroPadrao.Filtrar(Programa: Integer; Campo,
+  Texto, Ativo: string; Contem: Boolean = True): string;
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  Result := obj.Filtrar(Campo, Texto, Ativo, Contem);
+end;
+
+function TCadastroPadrao.FiltrarCodigo(Programa, Codigo: integer): string;
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  Result := obj.FiltrarCodigo(Codigo);
+end;
+
+procedure TCadastroPadrao.LocalizarCodigo(Programa: Integer; var Qry: TFDQuery;
+  Codigo: integer);
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  obj.LocalizarCodigo(Qry, Codigo);
+end;
+
+procedure TCadastroPadrao.LocalizarId(Programa: Integer; var Qry: TFDQuery; Id:
+  integer);
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  obj.LocalizarId(Qry, Id);
+end;
+
+procedure TCadastroPadrao.Novo(Programa, IdUsuario: Integer);
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  obj.Novo(Programa, IdUsuario);
+end;
+
+function TCadastroPadrao.ProximoCodigo(Programa: Integer): Integer;
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  Result := obj.ProximoCodigo();
+end;
+
+function TCadastroPadrao.ProximoId(Programa: Integer): Integer;
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  Result := obj.ProximoId;
+end;
+
+procedure TCadastroPadrao.Relatorio(Programa, IdUsuario: Integer);
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  obj.Relatorio(Programa, IdUsuario);
+end;
+
+procedure TCadastroPadrao.Salvar(Programa, IdUsuario: Integer);
+var
+  obj: ICadastroInterface;
+begin
+  obj := CriarFactory(Programa);
+  obj.Salvar(Programa, IdUsuario);
+end;
+
+end.

@@ -1,0 +1,25 @@
+unit uDMRelCliente;
+
+interface
+
+uses
+  System.SysUtils, System.Classes;
+
+type
+  TDMRelCliente = class(TDataModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMRelCliente: TDMRelCliente;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

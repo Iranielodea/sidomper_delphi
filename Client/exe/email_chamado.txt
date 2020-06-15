@@ -1,0 +1,8 @@
+<html>Caro(a) : LABLOG SOLUCOES EM DIAGNOSTICOS LTDA - ME, seguem abaixo informações referente ao chamado realizado na Domper Consultoria e Sistemas: <br><br>Nº Chamado : 053154<br>Data Abertura : 11/06/2019 - Hora : 14:29:00<br>Aberto por : VINICIUS CONDRAS VIEIRA<br>Contato : JULIANO<br>Descrição : Situação:Ao lançar uma nota pra bonificação ele zera os campos de base icms 
+
+Id:
+Senha:6678<br><br>Dados do Atendimento (AUDITORIA)<br><br>Usuário : VINICIUS CONDRAS VIEIRA<br>Data Ocorrência: 11/06/2019<br>Hora Inicial : 14:30:00<br>Hora Final : 14:43:00<br>Solução : Cliente está importando para a nota o pedido 6722, e utilizando o CFOP 5.910. Ao importar para a nota, ele altera o CFOP principal da nota para 5.910, assim como o CFOP do item. Ao alterar o CFOP do item, o sistema está zerando os campos BASE % e Alíquota do ICMS, mesmo que haja os valores informados na tributação por estado vinculada ao CFOP 5.910.<br><br>Usuário : RODRIGO HASSE DA SILVA<br>Data Ocorrência: 11/06/2019<br>Hora Inicial : 14:55:00<br>Hora Final : 17:47:00<br>Solução : <br><br>Usuário : BETINA RIBEIRO DE JESUS<br>Data Ocorrência: 11/06/2019<br>Hora Inicial : 18:04:00<br>Hora Final : 18:05:00<br>Solução : Aguardando resposta do contador do cliente;
+
+Questionamento:
+-> As notas emitidas no CFOP 5.910 devem destacar o ICMS?
+-> O CST correto, se destacado o ICMS será 090 ou 000?<br><br>Colocamo-nos a disposição para maiores esclarecimentos. <br><br>Equipe Domper <br><br>Esta mensagem é automática e foi gerada pelo Sistema Interno  de Atividades Domper. <br> Por favor não responda este email.</html>

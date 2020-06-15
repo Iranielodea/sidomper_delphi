@@ -1,0 +1,25 @@
+unit uBaseDadosNova;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons;
+
+type
+  TfrmBaseDadosNova = class(TForm)
+    btnExportar: TBitBtn;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmBaseDadosNova: TfrmBaseDadosNova;
+
+implementation
+
+{$R *.dfm}
+
+end.

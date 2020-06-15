@@ -1,0 +1,335 @@
+unit uSolicitacaoVO;
+
+interface
+
+uses
+  System.SysUtils, uStatusVO, uClienteVO, uUsuarioVO, uModuloVO, uProdutoVO,
+    uCategoriaVO, uTipoVO, System.Generics.Collections, uSolicitacaoStatusVO,
+    uSolicitacaoCronogramaVO, uSolicitacaoOcorrenciaVO;
+
+type
+  TSolicitacaoVO = class
+  private
+    FUsuarioAtendeAtual: Integer;
+    FId: Integer;
+    FStatus: TStatusVO;
+    FCliente: TClienteVO;
+    FTitulo: string;
+    FNivel: string;
+    FData: TDate;
+    FIdStatus: Integer;
+    FTempoPrevisto: Currency;
+    FVersao: string;
+    FHora: string;
+    FIdDesenvolvedor: Integer;
+    FPrevisaoEntrega: TDate;
+    FDescricao: string;
+    FIdTipo: Integer;
+    FIdAnalista: Integer;
+    FIdModulo: Integer;
+    FUsuarioAbertura: Integer;
+    FIdProduto: Integer;
+    FAnexo: string;
+    FIdVersao: Integer;
+    FContato: string;
+    FIdCliente: Integer;
+    FDescricaoLiberacao: string;
+    FIdCategoria: Integer;
+    FProduto: TProduto;
+    FUsuarioAtendeAtualVO: TUsuarioVO;
+    FUsuarioAberturaVO: TUsuarioVO;
+    FCategoria: TCategoriaVO;
+    FDesenvolvedor: TUsuarioVO;
+    FTipo: TTipoVO;
+    FAnalista: TUsuarioVO;
+    FModulo: TModuloVO;
+    FSolicitacoesStatus: TObjectList<TSolicitacaoStatusVO>;
+    FSolicitacoesCronogramas: TObjectList<TSolicitacaoCronogramaVO>;
+    FSolicitacoesOcorrencias: TObjectList<TSolicitacaoOcorrenciaVO>;
+    procedure SetId(const Value: Integer);
+    procedure SetUsuarioAtendeAtual(const Value: Integer);
+    procedure SetStatus(const Value: TStatusVO);
+    procedure SetCliente(const Value: TClienteVO);
+    procedure SetTitulo(const Value: string);
+    procedure SetNivel(const Value: string);
+    procedure SetData(const Value: TDate);
+    procedure SetAnexo(const Value: string);
+    procedure SetContato(const Value: string);
+    procedure SetDescricao(const Value: string);
+    procedure SetDescricaoLiberacao(const Value: string);
+    procedure SetHora(const Value: string);
+    procedure SetIdAnalista(const Value: Integer);
+    procedure SetIdCategoria(const Value: Integer);
+    procedure SetIdCliente(const Value: Integer);
+    procedure SetIdDesenvolvedor(const Value: Integer);
+    procedure SetIdModulo(const Value: Integer);
+    procedure SetIdProduto(const Value: Integer);
+    procedure SetIdStatus(const Value: Integer);
+    procedure SetIdTipo(const Value: Integer);
+    procedure SetIdVersao(const Value: Integer);
+    procedure SetPrevisaoEntrega(const Value: TDate);
+    procedure SetTempoPrevisto(const Value: Currency);
+    procedure SetUsuarioAbertura(const Value: Integer);
+    procedure SetVersao(const Value: string);
+    procedure SetAnalista(const Value: TUsuarioVO);
+    procedure SetCategoria(const Value: TCategoriaVO);
+    procedure SetDesenvolvedor(const Value: TUsuarioVO);
+    procedure SetModulo(const Value: TModuloVO);
+    procedure SetProduto(const Value: TProduto);
+    procedure SetTipo(const Value: TTipoVO);
+    procedure SetUsuarioAberturaVO(const Value: TUsuarioVO);
+    procedure SetUsuarioAtendeAtualVO(const Value: TUsuarioVO);
+  public
+    property Id: Integer read FId write SetId;
+    property Data: TDate  read FData write SetData;
+    property Hora: string read FHora write SetHora;
+    property IdCliente: Integer read FIdCliente write SetIdCliente;
+    property UsuarioAbertura: Integer read FUsuarioAbertura write SetUsuarioAbertura;
+    property IdModulo: Integer read FIdModulo write SetIdModulo;
+    property IdProduto: Integer read FIdProduto write SetIdProduto;
+    property Titulo: string read FTitulo write SetTitulo;
+    property Descricao: string read FDescricao write SetDescricao;
+    property Nivel: string read FNivel write SetNivel;
+    property Versao: string read FVersao write SetVersao;
+    property Anexo: string read FAnexo write SetAnexo;
+    property IdAnalista: Integer read FIdAnalista write SetIdAnalista;
+    property IdStatus: Integer read FIdStatus write SetIdStatus;
+    property IdTipo: Integer read FIdTipo write SetIdTipo;
+    property TempoPrevisto: Currency read FTempoPrevisto write SetTempoPrevisto;
+    property PrevisaoEntrega: TDate read FPrevisaoEntrega write SetPrevisaoEntrega;
+    property IdDesenvolvedor: Integer read FIdDesenvolvedor write SetIdDesenvolvedor;
+    property DescricaoLiberacao: string read FDescricaoLiberacao write SetDescricaoLiberacao;
+    property UsuarioAtendeAtual: Integer read FUsuarioAtendeAtual write SetUsuarioAtendeAtual;
+    property Contato: string read FContato write SetContato;
+    property IdVersao: Integer read FIdVersao write SetIdVersao;
+    property IdCategoria: Integer read FIdCategoria write SetIdCategoria;
+
+    property Cliente: TClienteVO read FCliente write SetCliente;
+    property UsuarioAberturaVO: TUsuarioVO read FUsuarioAberturaVO write SetUsuarioAberturaVO;
+    property Modulo: TModuloVO read FModulo write SetModulo;
+    property Produto: TProduto read FProduto write SetProduto;
+    property Analista: TUsuarioVO read FAnalista write SetAnalista;
+    property Status: TStatusVO read FStatus write SetStatus;
+    property Tipo: TTipoVO read FTipo write SetTipo;
+    property Desenvolvedor: TUsuarioVO read FDesenvolvedor write SetDesenvolvedor;
+    property UsuarioAtendeAtualVO: TUsuarioVO read FUsuarioAtendeAtualVO write SetUsuarioAtendeAtualVO;
+    property Categoria: TCategoriaVO read FCategoria write SetCategoria;
+
+    property SolicitacoesStatus: TObjectList<TSolicitacaoStatusVO> read FSolicitacoesStatus write FSolicitacoesStatus;
+    //property SolicitacoesTempos: TObjectList<TSolicitacaoStatusVO> read FSolicitacoesTempos write FSolicitacoesTempos;
+    property SolicitacoesCronogramas: TObjectList<TSolicitacaoCronogramaVO> read FSolicitacoesCronogramas write FSolicitacoesCronogramas;
+    property SolicitacoesOcorrencias: TObjectList<TSolicitacaoOcorrenciaVO> read FSolicitacoesOcorrencias write FSolicitacoesOcorrencias;
+
+    constructor create; overload;
+    destructor destroy; override;
+  end;
+
+  TListaSolicitacao = TObjectList<TSolicitacaoVO>;
+
+implementation
+
+{ TSolicitacaoVO }
+
+constructor TSolicitacaoVO.create;
+begin
+  inherited create;
+  FCategoria := TCategoriaVO.Create;
+  FUsuarioAtendeAtualVO := TUsuarioVO.Create;
+  FDesenvolvedor := TUsuarioVO.Create;
+  FTipo := TTipoVO.Create;
+  FStatus := TStatusVO.Create;
+  FAnalista := TUsuarioVO.Create;
+  FProduto := TProduto.Create;
+  FModulo := TModuloVO.Create;
+  FUsuarioAberturaVO := TUsuarioVO.Create;
+  FCliente := TClienteVO.create;
+  FSolicitacoesStatus := TObjectList<TSolicitacaoStatusVO>.Create(nil);
+//  FSolicitacoesTempos := TObjectList<TSolicitacaoTempoVO>.Create(nil);
+  FSolicitacoesCronogramas := TObjectList<TSolicitacaoCronogramaVO>.Create(nil);
+  FSolicitacoesOcorrencias := TObjectList<TSolicitacaoOcorrenciaVO>.Create(nil);
+end;
+
+destructor TSolicitacaoVO.destroy;
+begin
+  FreeAndNil(FCliente);
+  FreeAndNil(FUsuarioAberturaVO);
+  FreeAndNil(FModulo);
+  FreeAndNil(FProduto);
+  FreeAndNil(FAnalista);
+  FreeAndNil(FStatus);
+  FreeAndNil(FTipo);
+  FreeAndNil(FDesenvolvedor);
+  FreeAndNil(FUsuarioAtendeAtualVO);
+  FreeAndNil(FCategoria);
+  FreeAndNil(FSolicitacoesStatus);
+  FreeAndNil(FSolicitacoesCronogramas);
+  FreeAndNil(FSolicitacoesOcorrencias);
+  inherited;
+end;
+
+procedure TSolicitacaoVO.SetAnalista(const Value: TUsuarioVO);
+begin
+  FAnalista := Value;
+end;
+
+procedure TSolicitacaoVO.SetAnexo(const Value: string);
+begin
+  FAnexo := Value;
+end;
+
+procedure TSolicitacaoVO.SetCategoria(const Value: TCategoriaVO);
+begin
+  FCategoria := Value;
+end;
+
+procedure TSolicitacaoVO.SetCliente(const Value: TClienteVO);
+begin
+  FCliente := Value;
+end;
+
+procedure TSolicitacaoVO.SetContato(const Value: string);
+begin
+  FContato := Value;
+end;
+
+procedure TSolicitacaoVO.SetData(const Value: TDate);
+begin
+  FData := Value;
+end;
+
+procedure TSolicitacaoVO.SetDescricao(const Value: string);
+begin
+  FDescricao := Value;
+end;
+
+procedure TSolicitacaoVO.SetDescricaoLiberacao(const Value: string);
+begin
+  FDescricaoLiberacao := Value;
+end;
+
+procedure TSolicitacaoVO.SetDesenvolvedor(const Value: TUsuarioVO);
+begin
+  FDesenvolvedor := Value;
+end;
+
+procedure TSolicitacaoVO.SetHora(const Value: string);
+begin
+  FHora := Value;
+end;
+
+procedure TSolicitacaoVO.SetId(const Value: Integer);
+begin
+  FId := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdAnalista(const Value: Integer);
+begin
+  FIdAnalista := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdCategoria(const Value: Integer);
+begin
+  FIdCategoria := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdCliente(const Value: Integer);
+begin
+  FIdCliente := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdDesenvolvedor(const Value: Integer);
+begin
+  FIdDesenvolvedor := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdModulo(const Value: Integer);
+begin
+  FIdModulo := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdProduto(const Value: Integer);
+begin
+  FIdProduto := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdStatus(const Value: Integer);
+begin
+  FIdStatus := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdTipo(const Value: Integer);
+begin
+  FIdTipo := Value;
+end;
+
+procedure TSolicitacaoVO.SetIdVersao(const Value: Integer);
+begin
+  FIdVersao := Value;
+end;
+
+procedure TSolicitacaoVO.SetModulo(const Value: TModuloVO);
+begin
+  FModulo := Value;
+end;
+
+procedure TSolicitacaoVO.SetNivel(const Value: string);
+begin
+  FNivel := Value;
+end;
+
+procedure TSolicitacaoVO.SetPrevisaoEntrega(const Value: TDate);
+begin
+  FPrevisaoEntrega := Value;
+end;
+
+procedure TSolicitacaoVO.SetProduto(const Value: TProduto);
+begin
+  FProduto := Value;
+end;
+
+procedure TSolicitacaoVO.SetStatus(const Value: TStatusVO);
+begin
+  FStatus := Value;
+end;
+
+procedure TSolicitacaoVO.SetTempoPrevisto(const Value: Currency);
+begin
+  FTempoPrevisto := Value;
+end;
+
+procedure TSolicitacaoVO.SetTipo(const Value: TTipoVO);
+begin
+  FTipo := Value;
+end;
+
+procedure TSolicitacaoVO.SetTitulo(const Value: string);
+begin
+  FTitulo := Value;
+end;
+
+procedure TSolicitacaoVO.SetUsuarioAbertura(const Value: Integer);
+begin
+  FUsuarioAbertura := Value;
+end;
+
+procedure TSolicitacaoVO.SetUsuarioAberturaVO(const Value: TUsuarioVO);
+begin
+  FUsuarioAberturaVO := Value;
+end;
+
+procedure TSolicitacaoVO.SetUsuarioAtendeAtual(const Value: Integer);
+begin
+  FUsuarioAtendeAtual := Value;
+end;
+
+procedure TSolicitacaoVO.SetUsuarioAtendeAtualVO(const Value: TUsuarioVO);
+begin
+  FUsuarioAtendeAtualVO := Value;
+end;
+
+procedure TSolicitacaoVO.SetVersao(const Value: string);
+begin
+  FVersao := Value;
+end;
+
+end.

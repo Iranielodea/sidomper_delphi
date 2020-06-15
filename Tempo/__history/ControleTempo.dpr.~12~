@@ -1,0 +1,23 @@
+program ControleTempo;
+
+uses
+  Vcl.Forms,
+  uTelaPrincipal in 'uTelaPrincipal.pas' {frmTelaPrincipal},
+  uDM in 'uDM.pas' {DM: TDataModule},
+  uRegras in 'uRegras.pas',
+  uDMSolicitacao in 'uDMSolicitacao.pas' {dmSolicitacao: TDataModule},
+  uSolicitacaoVO in '..\Comum\uSolicitacaoVO.pas',
+  uConverter in '..\Remoto\Comum\uConverter.pas',
+  uStatusVO in 'uStatusVO.pas',
+  uClienteVO in 'uClienteVO.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmTelaPrincipal, frmTelaPrincipal);
+  Application.CreateForm(TDM, DM);
+  Application.CreateForm(TdmSolicitacao, dmSolicitacao);
+  Application.Run;
+end.

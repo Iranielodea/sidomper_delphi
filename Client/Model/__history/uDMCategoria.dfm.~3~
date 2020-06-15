@@ -1,0 +1,48 @@
+inherited DMCategoria: TDMCategoria
+  OnCreate = DataModuleCreate
+  inherited CDSConsulta: TClientDataSet
+    ProviderName = 'dspCategoriaCons'
+    RemoteServer = DM.DSPConexao2
+    object CDSConsultaCat_Id: TAutoIncField
+      FieldName = 'Cat_Id'
+      ReadOnly = True
+      Visible = False
+    end
+    object CDSConsultaCat_Codigo: TIntegerField
+      Alignment = taCenter
+      DisplayLabel = 'C'#243'digo'
+      FieldName = 'Cat_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSConsultaCat_Nome: TStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'Cat_Nome'
+      Required = True
+      Size = 100
+    end
+  end
+  inherited CDSCadastro: TClientDataSet
+    ProviderName = 'dspCategoriaCad'
+    RemoteServer = DM.DSPConexao2
+    object CDSCadastroCat_Id: TAutoIncField
+      FieldName = 'Cat_Id'
+      ReadOnly = True
+    end
+    object CDSCadastroCat_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Cat_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSCadastroCat_Nome: TStringField
+      FieldName = 'Cat_Nome'
+      Required = True
+      Size = 100
+    end
+    object CDSCadastroCat_Ativo: TBooleanField
+      FieldName = 'Cat_Ativo'
+      Required = True
+    end
+  end
+end

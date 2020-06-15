@@ -1,0 +1,36 @@
+object frmBaseConhDetalhe: TfrmBaseConhDetalhe
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'Detalhes'
+  ClientHeight = 621
+  ClientWidth = 1018
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object redtGeral: TRichEdit
+    Left = 0
+    Top = 0
+    Width = 1018
+    Height = 621
+    Align = alClient
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssVertical
+    TabOrder = 0
+    OnKeyDown = redtGeralKeyDown
+  end
+end

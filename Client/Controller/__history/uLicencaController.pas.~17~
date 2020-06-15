@@ -1,0 +1,85 @@
+unit uLicencaController;
+
+interface
+
+uses
+  System.SysUtils, uDMOrcamento, uRegras, uEnumerador, uDM, Data.DB, Vcl.Forms,
+  uFiltroOrcamento, Data.DBXJSON, Data.DBXJSONReflect, uUsuario, uParcelas, uOrcamentoVO,
+  uFormaPagtoVO, uObsevacaoController, uConverter, System.Generics.Collections,
+  uOrcamentoEmailVO, uGenericProperty, uDepartamentoEmailVO,
+  uParametrosController, uFormaPagtoController, uClienteController,
+  uTipoController, uTipoVO, uContatoVO, ULicencaVO, uLicencaItensVO, uFiltroLicenca;
+
+type
+  TLicencaController = class
+  public
+    procedure Importar();
+    function BuscarLicencas(AFiltro: TFiltroLicenca): TObjectList<TLicencaVO>;
+    function BuscarLicencasItens(AFiltro: TFiltroLicenca): TObjectList<TLicencaItensVO>;
+    procedure PermissaoAcessar(AIdUsuario: Integer);
+  end;
+
+implementation
+
+{ TLicencaController }
+
+function TLicencaController.BuscarLicencas(AFiltro: TFiltroLicenca): TObjectList<TLicencaVO>;
+var
+  Negocio: TServerModule2Client;
+  lista : TObjectList<TLicencaVO>;
+  objJSON: TJSONValue;
+begin
+  objJSON := TConverte.ObjectToJSON<TFiltroLicenca>(AFiltro);
+
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    lista := TConverte.JSONToObject<TListaLicenca>(Negocio.LicencasListarTodos(objJSON));
+    Result := lista;
+  finally
+    FreeAndNil(Negocio);
+//    FreeAndNil(objJSON);
+  end;
+end;
+
+function TLicencaController.BuscarLicencasItens(AFiltro: TFiltroLicenca): TObjectList<TLicencaItensVO>;
+var
+  Negocio: TServerModule2Client;
+  lista : TObjectList<TLicencaItensVO>;
+  objJSON: TJSONValue;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  objJSON := TConverte.ObjectToJSON<TFiltroLicenca>(AFiltro);
+  try
+    lista := TConverte.JSONToObject<TListaLicencaItens>(Negocio.LicencasListarTodosItens(objJSON));
+    Result := lista;
+  finally
+    FreeAndNil(Negocio);
+//    FreeAndNil(objJSON);
+  end;
+end;
+
+procedure TLicencaController.Importar;
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    Negocio.LicencasImportar();
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TLicencaController.PermissaoAcessar(AIdUsuario: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    Negocio.LicencaPermissaoAcessar(CLicenca, AIdUsuario);
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+end.

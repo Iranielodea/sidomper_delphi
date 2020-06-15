@@ -1,0 +1,593 @@
+object frmLicenca: TfrmLicenca
+  Tag = 122
+  Left = 0
+  Top = 0
+  Caption = 'Licen'#231'as'
+  ClientHeight = 625
+  ClientWidth = 1105
+  Color = clBtnFace
+  Font.Charset = ANSI_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Verdana'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnKeyPress = FormKeyPress
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 14
+  object PageControl1: TPageControl
+    Left = 0
+    Top = 105
+    Width = 1105
+    Height = 479
+    ActivePage = tsLicenca
+    Align = alClient
+    TabOrder = 0
+    object tsLicenca: TTabSheet
+      Caption = 'Lista Cliente'
+      object Panel2: TPanel
+        Left = 0
+        Top = 0
+        Width = 1097
+        Height = 450
+        Align = alClient
+        BevelOuter = bvLowered
+        TabOrder = 0
+        object dbLicenca: TDBGrid
+          Left = 1
+          Top = 1
+          Width = 1095
+          Height = 426
+          Align = alClient
+          DataSource = dsCad
+          Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+          TabOrder = 0
+          TitleFont.Charset = ANSI_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -12
+          TitleFont.Name = 'Verdana'
+          TitleFont.Style = []
+          OnDrawColumnCell = dbLicencaDrawColumnCell
+          OnTitleClick = dbLicencaTitleClick
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'Documento'
+              Width = 133
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Empresa'
+              Width = 128
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'RazaoSocial'
+              Title.Caption = 'Raz'#227'o Social'
+              Width = 394
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'QtdeEstacao'
+              Title.Caption = 'Qtde Esta'#231#245'es'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'QtdeUsuario'
+              Title.Caption = 'Qtde Usu'#225'rios'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'IPExterno'
+              Title.Caption = 'IP Externo'
+              Width = 118
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DataUtilizacao'
+              Title.Caption = 'Data Utiliza'#231#227'o'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Build'
+              Width = 83
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'IPLocal'
+              Title.Caption = 'IP Local'
+              Width = 108
+              Visible = True
+            end>
+        end
+        object Panel5: TPanel
+          Left = 1
+          Top = 427
+          Width = 1095
+          Height = 22
+          Align = alBottom
+          BevelOuter = bvLowered
+          TabOrder = 1
+          object lblQtdeLicenca: TLabel
+            Left = 1
+            Top = 6
+            Width = 91
+            Height = 14
+            Caption = 'lblQtdeLicenca'
+          end
+          object lblQtdeEstacao: TLabel
+            Left = 325
+            Top = 6
+            Width = 95
+            Height = 14
+            Alignment = taRightJustify
+            Caption = 'lblQtdeEstacao'
+          end
+          object lblQtdeUsuarios: TLabel
+            Left = 604
+            Top = 6
+            Width = 93
+            Height = 14
+            Alignment = taRightJustify
+            Caption = 'lblQtdeUsuario'
+          end
+        end
+      end
+    end
+    object tsLicenca1: TTabSheet
+      Caption = 'Lista Licen'#231'a'
+      ImageIndex = 1
+      object Panel3: TPanel
+        Left = 0
+        Top = 0
+        Width = 1097
+        Height = 450
+        Align = alClient
+        BevelOuter = bvLowered
+        TabOrder = 0
+        object dbItens: TDBGrid
+          Left = 1
+          Top = 1
+          Width = 1095
+          Height = 426
+          Align = alClient
+          DataSource = dsCad1
+          Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+          PopupMenu = PopupMenu1
+          TabOrder = 0
+          TitleFont.Charset = ANSI_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -12
+          TitleFont.Name = 'Verdana'
+          TitleFont.Style = []
+          OnDrawColumnCell = dbItensDrawColumnCell
+          OnDblClick = dbItensDblClick
+          OnTitleClick = dbItensTitleClick
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'Documento'
+              Width = 151
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DataLcto'
+              Title.Caption = 'Data Lcto'
+              Width = 99
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'RazaoSocial'
+              Title.Caption = 'Raz'#227'o Social'
+              Width = 458
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Licenca'
+              Title.Caption = 'Licen'#231'a'
+              Width = 118
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Utilizada'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DataUtilizacao'
+              Title.Caption = 'Data Utiliza'#231#227'o'
+              Width = 110
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'Situacao'
+              Title.Caption = 'Situa'#231#227'o'
+              Width = 58
+              Visible = True
+            end>
+        end
+        object Panel4: TPanel
+          Left = 1
+          Top = 427
+          Width = 1095
+          Height = 22
+          Align = alBottom
+          BevelOuter = bvLowered
+          TabOrder = 1
+          object lblQtdeLicenca2: TLabel
+            Left = 1
+            Top = 6
+            Width = 99
+            Height = 14
+            Caption = 'lblQtdeLicenca2'
+          end
+          object lblUtilizada: TLabel
+            Left = 264
+            Top = 8
+            Width = 68
+            Height = 14
+            Caption = 'lblUtilizada'
+          end
+          object lblNaoUtilizada: TLabel
+            Left = 464
+            Top = 6
+            Width = 93
+            Height = 14
+            Caption = 'lblNaoUtilizada'
+          end
+          object lblNormal: TLabel
+            Left = 711
+            Top = 6
+            Width = 58
+            Height = 14
+            Caption = 'lblNormal'
+          end
+          object lblInutilizada: TLabel
+            Left = 895
+            Top = 6
+            Width = 80
+            Height = 14
+            Caption = 'lblInutilizada'
+          end
+        end
+      end
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 584
+    Width = 1105
+    Height = 41
+    Align = alBottom
+    BevelOuter = bvLowered
+    TabOrder = 1
+    object btnImportar: TBitBtn
+      Left = 6
+      Top = 6
+      Width = 131
+      Height = 25
+      Caption = '&Importar'
+      TabOrder = 0
+      OnClick = btnImportarClick
+    end
+    object btnFechar: TBitBtn
+      Left = 280
+      Top = 6
+      Width = 131
+      Height = 25
+      Caption = 'Sai&r'
+      TabOrder = 2
+      OnClick = btnFecharClick
+    end
+    object btnLimparLicenca: TBitBtn
+      Left = 143
+      Top = 6
+      Width = 131
+      Height = 25
+      Caption = '&Limpar Licen'#231'as'
+      TabOrder = 1
+      OnClick = btnLimparLicencaClick
+    end
+  end
+  object Panel6: TPanel
+    Left = 0
+    Top = 0
+    Width = 1105
+    Height = 105
+    Align = alTop
+    BevelOuter = bvLowered
+    TabOrder = 2
+    object Label1: TLabel
+      Left = 24
+      Top = 24
+      Width = 44
+      Height = 14
+      Caption = 'Cliente'
+    end
+    object Label2: TLabel
+      Left = 24
+      Top = 56
+      Width = 55
+      Height = 14
+      Caption = 'Revenda'
+    end
+    object Label3: TLabel
+      Left = 24
+      Top = 85
+      Width = 70
+      Height = 14
+      Caption = 'Data Inicial'
+    end
+    object Label4: TLabel
+      Left = 200
+      Top = 85
+      Width = 63
+      Height = 14
+      Caption = 'Data Final'
+    end
+    object btnCliente: TSpeedButton
+      Left = 787
+      Top = 21
+      Width = 23
+      Height = 22
+      OnClick = btnClienteClick
+    end
+    object btnRevenda: TSpeedButton
+      Left = 787
+      Top = 49
+      Width = 23
+      Height = 22
+      OnClick = btnRevendaClick
+    end
+    object Label5: TLabel
+      Left = 364
+      Top = 85
+      Width = 54
+      Height = 14
+      Caption = 'Utilizada'
+    end
+    object Label6: TLabel
+      Left = 575
+      Top = 85
+      Width = 54
+      Height = 14
+      Caption = 'Situa'#231#227'o'
+    end
+    object btnFiltrar: TBitBtn
+      Left = 787
+      Top = 76
+      Width = 100
+      Height = 25
+      Caption = '&Filtrar'
+      TabOrder = 8
+      OnClick = btnFiltrarClick
+    end
+    object edtCodCliente: TEdit
+      Left = 100
+      Top = 21
+      Width = 57
+      Height = 22
+      Hint = '[F9] - Pesquisar'
+      Alignment = taCenter
+      NumbersOnly = True
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      OnExit = edtCodClienteExit
+      OnKeyDown = edtCodRevendaKeyDown
+    end
+    object edtCodRevenda: TEdit
+      Left = 100
+      Top = 49
+      Width = 57
+      Height = 22
+      Hint = '[F9] - Pesquisar'
+      Alignment = taCenter
+      NumbersOnly = True
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 1
+      OnExit = edtCodRevendaExit
+      OnKeyDown = edtCodRevendaKeyDown
+    end
+    object edtNomeCliente: TEdit
+      Left = 163
+      Top = 21
+      Width = 618
+      Height = 22
+      TabStop = False
+      ReadOnly = True
+      TabOrder = 2
+    end
+    object edtNomeRevenda: TEdit
+      Left = 163
+      Top = 49
+      Width = 618
+      Height = 22
+      TabStop = False
+      ReadOnly = True
+      TabOrder = 3
+    end
+    object edtDataInicial: TMaskEdit
+      Left = 100
+      Top = 77
+      Width = 89
+      Height = 22
+      EditMask = '##/##/####'
+      MaxLength = 10
+      TabOrder = 4
+      Text = '  /  /    '
+    end
+    object edtDataFinal: TMaskEdit
+      Left = 269
+      Top = 77
+      Width = 89
+      Height = 22
+      EditMask = '##/##/####'
+      MaxLength = 10
+      TabOrder = 5
+      Text = '  /  /    '
+    end
+    object edtIdCliente: TEdit
+      Left = 887
+      Top = 20
+      Width = 25
+      Height = 22
+      TabOrder = 9
+      Visible = False
+    end
+    object edtIdRevenda: TEdit
+      Left = 887
+      Top = 48
+      Width = 25
+      Height = 22
+      TabOrder = 10
+      Visible = False
+    end
+    object cbbUtilizada: TComboBox
+      Left = 424
+      Top = 77
+      Width = 145
+      Height = 22
+      Style = csDropDownList
+      ItemIndex = 2
+      TabOrder = 6
+      Text = 'Todos'
+      Items.Strings = (
+        'Sim'
+        'N'#227'o'
+        'Todos')
+    end
+    object cbbSituacao: TComboBox
+      Left = 635
+      Top = 77
+      Width = 145
+      Height = 22
+      Style = csDropDownList
+      ItemIndex = 2
+      TabOrder = 7
+      Text = 'Todos'
+      Items.Strings = (
+        'Normal'
+        'Inutilizada Domper'
+        'Todos')
+    end
+  end
+  object dsCad: TDataSource
+    DataSet = CDSCad
+    Left = 532
+    Top = 337
+  end
+  object dsCad1: TDataSource
+    DataSet = CDSCad1
+    Left = 668
+    Top = 337
+  end
+  object CDSCad: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 232
+    Top = 160
+    object CDSCadDocumento: TStringField
+      FieldName = 'Documento'
+      Size = 25
+    end
+    object CDSCadEmpresa: TStringField
+      FieldName = 'Empresa'
+      Size = 250
+    end
+    object CDSCadQtdeEstacao: TIntegerField
+      FieldName = 'QtdeEstacao'
+    end
+    object CDSCadQtdeUsuario: TIntegerField
+      FieldName = 'QtdeUsuario'
+    end
+    object CDSCadIPExterno: TStringField
+      FieldName = 'IPExterno'
+      Size = 25
+    end
+    object CDSCadDataUtilizacao: TDateField
+      FieldName = 'DataUtilizacao'
+      EditMask = '##/##/####'
+    end
+    object CDSCadBuild: TStringField
+      FieldName = 'Build'
+      Size = 25
+    end
+    object CDSCadIPLocal: TStringField
+      FieldName = 'IPLocal'
+      Size = 25
+    end
+    object CDSCadIdCliente: TIntegerField
+      FieldName = 'IdCliente'
+    end
+    object CDSCadRazaoSocial: TStringField
+      FieldName = 'RazaoSocial'
+      Size = 100
+    end
+  end
+  object CDSCad1: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 376
+    Top = 160
+    object CDSCad1Documento: TStringField
+      FieldName = 'Documento'
+      Size = 25
+    end
+    object CDSCad1DataLcto: TDateField
+      FieldName = 'DataLcto'
+      EditMask = '##/##/####'
+    end
+    object CDSCad1Licenca: TStringField
+      FieldName = 'Licenca'
+      Size = 50
+    end
+    object CDSCad1Utilizada: TStringField
+      FieldName = 'Utilizada'
+      Size = 3
+    end
+    object CDSCad1DataUtilizacao: TDateField
+      FieldName = 'DataUtilizacao'
+      EditMask = '##/##/####'
+    end
+    object CDSCad1Situacao: TStringField
+      FieldName = 'Situacao'
+      Size = 9
+    end
+    object CDSCad1IdCliente: TIntegerField
+      FieldName = 'IdCliente'
+    end
+    object CDSCad1RazaoSocial: TStringField
+      FieldName = 'RazaoSocial'
+      Size = 100
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 724
+    Top = 250
+    object CopiarLicena1: TMenuItem
+      Caption = 'Copiar Licen'#231'a'
+      OnClick = CopiarLicena1Click
+    end
+  end
+end

@@ -1,0 +1,55 @@
+unit uImagens;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons;
+
+type
+  TfrmImagens = class(TForm)
+    btnNovo: TBitBtn;
+    btnExcluir1: TBitBtn;
+    btnFiltrar: TBitBtn;
+    btnSair: TBitBtn;
+    btnPrimeiro: TBitBtn;
+    btnAnterior: TBitBtn;
+    btnProximo: TBitBtn;
+    btnUltimo: TBitBtn;
+    btnSalvar: TBitBtn;
+    btnRetornar: TBitBtn;
+    btnFiltro: TBitBtn;
+    btnImprimir: TBitBtn;
+    btnProcurar: TBitBtn;
+    btnNovoItem: TBitBtn;
+    btnExcluirItem: TBitBtn;
+    btnCancelarItem: TBitBtn;
+    btnAnexar: TBitBtn;
+    btnExportar: TBitBtn;
+    btnCancelar: TBitBtn;
+    btnEspecificacao: TBitBtn;
+    btnEditar: TBitBtn;
+    btnExcluir: TBitBtn;
+    BitBtn1: TBitBtn;
+    BitBtn2: TBitBtn;
+    btnConfirmar: TBitBtn;
+    btnSolucao: TBitBtn;
+    btnDetalhe: TBitBtn;
+    btnEmail: TBitBtn;
+    btnColaborador: TBitBtn;
+    btnConferir: TBitBtn;
+    btnImportar: TBitBtn;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmImagens: TfrmImagens;
+
+implementation
+
+{$R *.dfm}
+
+end.

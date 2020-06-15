@@ -1,0 +1,99 @@
+unit uConfig;
+
+interface
+
+uses
+  System.SysUtils, System.IniFiles, Vcl.Forms, Vcl.Dialogs;
+
+type tpBanco = (banFB, banMSS);
+
+type
+  TConfig = class
+  private
+    FArquivo: string;
+    FPorta: Integer;
+    FDataBase: string;
+    FServidor: string;
+    FHostName: string;
+    FUser_Name: string;
+    FPassword: string;
+    FEstiloTelas: string;
+    procedure SetEstiloTelas(const Value: string);
+
+  public
+    procedure Carregar(ABanco: tpBanco);
+    procedure Salvar;
+    property Porta: Integer read FPorta write FPorta;
+    property DataBase: string read FDataBase write FDataBase;
+    property Servidor: string read FServidor write FServidor;
+    property HostName: string read FHostName write FHostName;
+    property User_Name: string read FUser_Name write FUser_Name;
+    property Password: string read FPassword write FPassword;
+    property EstiloTelas: string read FEstiloTelas write SetEstiloTelas;
+
+    constructor create(ABanco: tpBanco); overload;
+  end;
+
+implementation
+
+{ TConfig }
+
+procedure TConfig.Carregar(ABanco: tpBanco);
+var
+  ArqIni: TIniFile;
+begin
+  ArqIni := TIniFile.Create(FArquivo);
+  try
+    FPorta        := ArqIni.ReadInteger('Servidor', 'Porta', 0);
+    FDataBase     := ArqIni.ReadString('Servidor', 'DataBase', '');
+    FServidor     := ArqIni.ReadString('Servidor', 'Servidor', '');
+    FUser_Name    := ArqIni.ReadString('Servidor', 'User_Name', '');
+    FHostName     := ArqIni.ReadString('Cliente', 'HostName', '');
+    FEstiloTelas  := ArqIni.ReadString('Cliente', 'Stilo', '');
+
+    if ABanco = banFB then
+      FPassword     := 'masterkey'
+    else
+      FPassword     := '12';
+
+  finally
+    FreeAndNil(ArqIni);
+  end;
+end;
+
+constructor TConfig.create(ABanco: tpBanco);
+var
+  sCaminho: string;
+begin
+  inherited create;
+  sCaminho := ExtractFilePath(application.ExeName);
+  if ABanco = banFB then
+    sCaminho := sCaminho + 'DomperFB.ini'
+  else
+    sCaminho := sCaminho + 'Domper.ini';
+  FArquivo := sCaminho;
+end;
+
+procedure TConfig.Salvar;
+var
+  ArqIni: TIniFile;
+begin
+  ArqIni := TIniFile.Create(FArquivo);
+  try
+    ArqIni.WriteInteger('Servidor', 'Porta', FPorta);
+    ArqIni.WriteString('Servidor', 'Servidor', FServidor);
+    ArqIni.WriteString('Servidor', 'DataBase', FDataBase);
+    ArqIni.WriteString('Servidor', 'User_Name', FUser_Name);
+    ArqIni.WriteString('Cliente', 'HostName', FHostName);
+    ArqIni.WriteString('Cliente', 'Stilo', FEstiloTelas);
+  finally
+    FreeAndNil(ArqIni);
+  end;
+end;
+
+procedure TConfig.SetEstiloTelas(const Value: string);
+begin
+  FEstiloTelas := Value;
+end;
+
+end.

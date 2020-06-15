@@ -1,0 +1,857 @@
+object DMRelEscala: TDMRelEscala
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 150
+  Width = 327
+  object cdsRelatorio1: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspEscalaRelatorio1'
+    OnCalcFields = cdsRelatorio1CalcFields
+    Left = 32
+    Top = 24
+    object cdsRelatorio1Usu_Codigo: TIntegerField
+      FieldName = 'Usu_Codigo'
+      Origin = 'Usu_Codigo'
+      Required = True
+    end
+    object cdsRelatorio1Usu_Nome: TWideStringField
+      FieldName = 'Usu_Nome'
+      Origin = 'Usu_Nome'
+      Required = True
+      Size = 100
+    end
+    object cdsRelatorio1Esc_Usuario: TIntegerField
+      FieldName = 'Esc_Usuario'
+      Origin = 'Esc_Usuario'
+      Required = True
+    end
+    object cdsRelatorio1Esc_Data: TDateField
+      FieldName = 'Esc_Data'
+      Origin = 'Esc_Data'
+      Required = True
+    end
+    object cdsRelatorio1Esc_HoraFim: TTimeField
+      FieldName = 'Esc_HoraFim'
+      Origin = 'Esc_HoraFim'
+      Required = True
+    end
+    object cdsRelatorio1Esc_HoraInicio: TTimeField
+      FieldName = 'Esc_HoraInicio'
+      Origin = 'Esc_HoraInicio'
+      Required = True
+    end
+    object cdsRelatorio1Esc_TotalHoras: TFloatField
+      FieldName = 'Esc_TotalHoras'
+      Origin = 'Esc_TotalHoras'
+      Required = True
+    end
+    object cdsRelatorio1TotalHoras: TFloatField
+      FieldName = 'TotalHoras'
+      Origin = 'TotalHoras'
+      ReadOnly = True
+    end
+    object cdsRelatorio1CHorasAtendimento: TStringField
+      FieldKind = fkInternalCalc
+      FieldName = 'CHorasAtendimento'
+      Size = 10
+    end
+    object cdsRelatorio1CHorasDisposicao: TStringField
+      FieldKind = fkInternalCalc
+      FieldName = 'CHorasDisposicao'
+      Size = 10
+    end
+    object cdsRelatorio1CDiaSemana: TStringField
+      FieldKind = fkInternalCalc
+      FieldName = 'CDiaSemana'
+    end
+  end
+  object dsRelatorio1: TDataSource
+    DataSet = cdsRelatorio1
+    Left = 104
+    Top = 24
+  end
+  object DBRelatorio1: TppDBPipeline
+    DataSource = dsRelatorio1
+    UserName = 'DBRelatorio1'
+    Left = 176
+    Top = 24
+  end
+  object Relatorio1: TppReport
+    AutoStop = False
+    DataPipeline = DBRelatorio1
+    PassSetting = psTwoPass
+    PrinterSetup.BinName = 'Default'
+    PrinterSetup.DocumentName = 'Report'
+    PrinterSetup.PaperName = 'A4'
+    PrinterSetup.PrinterName = 'Default'
+    PrinterSetup.SaveDeviceSettings = False
+    PrinterSetup.mmMarginBottom = 6350
+    PrinterSetup.mmMarginLeft = 6350
+    PrinterSetup.mmMarginRight = 6350
+    PrinterSetup.mmMarginTop = 6350
+    PrinterSetup.mmPaperHeight = 297000
+    PrinterSetup.mmPaperWidth = 210000
+    PrinterSetup.PaperSize = 9
+    ArchiveFileName = '($MyDocuments)\ReportArchive.raf'
+    DeviceType = 'Screen'
+    DefaultFileDeviceType = 'PDF'
+    EmailSettings.ReportFormat = 'PDF'
+    LanguageID = 'Default'
+    OpenFile = False
+    OutlineSettings.CreateNode = True
+    OutlineSettings.CreatePageNodes = True
+    OutlineSettings.Enabled = True
+    OutlineSettings.Visible = True
+    ThumbnailSettings.Enabled = True
+    ThumbnailSettings.Visible = True
+    ThumbnailSettings.DeadSpace = 30
+    PDFSettings.EmbedFontOptions = [efUseSubset]
+    PDFSettings.EncryptSettings.AllowCopy = True
+    PDFSettings.EncryptSettings.AllowInteract = True
+    PDFSettings.EncryptSettings.AllowModify = True
+    PDFSettings.EncryptSettings.AllowPrint = True
+    PDFSettings.EncryptSettings.Enabled = False
+    PDFSettings.EncryptSettings.KeyLength = kl40Bit
+    PDFSettings.FontEncoding = feAnsi
+    PDFSettings.ImageCompressionLevel = 25
+    PreviewFormSettings.WindowState = wsMaximized
+    PreviewFormSettings.ZoomSetting = zs100Percent
+    RTFSettings.DefaultFont.Charset = DEFAULT_CHARSET
+    RTFSettings.DefaultFont.Color = clWindowText
+    RTFSettings.DefaultFont.Height = -13
+    RTFSettings.DefaultFont.Name = 'Arial'
+    RTFSettings.DefaultFont.Style = []
+    TextFileName = '($MyDocuments)\Report.pdf'
+    TextSearchSettings.DefaultString = '<Texto a localizar>'
+    TextSearchSettings.Enabled = True
+    XLSSettings.AppName = 'ReportBuilder'
+    XLSSettings.Author = 'ReportBuilder'
+    XLSSettings.Subject = 'Report'
+    XLSSettings.Title = 'Report'
+    Left = 240
+    Top = 24
+    Version = '15.03'
+    mmColumnWidth = 0
+    DataPipelineName = 'DBRelatorio1'
+    object ppHeaderBand1: TppHeaderBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 21167
+      mmPrintPosition = 0
+      object lblTitulo1: TppLabel
+        UserName = 'lblTitulo1'
+        Caption = 'Escala de Plant'#227'o'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 14
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 5821
+        mmLeft = 73025
+        mmTop = 529
+        mmWidth = 43656
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable1: TppSystemVariable
+        UserName = 'SystemVariable1'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 0
+        mmTop = 529
+        mmWidth = 18521
+        BandType = 0
+        LayerName = Foreground
+      end
+      object lblData1: TppLabel
+        UserName = 'lblData1'
+        AutoSize = False
+        Caption = 'lblData1'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 3440
+        mmLeft = 47890
+        mmTop = 6350
+        mmWidth = 99484
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable9: TppSystemVariable
+        UserName = 'SystemVariable9'
+        VarType = vtTime
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 0
+        mmTop = 4233
+        mmWidth = 14817
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable2: TppSystemVariable
+        UserName = 'SystemVariable2'
+        VarType = vtPageSetDesc
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 166952
+        mmTop = 529
+        mmWidth = 24077
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel1: TppLabel
+        UserName = 'Label1'
+        Caption = 'Data'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 4234
+        mmLeft = 1852
+        mmTop = 15081
+        mmWidth = 7408
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel2: TppLabel
+        UserName = 'Label2'
+        Caption = 'Dia da Semana'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 24606
+        mmTop = 15081
+        mmWidth = 24077
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel3: TppLabel
+        UserName = 'Label3'
+        Caption = 'Hora Inicial'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 53975
+        mmTop = 15081
+        mmWidth = 22225
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel4: TppLabel
+        UserName = 'Label4'
+        Caption = 'Hora Final'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 80433
+        mmTop = 15081
+        mmWidth = 18521
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel5: TppLabel
+        UserName = 'Label5'
+        Caption = 'Horas a Disposi'#231#227'o'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 103188
+        mmTop = 15081
+        mmWidth = 33338
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel6: TppLabel
+        UserName = 'Label6'
+        Caption = 'Horas em Atendimento'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 141023
+        mmTop = 15081
+        mmWidth = 37042
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLine1: TppLine
+        UserName = 'Line1'
+        Position = lpBottom
+        Weight = 0.750000000000000000
+        mmHeight = 2381
+        mmLeft = 0
+        mmTop = 18785
+        mmWidth = 196850
+        BandType = 0
+        LayerName = Foreground
+      end
+    end
+    object ppDetailBand1: TppDetailBand
+      Background1.Brush.Style = bsClear
+      Background2.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 4498
+      mmPrintPosition = 0
+      object ppDBText3: TppDBText
+        UserName = 'DBText3'
+        DataField = 'Esc_Data'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 21167
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText4: TppDBText
+        UserName = 'DBText4'
+        DataField = 'CDiaSemana'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 24606
+        mmTop = 0
+        mmWidth = 24077
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText5: TppDBText
+        UserName = 'DBText5'
+        DataField = 'Esc_HoraInicio'
+        DataPipeline = DBRelatorio1
+        DisplayFormat = 'h:nn'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 58738
+        mmTop = 0
+        mmWidth = 13494
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText6: TppDBText
+        UserName = 'DBText6'
+        DataField = 'Esc_HoraFim'
+        DataPipeline = DBRelatorio1
+        DisplayFormat = 'h:nn'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 80433
+        mmTop = 0
+        mmWidth = 13494
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText7: TppDBText
+        UserName = 'DBText7'
+        DataField = 'CHorasDisposicao'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 103188
+        mmTop = 0
+        mmWidth = 27517
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText8: TppDBText
+        UserName = 'DBText8'
+        DataField = 'CHorasAtendimento'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 141023
+        mmTop = 0
+        mmWidth = 34131
+        BandType = 4
+        LayerName = Foreground
+      end
+    end
+    object ppSummaryBand1: TppSummaryBand
+      BeforePrint = ppSummaryBand1BeforePrint
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 11377
+      mmPrintPosition = 0
+      object ppLabel9: TppLabel
+        UserName = 'Label9'
+        Caption = 'Total Geral'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        Visible = False
+        mmHeight = 4233
+        mmLeft = 0
+        mmTop = 1852
+        mmWidth = 20373
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppDBCalc2: TppDBCalc
+        UserName = 'DBCalc2'
+        DataField = 'Usu_Codigo'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        Visible = False
+        DBCalcType = dcCount
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 33073
+        mmTop = 1852
+        mmWidth = 17198
+        BandType = 7
+        LayerName = Foreground
+      end
+      object lblRelatorio1C: TppLabel
+        UserName = 'lblRelatorio1C'
+        Caption = 'lblRelatorio1c'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        Visible = False
+        mmHeight = 4233
+        mmLeft = 101600
+        mmTop = 1852
+        mmWidth = 29104
+        BandType = 7
+        LayerName = Foreground
+      end
+      object lblRelatorio1D: TppLabel
+        UserName = 'lblRelatorio1D'
+        Caption = 'lblRelatorio1A'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        Visible = False
+        mmHeight = 4233
+        mmLeft = 141023
+        mmTop = 1852
+        mmWidth = 34131
+        BandType = 7
+        LayerName = Foreground
+      end
+      object Relatorio1CalcTotalHoras2: TppDBCalc
+        UserName = 'Relatorio1CalcTotalHoras2'
+        DataField = 'Esc_TotalHoras'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        Visible = False
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 57150
+        mmTop = 3175
+        mmWidth = 18256
+        BandType = 7
+        LayerName = Foreground
+      end
+      object Relatorio1CalcTotalAtend2: TppDBCalc
+        UserName = 'Relatorio1CalcTotalAtend2'
+        DataField = 'TotalHoras'
+        DataPipeline = DBRelatorio1
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        Visible = False
+        DataPipelineName = 'DBRelatorio1'
+        mmHeight = 4498
+        mmLeft = 78317
+        mmTop = 3175
+        mmWidth = 13229
+        BandType = 7
+        LayerName = Foreground
+      end
+    end
+    object ppGroup1: TppGroup
+      BreakName = 'Esc_Usuario'
+      DataPipeline = DBRelatorio1
+      GroupFileSettings.NewFile = False
+      GroupFileSettings.EmailFile = False
+      OutlineSettings.CreateNode = True
+      NewPage = True
+      StartOnOddPage = False
+      UserName = 'Group1'
+      mmNewColumnThreshold = 0
+      mmNewPageThreshold = 0
+      DataPipelineName = 'DBRelatorio1'
+      NewFile = False
+      object ppGroupHeaderBand1: TppGroupHeaderBand
+        Background.Brush.Style = bsClear
+        mmBottomOffset = 0
+        mmHeight = 8467
+        mmPrintPosition = 0
+        object ppLabel7: TppLabel
+          UserName = 'Label7'
+          Caption = 'Usu'#225'rio'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          mmHeight = 4233
+          mmLeft = 0
+          mmTop = 2117
+          mmWidth = 12965
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppDBText1: TppDBText
+          UserName = 'DBText1'
+          DataField = 'Usu_Codigo'
+          DataPipeline = DBRelatorio1
+          DisplayFormat = '0000'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          DataPipelineName = 'DBRelatorio1'
+          mmHeight = 4498
+          mmLeft = 14552
+          mmTop = 2117
+          mmWidth = 10319
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppDBText2: TppDBText
+          UserName = 'DBText2'
+          DataField = 'Usu_Nome'
+          DataPipeline = DBRelatorio1
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          DataPipelineName = 'DBRelatorio1'
+          mmHeight = 4498
+          mmLeft = 27252
+          mmTop = 2117
+          mmWidth = 125148
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+      end
+      object ppGroupFooterBand1: TppGroupFooterBand
+        BeforePrint = ppGroupFooterBand1BeforePrint
+        Background.Brush.Style = bsClear
+        HideWhenOneDetail = False
+        mmBottomOffset = 0
+        mmHeight = 32279
+        mmPrintPosition = 0
+        object ppLabel8: TppLabel
+          UserName = 'Label8'
+          Caption = 'Total do Usu'#225'rio'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          mmHeight = 4233
+          mmLeft = 0
+          mmTop = 3175
+          mmWidth = 29633
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object lblRelatorio1A: TppLabel
+          UserName = 'lblRelatorio1A'
+          Caption = 'lblRelatorio1A'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          TextAlignment = taRightJustified
+          Transparent = True
+          mmHeight = 4233
+          mmLeft = 104775
+          mmTop = 3175
+          mmWidth = 25929
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object lblRelatorio1b: TppLabel
+          UserName = 'lblRelatorio1B'
+          Caption = 'lblRelatorio1A'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          TextAlignment = taRightJustified
+          Transparent = True
+          mmHeight = 4233
+          mmLeft = 141023
+          mmTop = 3175
+          mmWidth = 34131
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppDBCalc1: TppDBCalc
+          UserName = 'DBCalc1'
+          DataField = 'Usu_Codigo'
+          DataPipeline = DBRelatorio1
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          ResetGroup = ppGroup1
+          TextAlignment = taRightJustified
+          Transparent = True
+          DBCalcType = dcCount
+          DataPipelineName = 'DBRelatorio1'
+          mmHeight = 4498
+          mmLeft = 33073
+          mmTop = 3175
+          mmWidth = 17198
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLine2: TppLine
+          UserName = 'Line2'
+          Position = lpBottom
+          Weight = 0.750000000000000000
+          mmHeight = 1852
+          mmLeft = 0
+          mmTop = 7144
+          mmWidth = 196850
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object Relatorio1CalcTotalHoras1: TppDBCalc
+          UserName = 'Relatorio1CalcTotalHoras1'
+          DataField = 'Esc_TotalHoras'
+          DataPipeline = DBRelatorio1
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          ResetGroup = ppGroup1
+          TextAlignment = taRightJustified
+          Transparent = True
+          Visible = False
+          DataPipelineName = 'DBRelatorio1'
+          mmHeight = 4498
+          mmLeft = 59002
+          mmTop = 2910
+          mmWidth = 13229
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object Relatorio1CalcTotalAtend1: TppDBCalc
+          UserName = 'Relatorio1CalcTotalAtend1'
+          DataField = 'TotalHoras'
+          DataPipeline = DBRelatorio1
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          ResetGroup = ppGroup1
+          TextAlignment = taRightJustified
+          Transparent = True
+          Visible = False
+          DataPipelineName = 'DBRelatorio1'
+          mmHeight = 4498
+          mmLeft = 80433
+          mmTop = 3175
+          mmWidth = 13229
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLabel10: TppLabel
+          UserName = 'Label10'
+          Caption = 'Empresa'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = []
+          Transparent = True
+          mmHeight = 3969
+          mmLeft = 33073
+          mmTop = 26723
+          mmWidth = 12965
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLabel11: TppLabel
+          UserName = 'Label11'
+          Caption = 'Nome do Usu'#225'rio'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = []
+          Transparent = True
+          mmHeight = 3969
+          mmLeft = 119592
+          mmTop = 26723
+          mmWidth = 27781
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLine3: TppLine
+          UserName = 'Line3'
+          Position = lpBottom
+          Weight = 0.750000000000000000
+          mmHeight = 2646
+          mmLeft = 9260
+          mmTop = 23283
+          mmWidth = 70115
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLine4: TppLine
+          UserName = 'Line4'
+          Position = lpBottom
+          Weight = 0.750000000000000000
+          mmHeight = 2646
+          mmLeft = 101600
+          mmTop = 23283
+          mmWidth = 70115
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+      end
+    end
+    object ppDesignLayers1: TppDesignLayers
+      object ppDesignLayer1: TppDesignLayer
+        UserName = 'Foreground'
+        LayerType = ltBanded
+        Index = 0
+      end
+    end
+    object ppParameterList1: TppParameterList
+    end
+  end
+end

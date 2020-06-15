@@ -1,0 +1,23 @@
+unit uPermissaoChamadoVO;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TPermissaoSolicitacaoVO = class
+  private
+
+  public
+    property Abertura: Boolean read FAbertura write SetAbertura;
+    property Ocorrencia: Boolean;
+    property OcorrenciaTecnica: Boolean read FOcorrenciaTecnica write SetOcorrenciaTecnica;
+    property OcorrenciaRegra: Boolean read FOcorrenciaRegra write SetOcorrenciaRegra;
+    property StatusSolicitacao: Boolean read FStatusSolicitacao write SetStatusSolicitacao;
+  end;
+
+implementation
+
+
+end.

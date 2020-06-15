@@ -1,0 +1,42 @@
+unit uDMCategoria;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient, uDM, ppProd, ppClass, ppReport;
+
+type
+  TDMCategoria = class(TDMBase)
+    CDSConsultaCat_Id: TAutoIncField;
+    CDSConsultaCat_Codigo: TIntegerField;
+    CDSConsultaCat_Nome: TStringField;
+    CDSCadastroCat_Id: TAutoIncField;
+    CDSCadastroCat_Codigo: TIntegerField;
+    CDSCadastroCat_Nome: TStringField;
+    CDSCadastroCat_Ativo: TBooleanField;
+    Rel: TppReport;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMCategoria: TDMCategoria;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+procedure TDMCategoria.DataModuleCreate(Sender: TObject);
+begin
+  inherited;
+  CDSCadastro.RemoteServer := DM.DSPConexao2;
+  CDSConsulta.RemoteServer := DM.DSPConexao2;
+end;
+
+end.

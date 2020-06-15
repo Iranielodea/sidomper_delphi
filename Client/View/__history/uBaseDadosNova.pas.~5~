@@ -1,0 +1,54 @@
+unit uBaseDadosNova;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, uUtilitarioController;
+
+type
+  TfrmBaseDadosNova = class(TForm)
+    btnExportar: TBitBtn;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+    procedure Exportar;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmBaseDadosNova: TfrmBaseDadosNova;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmBaseDadosNova.Exportar;
+var
+  obj: TUtilitarioController;
+begin
+  obj := TUtilitarioController.Create;
+  try
+    obj.ExportarDadosBaseNova();
+    ShowMessage('Dados exportados com sucesso!');
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TfrmBaseDadosNova.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TfrmBaseDadosNova.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+    Close;
+end;
+
+end.

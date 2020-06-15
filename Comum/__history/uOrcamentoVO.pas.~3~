@@ -1,0 +1,513 @@
+unit uOrcamentoVO;
+
+interface
+
+uses
+  System.SysUtils, uOrcamentoItemVO, uOrcamentoItemModuloVO, uOrcamentoOcorrenciaVO,
+  uOrcamentoVectoVO, System.Generics.Collections,
+  uClassValidacao, uOrcamentoEmailVO, uKeyField, uTableName, uUsuarioVO, uTipo,
+  uTipoVO, uClienteVO, uContatoVO;
+
+type
+  [TableName('Orcamento')]
+  TOrcamentoVO = class
+  private
+    FObservacao: string;
+    FIdProspect: Integer;
+    FObservacaoEmail: string;
+    FIdUsuario: Integer;
+    FId: Integer;
+    FNumero: Integer;
+    FData: TDate;
+    FOrcamentoItemModulo: TObjectList<TOrcamentoItemModuloVO>;
+    FOrcamentoOcorrencia: TObjectList<TOrcamentoOcorrenciaVO>;
+    FOrcamentoItem: TObjectList<TOrcamentoItemVO>;
+    FOrcamentoVecto: TObjectList<TOrcamentoVectoVO>;
+    FIdCliente: Integer;
+    FSituacao: Integer;
+    FIdFormaPagto: Integer;
+    FFantasia: string;
+    FCnpjCpf: string;
+    FRazaoSocial: string;
+    FContato: string;
+    FEndereco: string;
+    FTelefone: string;
+    FOrcamentoEmail: TObjectList<TOrcamentoEmailVO>;
+    FUsuario: TUsuarioVO;
+    FIdTipo: Integer;
+    FTipo: TTipoVO;
+    FSituacaoDescricao: string;
+    FTotalOrcamento: Currency;
+    FTotalMensalidade: Currency;
+    FEmailEnviado: Boolean;
+    FSubTipo: Integer;
+    FDataSituacao: TDate;
+    FLogradouro: string;
+    FBairro: string;
+    FContatoCompraVendaFone: string;
+    FContatoCompraVenda: string;
+    FContatoFinanceiroFone: string;
+    FContatoFinanceiro: string;
+    FIdCidade: Integer;
+    FRepresentanteLegalCPF: string;
+    FRepresentanteLegal: string;
+    FCEP: string;
+    FIE: string;
+    FFone2: string;
+    FFoneOutro: string;
+    FFone1: string;
+    FCelular: string;
+    FCliente: TClienteVO;
+    FEnquadramento: string;
+    FListaContato: TObjectList<TContatoVO>;
+    procedure SetData(const Value: TDate);
+    procedure SetId(const Value: Integer);
+    procedure SetIdProspect(const Value: Integer);
+    procedure SetIdUsuario(const Value: Integer);
+    procedure SetNumero(const Value: Integer);
+    procedure SetObservacao(const Value: string);
+    procedure SetObservacaoEmail(const Value: string);
+    procedure SetOrcamentoOcorrencia(const Value: TObjectList<TOrcamentoOcorrenciaVO>);
+    procedure SetOrcamentoItem(const Value: TObjectList<TOrcamentoItemVO>);
+    procedure SetOrcamentoItemModulo(
+      const Value: TObjectList<TOrcamentoItemModuloVO>);
+    procedure SetOrcamentoVecto(const Value: TObjectList<TOrcamentoVectoVO>);
+    function GetTotalLiquido: Currency;
+    function GetTotalParcelas: Currency;
+    procedure SetIdCliente(const Value: Integer);
+    procedure SetSituacao(const Value: Integer);
+    procedure SetIdFormaPagto(const Value: Integer);
+    procedure SetCnpjCpf(const Value: string);
+    procedure SetContato(const Value: string);
+    procedure SetEndereco(const Value: string);
+    procedure SetFantasia(const Value: string);
+    procedure SetRazaoSocial(const Value: string);
+    procedure SetTelefone(const Value: string);
+    procedure SetOrcamentoEmail(const Value: TObjectList<TOrcamentoEmailVO>);
+    procedure SetUsuario(const Value: TUsuarioVO);
+    procedure SetIdTipo(const Value: Integer);
+    procedure SetTipo(const Value: TTipoVO);
+    procedure SetSituacaoDescricao(const Value: string);
+    procedure SetTotalMensalidade(const Value: Currency);
+    procedure SetTotalOrcamento(const Value: Currency);
+    procedure SetEmailEnviado(const Value: Boolean);
+    procedure SetSubTipo(const Value: Integer);
+    procedure SetDataSituacao(const Value: TDate);
+    procedure SetBairro(const Value: string);
+    procedure SetCelular(const Value: string);
+    procedure SetCEP(const Value: string);
+    procedure SetContatoCompraVenda(const Value: string);
+    procedure SetContatoCompraVendaFone(const Value: string);
+    procedure SetContatoFinanceiro(const Value: string);
+    procedure SetContatoFinanceiroFone(const Value: string);
+    procedure SetFone1(const Value: string);
+    procedure SetFone2(const Value: string);
+    procedure SetFoneOutro(const Value: string);
+    procedure SetIdCidade(const Value: Integer);
+    procedure SetIE(const Value: string);
+    procedure SetLogradouro(const Value: string);
+    procedure SetRepresentanteLegal(const Value: string);
+    procedure SetRepresentanteLegalCPF(const Value: string);
+    procedure SetCliente(const Value: TClienteVO);
+    procedure SetEnquadramento(const Value: string);
+    procedure SetListaContato(const Value: TObjectList<TContatoVO>);
+  public
+    [KeyField('Orc_Id')]
+    property Id: Integer read FId write SetId;
+    [FieldName('Orc_Numero')]
+    property Numero: Integer read FNumero write SetNumero;
+    [FieldDate('Orc_Data')]
+    property Data: TDate read FData write SetData;
+    [FieldName('Orc_Usuario')]
+    property IdUsuario: Integer read FIdUsuario write SetIdUsuario;
+    [FieldNull('Orc_Prospect')]
+    property IdProspect: Integer read FIdProspect write SetIdProspect;
+    [FieldNull('Orc_Cliente')]
+    property IdCliente: Integer read FIdCliente write SetIdCliente;
+    [FieldName('Orc_Observacao')]
+    property Observacao: string read FObservacao write SetObservacao;
+    [FieldName('Orc_ObservacaoEmail')]
+    property ObservacaoEmail: string read FObservacaoEmail write SetObservacaoEmail;
+    [FieldName('Orc_Situacao')]
+    property Situacao: Integer read FSituacao write SetSituacao;
+    [FieldNull('Orc_FormaPagto')]
+    property IdFormaPagto: Integer read FIdFormaPagto write SetIdFormaPagto;
+    [FieldName('Orc_RazaoSocial')]
+    property RazaoSocial: string read FRazaoSocial write SetRazaoSocial;
+    [FieldName('Orc_Fantasia')]
+    property Fantasia: string read FFantasia write SetFantasia;
+    [FieldName('Orc_Endereco')]
+    property Endereco: string read FEndereco write SetEndereco;
+    [FieldName('Orc_Telefone')]
+    property Telefone: string read FTelefone write SetTelefone;
+    [FieldName('Orc_Contato')]
+    property Contato: string read FContato write SetContato;
+    [FieldName('Orc_Dcto')]
+    property CnpjCpf: string read FCnpjCpf write SetCnpjCpf;
+    [ForeignFey('Orc_Usuario')]
+    property Usuario: TUsuarioVO read FUsuario write SetUsuario;
+    [FieldNull('Orc_Tipo')]
+    property IdTipo: Integer read FIdTipo write SetIdTipo;
+    [FieldNull('Orc_SubTipo')]
+    property SubTipo: Integer read FSubTipo write SetSubTipo;
+    [FieldNull('Orc_EmailEnviado')]
+    property EmailEnviado: Boolean read FEmailEnviado write SetEmailEnviado;
+    [FieldName('Orc_DataSituacao')]
+    property DataSituacao: TDate read FDataSituacao write SetDataSituacao;
+    [FieldName('Orc_Logradouro')]
+    property Logradouro: string read FLogradouro write SetLogradouro;
+    [FieldName('Orc_Bairro')]
+    property Bairro: string read FBairro write SetBairro;
+    [FieldName('Orc_CEP')]
+    property CEP: string read FCEP write SetCEP;
+    [FieldNull('Orc_Cidade')]
+    property IdCidade: Integer read FIdCidade write SetIdCidade;
+    [FieldName('Orc_Fone1')]
+    property Fone1: string read FFone1 write SetFone1;
+    [FieldName('Orc_Fone2')]
+    property Fone2: string read FFone2 write SetFone2;
+    [FieldName('Orc_Celular')]
+    property Celular: string read FCelular write SetCelular;
+    [FieldName('Orc_FoneOutro')]
+    property FoneOutro: string read FFoneOutro write SetFoneOutro;
+    [FieldName('Orc_ContatoFinanceiro')]
+    property ContatoFinanceiro: string read FContatoFinanceiro write SetContatoFinanceiro;
+    [FieldName('Orc_ContatoFinanceiroFone')]
+    property ContatoFinanceiroFone: string read FContatoFinanceiroFone write SetContatoFinanceiroFone;
+    [FieldName('Orc_ContatoCompraVenda')]
+    property ContatoCompraVenda: string read FContatoCompraVenda write SetContatoCompraVenda;
+    [FieldName('Orc_ContatoCompraVendaFone')]
+    property ContatoCompraVendaFone: string read FContatoCompraVendaFone write SetContatoCompraVendaFone;
+    [FieldName('Orc_IE')]
+    property IE: string read FIE write SetIE;
+    [FieldName('Orc_RepreLegal')]
+    property RepresentanteLegal: string read FRepresentanteLegal write SetRepresentanteLegal;
+    [FieldName('Orc_RepreLegalCPF')]
+    property RepresentanteLegalCPF: string read FRepresentanteLegalCPF write SetRepresentanteLegalCPF;
+    [FieldName('Orc_Enquadramento')]
+    property Enquadramento: string read FEnquadramento write SetEnquadramento;
+
+    property SituacaoDescricao: string read FSituacaoDescricao write SetSituacaoDescricao;
+    property Tipo: TTipoVO read FTipo write SetTipo;
+    property TotalOrcamento: Currency read FTotalOrcamento write SetTotalOrcamento;
+    property TotalMensalidade: Currency read FTotalMensalidade write SetTotalMensalidade;
+
+    property TotalLiquido: Currency read GetTotalLiquido;
+    property TotalParcelas: Currency read GetTotalParcelas;
+    property OrcamentoItem: TObjectList<TOrcamentoItemVO> read FOrcamentoItem write SetOrcamentoItem;
+    property OrcamentoItemModulo: TObjectList<TOrcamentoItemModuloVO> read FOrcamentoItemModulo write SetOrcamentoItemModulo;
+    property OrcamentoOcorrencia: TObjectList<TOrcamentoOcorrenciaVO> read FOrcamentoOcorrencia write SetOrcamentoOcorrencia;
+    property OrcamentoVecto: TObjectList<TOrcamentoVectoVO> read FOrcamentoVecto write SetOrcamentoVecto;
+    Property OrcamentoEmail: TObjectList<TOrcamentoEmailVO> read FOrcamentoEmail write SetOrcamentoEmail;
+    property Cliente: TClienteVO read FCliente write SetCliente;
+    property ListaContato: TObjectList<TContatoVO> read FListaContato write SetListaContato;
+
+    constructor create;
+    destructor destroy; override;
+  end;
+
+  TListaOrcamento = TObjectList<TOrcamentoVO>;
+
+implementation
+
+{ TOrcamentoVO }
+
+constructor TOrcamentoVO.create;
+begin
+  inherited create;
+  FOrcamentoItem := TObjectList<TOrcamentoItemVO>.Create;
+  FOrcamentoItemModulo := TObjectList<TOrcamentoItemModuloVO>.Create;
+  FOrcamentoOcorrencia := TObjectList<TOrcamentoOcorrenciaVO>.Create;
+  FOrcamentoVecto := TObjectList<TOrcamentoVectoVO>.Create;
+  FOrcamentoEmail := TObjectList<TOrcamentoEmailVO>.Create;
+  FListaContato := TObjectList<TContatoVO>.Create;
+  FUsuario := TUsuarioVO.Create;
+  FTipo := TTipoVO.Create;
+  FCliente := TClienteVO.create;
+end;
+
+destructor TOrcamentoVO.destroy;
+begin
+  FreeAndNil(FOrcamentoItem);
+  FreeAndNil(FOrcamentoItemModulo);
+  FreeAndNil(FOrcamentoOcorrencia);
+  FreeAndNil(FOrcamentoVecto);
+  FreeAndNil(FOrcamentoEmail);
+  FreeAndNil(FListaContato);
+  FreeAndNil(FUsuario);
+  FreeAndNil(FTipo);
+  FreeAndNil(FCliente);
+  inherited;
+end;
+
+function TOrcamentoVO.GetTotalLiquido: Currency;
+var
+  Item: TOrcamentoItemVO;
+begin
+  Result := 0;
+  for Item in OrcamentoItem do
+    Result := Result + (Item.ValorLicencaImpl - Item.ValorDescImpl);
+end;
+
+function TOrcamentoVO.GetTotalParcelas: Currency;
+var
+  Item: TOrcamentoVectoVO;
+begin
+  Result := 0;
+  for Item in OrcamentoVecto do
+    Result := Result + Item.Valor;
+end;
+
+procedure TOrcamentoVO.SetBairro(const Value: string);
+begin
+  FBairro := Value;
+end;
+
+procedure TOrcamentoVO.SetCelular(const Value: string);
+begin
+  FCelular := Value;
+end;
+
+procedure TOrcamentoVO.SetCEP(const Value: string);
+begin
+  FCEP := Value;
+end;
+
+procedure TOrcamentoVO.SetCliente(const Value: TClienteVO);
+begin
+  FCliente := Value;
+end;
+
+procedure TOrcamentoVO.SetCnpjCpf(const Value: string);
+begin
+  FCnpjCpf := Value;
+end;
+
+procedure TOrcamentoVO.SetContato(const Value: string);
+begin
+  FContato := Value;
+end;
+
+procedure TOrcamentoVO.SetContatoCompraVenda(const Value: string);
+begin
+  FContatoCompraVenda := Value;
+end;
+
+procedure TOrcamentoVO.SetContatoCompraVendaFone(const Value: string);
+begin
+  FContatoCompraVendaFone := Value;
+end;
+
+procedure TOrcamentoVO.SetContatoFinanceiro(const Value: string);
+begin
+  FContatoFinanceiro := Value;
+end;
+
+procedure TOrcamentoVO.SetContatoFinanceiroFone(const Value: string);
+begin
+  FContatoFinanceiroFone := Value;
+end;
+
+procedure TOrcamentoVO.SetData(const Value: TDate);
+begin
+  FData := Value;
+end;
+
+procedure TOrcamentoVO.SetDataSituacao(const Value: TDate);
+begin
+  FDataSituacao := Value;
+end;
+
+procedure TOrcamentoVO.SetEmailEnviado(const Value: Boolean);
+begin
+  FEmailEnviado := Value;
+end;
+
+procedure TOrcamentoVO.SetEndereco(const Value: string);
+begin
+  FEndereco := Value;
+end;
+
+procedure TOrcamentoVO.SetEnquadramento(const Value: string);
+begin
+  FEnquadramento := Value;
+end;
+
+procedure TOrcamentoVO.SetFantasia(const Value: string);
+begin
+  FFantasia := Value;
+end;
+
+procedure TOrcamentoVO.SetFone1(const Value: string);
+begin
+  FFone1 := Value;
+end;
+
+procedure TOrcamentoVO.SetFone2(const Value: string);
+begin
+  FFone2 := Value;
+end;
+
+procedure TOrcamentoVO.SetFoneOutro(const Value: string);
+begin
+  FFoneOutro := Value;
+end;
+
+procedure TOrcamentoVO.SetId(const Value: Integer);
+begin
+  FId := Value;
+end;
+
+procedure TOrcamentoVO.SetIdCidade(const Value: Integer);
+begin
+  FIdCidade := Value;
+end;
+
+procedure TOrcamentoVO.SetIdCliente(const Value: Integer);
+begin
+  FIdCliente := Value;
+end;
+
+procedure TOrcamentoVO.SetIdFormaPagto(const Value: Integer);
+begin
+    FIdFormaPagto := Value;
+end;
+
+procedure TOrcamentoVO.SetIdProspect(const Value: Integer);
+begin
+  FIdProspect := Value;
+end;
+
+procedure TOrcamentoVO.SetIdTipo(const Value: Integer);
+begin
+  FIdTipo := Value;
+end;
+
+procedure TOrcamentoVO.SetIdUsuario(const Value: Integer);
+begin
+  FIdUsuario := Value;
+end;
+
+procedure TOrcamentoVO.SetIE(const Value: string);
+begin
+  FIE := Value;
+end;
+
+procedure TOrcamentoVO.SetListaContato(const Value: TObjectList<TContatoVO>);
+begin
+  FListaContato := Value;
+end;
+
+procedure TOrcamentoVO.SetLogradouro(const Value: string);
+begin
+  FLogradouro := Value;
+end;
+
+procedure TOrcamentoVO.SetNumero(const Value: Integer);
+begin
+  FNumero := Value;
+end;
+
+procedure TOrcamentoVO.SetObservacao(const Value: string);
+begin
+  FObservacao := Value;
+end;
+
+procedure TOrcamentoVO.SetObservacaoEmail(const Value: string);
+begin
+  FObservacaoEmail := Value;
+end;
+
+procedure TOrcamentoVO.SetOrcamentoEmail(
+  const Value: TObjectList<TOrcamentoEmailVO>);
+begin
+  FOrcamentoEmail := Value;
+end;
+
+procedure TOrcamentoVO.SetOrcamentoItem(
+  const Value: TObjectList<TOrcamentoItemVO>);
+begin
+  FOrcamentoItem := Value;
+end;
+
+procedure TOrcamentoVO.SetOrcamentoItemModulo(
+  const Value: TObjectList<TOrcamentoItemModuloVO>);
+begin
+  FOrcamentoItemModulo := Value;
+end;
+
+procedure TOrcamentoVO.SetOrcamentoOcorrencia(
+  const Value: TObjectList<TOrcamentoOcorrenciaVO>);
+begin
+  FOrcamentoOcorrencia := Value;
+end;
+
+procedure TOrcamentoVO.SetOrcamentoVecto(
+  const Value: TObjectList<TOrcamentoVectoVO>);
+begin
+  FOrcamentoVecto := Value;
+end;
+
+procedure TOrcamentoVO.SetRazaoSocial(const Value: string);
+begin
+  FRazaoSocial := Value;
+end;
+
+procedure TOrcamentoVO.SetRepresentanteLegal(const Value: string);
+begin
+  FRepresentanteLegal := Value;
+end;
+
+procedure TOrcamentoVO.SetRepresentanteLegalCPF(const Value: string);
+begin
+  FRepresentanteLegalCPF := Value;
+end;
+
+procedure TOrcamentoVO.SetSituacao(const Value: Integer);
+begin
+  // 1 - Em Analise
+  // 2 - Aprovado
+  // 3 - Não Aprovado
+
+  if Value in [1, 2, 3, 4] then
+    FSituacao := Value
+  else
+    FSituacao := 1;
+end;
+
+procedure TOrcamentoVO.SetSituacaoDescricao(const Value: string);
+begin
+  FSituacaoDescricao := Value;
+end;
+
+procedure TOrcamentoVO.SetSubTipo(const Value: Integer);
+begin
+  FSubTipo := Value;
+end;
+
+procedure TOrcamentoVO.SetTelefone(const Value: string);
+begin
+  FTelefone := Value;
+end;
+
+procedure TOrcamentoVO.SetTipo(const Value: TTipoVO);
+begin
+  FTipo := Value;
+end;
+
+procedure TOrcamentoVO.SetTotalMensalidade(const Value: Currency);
+begin
+  FTotalMensalidade := Value;
+end;
+
+procedure TOrcamentoVO.SetTotalOrcamento(const Value: Currency);
+begin
+  FTotalOrcamento := Value;
+end;
+
+procedure TOrcamentoVO.SetUsuario(const Value: TUsuarioVO);
+begin
+  FUsuario := Value;
+end;
+
+end.

@@ -1,0 +1,150 @@
+unit uUsuarioVO;
+
+interface
+
+uses
+  System.SysUtils, uContaEmailVO, System.Generics.Collections, uDepartamentoVO;
+
+type
+  TUsuarioVO = class
+  private
+    FEmail: string;
+    FAtivo: Boolean;
+    FCodigo: Integer;
+    Fid: Integer;
+    FPassword: string;
+    FNome: string;
+    FNotificar: Boolean;
+    FUserName: string;
+    FAdm: Boolean;
+    FOnLine: Boolean;
+    FContaEmail: TContaEmailVO;
+    FDepartamento: TDepartamentoVO;
+    FQtdeDias: Integer;
+    FIdRevenda: Integer;
+    procedure SetAdm(const Value: Boolean);
+    procedure SetAtivo(const Value: Boolean);
+    procedure SetCodigo(const Value: Integer);
+    procedure SetEmail(const Value: string);
+    procedure Setid(const Value: Integer);
+    procedure SetNome(const Value: string);
+    procedure SetNotificar(const Value: Boolean);
+    procedure SetOnLine(const Value: Boolean);
+    procedure SetPassword(const Value: string);
+    procedure SetUserName(const Value: string);
+    procedure SetContaEmail(const Value: TContaEmailVO);
+    procedure SetDepartamento(const Value: TDepartamentoVO);
+    procedure SetQtdeDias(const Value: Integer);
+    procedure SetIdRevenda(const Value: Integer);
+  public
+    property Id: Integer read Fid write Setid;
+    property Codigo: Integer read FCodigo write SetCodigo;
+    property UserName: string read FUserName write SetUserName;
+    property Nome: string read FNome write SetNome;
+    property Password: string read FPassword write SetPassword;
+    property Email: string read FEmail write SetEmail;
+    property OnLine: Boolean read FOnLine write SetOnLine;
+    property Adm: Boolean read FAdm write SetAdm;
+    property Ativo: Boolean read FAtivo write SetAtivo;
+    property Notificar: Boolean read FNotificar write SetNotificar;
+    property QtdeDias: Integer read FQtdeDias write SetQtdeDias;
+    property ContaEmail: TContaEmailVO read FContaEmail write SetContaEmail;
+    property IdRevenda: Integer read FIdRevenda write SetIdRevenda;
+
+    property Departamento: TDepartamentoVO read FDepartamento write SetDepartamento;
+
+    constructor Create();
+    destructor destroy; override;
+  end;
+
+  TListaUsuario = TObjectList<TUsuarioVO>;
+
+implementation
+
+{ TUsuarioVO }
+
+constructor TUsuarioVO.Create;
+begin
+  inherited Create;
+  FContaEmail := TContaEmailVO.Create;
+  FDepartamento := TDepartamentoVO.Create;
+end;
+
+destructor TUsuarioVO.destroy;
+begin
+  FreeAndNil(FContaEmail);
+  FreeAndNil(FDepartamento);
+  inherited;
+end;
+
+procedure TUsuarioVO.SetAdm(const Value: Boolean);
+begin
+  FAdm := Value;
+end;
+
+procedure TUsuarioVO.SetAtivo(const Value: Boolean);
+begin
+  FAtivo := Value;
+end;
+
+procedure TUsuarioVO.SetCodigo(const Value: Integer);
+begin
+  FCodigo := Value;
+end;
+
+procedure TUsuarioVO.SetContaEmail(const Value: TContaEmailVO);
+begin
+  FContaEmail := Value;
+end;
+
+procedure TUsuarioVO.SetDepartamento(const Value: TDepartamentoVO);
+begin
+  FDepartamento := Value;
+end;
+
+procedure TUsuarioVO.SetEmail(const Value: string);
+begin
+  FEmail := Value;
+end;
+
+procedure TUsuarioVO.Setid(const Value: Integer);
+begin
+  Fid := Value;
+end;
+
+procedure TUsuarioVO.SetIdRevenda(const Value: Integer);
+begin
+  FIdRevenda := Value;
+end;
+
+procedure TUsuarioVO.SetNome(const Value: string);
+begin
+  FNome := Value;
+end;
+
+procedure TUsuarioVO.SetNotificar(const Value: Boolean);
+begin
+  FNotificar := Value;
+end;
+
+procedure TUsuarioVO.SetOnLine(const Value: Boolean);
+begin
+  FOnLine := Value;
+end;
+
+procedure TUsuarioVO.SetPassword(const Value: string);
+begin
+  FPassword := Value;
+end;
+
+procedure TUsuarioVO.SetQtdeDias(const Value: Integer);
+begin
+  FQtdeDias := Value;
+end;
+
+procedure TUsuarioVO.SetUserName(const Value: string);
+begin
+  FUserName := Value;
+end;
+
+end.

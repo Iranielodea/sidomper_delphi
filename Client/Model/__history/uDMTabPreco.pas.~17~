@@ -1,0 +1,73 @@
+unit uDMTabPreco;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient, uDM;
+
+type
+  TDMTabPreco = class(TDMBase)
+    CDSItens: TClientDataSet;
+    CDSItensId: TIntegerField;
+    CDSItensIdTabPreco: TIntegerField;
+    CDSItensIdModulo: TIntegerField;
+    CDSItensCodModulo: TIntegerField;
+    CDSItensNomeModulo: TStringField;
+    CDSConsultaTab_Id: TAutoIncField;
+    CDSConsultaTab_Nome: TStringField;
+    CDSCadastroTab_Id: TAutoIncField;
+    CDSCadastroTab_Data: TDateField;
+    CDSCadastroTab_Referencia: TStringField;
+    CDSCadastroTab_Nome: TStringField;
+    CDSCadastroTab_Produto: TIntegerField;
+    CDSCadastroTab_Status: TIntegerField;
+    CDSCadastroTab_Tipo: TIntegerField;
+    CDSCadastroTab_Ativo: TBooleanField;
+    CDSCadastroTab_ValorImplSimples: TBCDField;
+    CDSCadastroTab_ValorMensalSimples: TBCDField;
+    CDSCadastroTab_Observacao: TStringField;
+    CDSCadastroTab_ValorImplRegNormal: TBCDField;
+    CDSCadastroTab_ValorMensalRegNormal: TBCDField;
+    CDSCadastroProd_Codigo: TIntegerField;
+    CDSCadastroProd_Nome: TWideStringField;
+    CDSCadastroSta_Codigo: TIntegerField;
+    CDSCadastroSta_Nome: TWideStringField;
+    CDSCadastroTip_Codigo: TIntegerField;
+    CDSCadastroTip_Nome: TWideStringField;
+    procedure DataModuleCreate(Sender: TObject);
+    procedure CDSCadastroNewRecord(DataSet: TDataSet);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMTabPreco: TDMTabPreco;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+procedure TDMTabPreco.CDSCadastroNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSCadastroTab_Data.AsDateTime := Date;
+  CDSCadastroTab_Ativo.AsBoolean := True;
+end;
+
+procedure TDMTabPreco.DataModuleCreate(Sender: TObject);
+begin
+  inherited;
+  CDSCadastro.RemoteServer := DM.DSPConexao2;
+  CDSConsulta.RemoteServer := DM.DSPConexao2;
+
+  CDSItens.CreateDataSet;
+
+
+end;
+
+end.

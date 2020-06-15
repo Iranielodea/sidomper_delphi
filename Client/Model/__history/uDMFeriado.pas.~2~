@@ -1,0 +1,26 @@
+unit uDMFeriado;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient;
+
+type
+  TDMFeriado = class(TDMBase)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMFeriado: TDMFeriado;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

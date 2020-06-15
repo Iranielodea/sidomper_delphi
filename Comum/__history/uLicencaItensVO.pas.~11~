@@ -1,0 +1,111 @@
+unit uLicencaItensVO;
+
+interface
+
+uses
+  uTableName, uKeyField, System.SysUtils, System.Generics.Collections;
+
+type
+  [TableName('Licenca_Itens')]
+  TLicencaItensVO = class
+  private
+    FDataLcto: TDate;
+    FCNPJCPF: string;
+    FId: Integer;
+    FDataUtilizacao: TDate;
+    FLicenca: string;
+    FSituacao: string;
+    FLicencaUtilizada: string;
+    FCodigo: Integer;
+    procedure SetCNPJCPF(const Value: string);
+    procedure SetDataLcto(const Value: TDate);
+    procedure SetDataUtilizacao(const Value: TDate);
+    procedure SetId(const Value: Integer);
+    procedure SetLicenca(const Value: string);
+    procedure SetSituacao(const Value: string);
+    procedure SetLicencaUtilizada(const Value: string);
+    procedure SetCodigo(const Value: Integer);
+    function GetSituacao: string;
+    function GetLicencaUtilizada: string;
+  public
+    [KeyField('LicIte_Id')]
+    property Id: Integer read FId write SetId;
+    [FieldName('LicIte_Codigo')]
+    property Codigo: Integer read FCodigo write SetCodigo;
+    [FieldName('LicIte_CNPJCPF')]
+    property CNPJCPF: string read FCNPJCPF write SetCNPJCPF;
+    [FieldDate('LicIte_DataLcto')]
+    property DataLcto: TDate read FDataLcto write SetDataLcto;
+    [FieldName('LicIte_Licenca')]
+    property Licenca: string read FLicenca write SetLicenca;
+    [FieldDate('LicIte_DataUtilizacao')]
+    property DataUtilizacao: TDate read FDataUtilizacao write SetDataUtilizacao;
+    [FieldName('LicIte_Situacao')]
+    property Situacao: string read GetSituacao write SetSituacao;
+    [FieldName('LicIte_Utilizada')]
+    property  LicencaUtilizada: string read GetLicencaUtilizada write SetLicencaUtilizada;
+  end;
+
+  TListaLicencaItens = TObjectList<TLicencaItensVO>;
+
+implementation
+
+{ TLicencaItensVO }
+
+function TLicencaItensVO.GetLicencaUtilizada: string;
+begin
+  if FLicencaUtilizada = 'S' then
+    Result := 'Sim';
+  if FLicencaUtilizada = 'N' then
+    Result := 'Não';
+end;
+
+function TLicencaItensVO.GetSituacao: string;
+begin
+  if FSituacao = '1' then
+    Result := 'Normal';
+  if FSituacao = '2' then
+    Result := 'Inutiliz.';
+end;
+
+procedure TLicencaItensVO.SetCNPJCPF(const Value: string);
+begin
+  FCNPJCPF := Value;
+end;
+
+procedure TLicencaItensVO.SetCodigo(const Value: Integer);
+begin
+  FCodigo := Value;
+end;
+
+procedure TLicencaItensVO.SetDataLcto(const Value: TDate);
+begin
+  FDataLcto := Value;
+end;
+
+procedure TLicencaItensVO.SetDataUtilizacao(const Value: TDate);
+begin
+  FDataUtilizacao := Value;
+end;
+
+procedure TLicencaItensVO.SetId(const Value: Integer);
+begin
+  FId := Value;
+end;
+
+procedure TLicencaItensVO.SetLicenca(const Value: string);
+begin
+  FLicenca := Value;
+end;
+
+procedure TLicencaItensVO.SetLicencaUtilizada(const Value: string);
+begin
+  FLicencaUtilizada := Value;
+end;
+
+procedure TLicencaItensVO.SetSituacao(const Value: string);
+begin
+  FSituacao := Value;
+end;
+
+end.

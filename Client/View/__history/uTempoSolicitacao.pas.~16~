@@ -1,0 +1,96 @@
+unit uTempoSolicitacao;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons, uSolicitacaoController, uSolicitacaoTempoVO;
+
+type
+  TfrmTempoSolicitacao = class(TForm)
+    lblCliente: TLabel;
+    lblIdSolicitacao: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    lblTitulo: TLabel;
+    Label5: TLabel;
+    lblNivel: TLabel;
+    Label7: TLabel;
+    Panel1: TPanel;
+    btnControle: TBitBtn;
+    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    FIdSolicitacao: Integer;
+    FSolicitacaoController: TSolicitacaoController;
+    FNomeStatus: string;
+    { Private declarations }
+    procedure IniciarTempo;
+    procedure FinalizarTempo;
+    procedure MostrarDados;
+  public
+    { Public declarations }
+    property IdSolicitacao: Integer read FIdSolicitacao write FIdSolicitacao;
+    property NomeStatus: string read FNomeStatus write FNomeStatus;
+  end;
+
+var
+  frmTempoSolicitacao: TfrmTempoSolicitacao;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmTempoSolicitacao.FinalizarTempo;
+begin
+
+end;
+
+procedure TfrmTempoSolicitacao.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TfrmTempoSolicitacao.FormCreate(Sender: TObject);
+begin
+  FSolicitacaoController := TSolicitacaoController.Create;
+end;
+
+procedure TfrmTempoSolicitacao.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FSolicitacaoController);
+end;
+
+procedure TfrmTempoSolicitacao.FormShow(Sender: TObject);
+begin
+  MostrarDados();
+end;
+
+procedure TfrmTempoSolicitacao.IniciarTempo;
+var
+  objVO: TSolicitacaoTempoVO;
+begin
+  objVO := TSolicitacaoTempoVO.Create;
+  try
+    objVO.IdSolicitacao := FSolicitacaoController.Model.CDSCadastroSol_Id.AsInteger;
+    objVO.IdUsuario := FSolicitacaoController.Model.CDSCadastroSol_UsuarioAtendeAtual.AsInteger;
+    objVO.Status.Nome := FNomeStatus;
+    FSolicitacaoController.Iniciar(objVO);
+  finally
+    FreeAndNil(objVO);
+  end;
+end;
+
+procedure TfrmTempoSolicitacao.MostrarDados;
+begin
+  FSolicitacaoController.LocalizarId(FIdSolicitacao);
+  lblIdSolicitacao.Caption := FSolicitacaoController.Model.CDSCadastroSol_Id.AsString;
+  lblCliente.Caption := FSolicitacaoController.Model.CDSCadastroCli_Nome.AsString;
+  lblTitulo.Caption := FSolicitacaoController.Model.CDSCadastroSol_Titulo.AsString;
+  lblNivel.Caption := FSolicitacaoController.Model.CDSCadastroSol_Nivel.AsString;
+end;
+
+end.

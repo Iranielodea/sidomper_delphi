@@ -1,0 +1,194 @@
+object frmTelaPrincipal: TfrmTelaPrincipal
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  Caption = 'Controle de Tempo'
+  ClientHeight = 32
+  ClientWidth = 360
+  Color = clGreen
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  FormStyle = fsStayOnTop
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnShow = FormShow
+  DesignSize = (
+    360
+    32)
+  PixelsPerInch = 96
+  TextHeight = 13
+  object lblCliente: TLabel
+    Left = 78
+    Top = 29
+    Width = 280
+    Height = 15
+    AutoSize = False
+    Caption = 'lblCliente'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lblIdSolicitacao: TLabel
+    Left = 78
+    Top = 8
+    Width = 54
+    Height = 15
+    Caption = 'lblCliente'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 8
+    Top = 8
+    Width = 64
+    Height = 15
+    Caption = 'Solicita'#231#227'o:'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 8
+    Top = 29
+    Width = 44
+    Height = 15
+    Caption = 'Cliente:'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lblTitulo: TLabel
+    Left = 78
+    Top = 50
+    Width = 278
+    Height = 15
+    AutoSize = False
+    Caption = 'lblCliente'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label5: TLabel
+    Left = 8
+    Top = 50
+    Width = 37
+    Height = 15
+    Caption = 'T'#237'tulo:'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lblNivel: TLabel
+    Left = 78
+    Top = 71
+    Width = 54
+    Height = 15
+    Caption = 'lblCliente'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label7: TLabel
+    Left = 8
+    Top = 71
+    Width = 32
+    Height = 15
+    Caption = 'N'#237'vel:'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lblStatus: TLabel
+    Left = 78
+    Top = 92
+    Width = 278
+    Height = 15
+    AutoSize = False
+    Caption = 'lblStatus'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label4: TLabel
+    Left = 8
+    Top = 92
+    Width = 39
+    Height = 15
+    Caption = 'Status:'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWhite
+    Font.Height = -13
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object btnDetalhe: TSpeedButton
+    Left = 197
+    Top = 2
+    Width = 23
+    Height = 22
+    Anchors = [akTop, akRight]
+    Caption = '>>'
+    OnClick = btnDetalheClick
+    ExplicitLeft = 346
+  end
+  object Panel1: TPanel
+    Left = 220
+    Top = 0
+    Width = 140
+    Height = 32
+    Align = alRight
+    BevelOuter = bvLowered
+    TabOrder = 0
+    ExplicitLeft = 369
+    ExplicitHeight = 101
+    object btnControle: TBitBtn
+      Left = 1
+      Top = 1
+      Width = 138
+      Height = 30
+      Align = alClient
+      Caption = 'Iniciar'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -24
+      Font.Name = 'Times New Roman'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      OnClick = btnControleClick
+      ExplicitHeight = 99
+    end
+  end
+end

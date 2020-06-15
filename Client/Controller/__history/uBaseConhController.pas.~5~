@@ -1,0 +1,424 @@
+unit uBaseConhController;
+
+interface
+
+uses
+  System.SysUtils, uDMBaseConh, uRegras, uEnumerador, uDM, Data.DB, Vcl.Forms,
+  Data.DBXJSON , Data.DBXJSONReflect, uFiltroBaseConhecimento, uTipoController,
+  uTipoVO, uParametrosController;
+
+type
+  TBaseConhController = class
+  private
+    FModel: TDMBaseConh;
+    FOperacao: TOperacao;
+    procedure Post;
+    procedure ObservacaoPadrao;
+    procedure TipoUmRegistro;
+  public
+    procedure FiltrarCodigo(ACodigo: Integer);
+    function CodigoAtual: Integer;
+    procedure Filtrar(APrograma: Integer; ACampo, ATexto, Ativo: string; AContem: Boolean = False);
+    procedure FiltrarBaseConh(AFiltro: TFiltroBaseConhecimento; ACampo, ATexto: string; AIdUsuario:
+        Integer; AContem: Boolean = False);
+    procedure LocalizarId(AId: Integer);
+    procedure Novo(AIdUsuario: Integer);
+    procedure Editar(AId: Integer; AFormulario: TForm);
+    procedure Salvar(AIdUsuario: Integer);
+    procedure Excluir(AIdUsuario, AId: Integer);
+    procedure Cancelar();
+    procedure Imprimir(AIdUsuario: Integer);
+    function ProximoId(): Integer;
+    procedure Pesquisar(AId: Integer);
+    procedure ModoEdicaoInsercao;
+    property Model: TDMBaseConh read FModel write FModel;
+    constructor Create();
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TSolicitacaoController }
+
+uses uFuncoesSIDomper, uUsuarioController, uClienteController,
+  uObsevacaoController;
+
+procedure TBaseConhController.FiltrarCodigo(ACodigo: Integer);
+var
+  Negocio: TServerMethods1Client;
+begin
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      FModel.CDSConsulta.Close;
+      Negocio.FiltrarCodigo(CBaseConhPrograma, ACodigo);
+      FModel.CDSConsulta.Open;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.FiltrarCodigo');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+function TBaseConhController.CodigoAtual: Integer;
+begin
+  Result := FModel.CDSCadastroBas_Id.AsInteger;
+end;
+
+procedure TBaseConhController.Cancelar;
+begin
+  if FModel.CDSCadastro.State in [dsEdit, dsInsert] then
+    FModel.CDSCadastro.Cancel;
+end;
+
+constructor TBaseConhController.Create;
+begin
+  inherited Create;
+  try
+    FModel := TDMBaseConh.Create(nil);
+  except
+    On E: Exception do
+    begin
+      TFuncoes.Excessao(E, 'TBaseConhController.Create');
+    end;
+  end;
+end;
+
+destructor TBaseConhController.Destroy;
+begin
+  try
+    FreeAndNil(FModel);
+  except
+    On E: Exception do
+    begin
+      TFuncoes.Excessao(E, 'TBaseConhController.Destroy');
+    end;
+  end;
+  inherited;
+end;
+
+procedure TBaseConhController.Editar(AId: Integer; AFormulario: TForm);
+var
+  Negocio: TServerMethods1Client;
+  Resultado: Boolean;
+begin
+  if AId = 0 then
+    raise Exception.Create('Não há Registro para Editar!');
+
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      FModel.CDSCadastro.Close;
+      Resultado := Negocio.Editar(CBaseConhPrograma, dm.IdUsuario, AId);
+      FModel.CDSCadastro.Open;
+
+      TFuncoes.HabilitarCampo(AFormulario, Resultado);
+
+      FOperacao := opEditar;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.Editar');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.Excluir(AIdUsuario, AId: Integer);
+var
+  Negocio: TServerMethods1Client;
+begin
+  if AId = 0 then
+    raise Exception.Create('Não há Registro para Excluir!');
+
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      Negocio.Excluir(CBaseConhPrograma, AIdUsuario, AId);
+      FModel.CDSConsulta.Delete;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.Excluir');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.Filtrar(APrograma:Integer; ACampo, ATexto, Ativo: string;
+  AContem: Boolean);
+var
+  Negocio: TServerMethods1Client;
+begin
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      FModel.CDSConsulta.Close;
+      Negocio.Filtrar(APrograma, ACampo, ATexto,  Ativo, AContem);
+      FModel.CDSConsulta.Open;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.Filtrar');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.FiltrarBaseConh(AFiltro: TFiltroBaseConhecimento; ACampo, ATexto:
+    string; AIdUsuario: Integer; AContem: Boolean = False);
+var
+  Negocio: TServerMethods1Client;
+  Marshal : TJSONMarshal;
+  oObjetoJSON : TJSONValue;
+begin
+  TFuncoes.ValidaIntervaloDatas(AFiltro.DataInicial, AFiltro.DataFinal);
+
+// serializa o objeto
+  Marshal := TJSONMarshal.Create;
+  try
+    oObjetoJSON := Marshal.Marshal(AFiltro);
+  finally
+    FreeAndNil(Marshal);
+  end;
+
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      FModel.CDSConsulta.Close;
+      Negocio.FiltrarBaseConh(oObjetoJSON, ACampo, ATexto, AIdUsuario, AContem);
+      FModel.CDSConsulta.Open;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.FiltrarBaseConh');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.Imprimir(AIdUsuario: Integer);
+var
+  Negocio: TServerMethods1Client;
+begin
+  Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
+  try
+    try
+      Negocio.Relatorio(CBaseConhPrograma, AIdUsuario);
+//    FModel.Rel.Print;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.Imprimir');
+      end;
+    end;
+
+  finally
+    FreeAndNil(Negocio);
+  end;
+  raise Exception.Create('Relatório não disponível no momento(a Desenvolver).');
+end;
+
+procedure TBaseConhController.LocalizarId(AId: Integer);
+var
+  Negocio: TServerMethods1Client;
+begin
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      FModel.CDSCadastro.Close;
+      Negocio.LocalizarId(CBaseConhPrograma, AId);
+      FModel.CDSCadastro.Open;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.LocalizarId');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.ModoEdicaoInsercao;
+begin
+  TFuncoes.ModoEdicaoInsercao(FModel.CDSCadastro);
+end;
+
+procedure TBaseConhController.Novo(AIdUsuario: Integer);
+var
+  Negocio: TServerMethods1Client;
+  Cliente: TClienteController;
+  Usuario: TUsuarioController;
+begin
+  Usuario := TUsuarioController.Create;
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      FModel.CDSCadastro.Close;
+      Negocio.Novo(CBaseConhPrograma, AIdUsuario);
+      FModel.CDSCadastro.Open;
+
+      FModel.CDSCadastro.Append;
+
+  //------------------------------------------------------------------------------
+  // usuario padrao
+      Usuario.LocalizarId(AIdUsuario);
+      FModel.CDSCadastroBas_Usuario.AsInteger := Usuario.Model.CDSCadastroUsu_Id.AsInteger;
+      FModel.CDSCadastroUsu_Codigo.AsInteger := Usuario.Model.CDSCadastroUsu_Codigo.AsInteger;
+      FModel.CDSCadastroUsu_Nome.AsString := Usuario.Model.CDSCadastroUsu_Nome.AsString;
+
+      ObservacaoPadrao();
+      TipoUmRegistro();
+
+      FOperacao := opIncluir;
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.Novo');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+    FreeAndNil(Usuario);
+  end;
+end;
+
+procedure TBaseConhController.ObservacaoPadrao;
+var
+  Obs: TObservacaoController;
+begin
+  Obs := TObservacaoController.Create;
+  try
+    Obs.LocalizarPadrao(prBase);
+    FModel.CDSCadastroBas_Descricao.AsString := Obs.Model.CDSCadastroObs_Descricao.AsString;
+  finally
+    FreeAndNil(Obs);
+  end;
+end;
+
+procedure TBaseConhController.Pesquisar(AId: Integer);
+begin
+  LocalizarId(AId);
+  if FModel.CDSCadastroBas_Id.AsInteger = 0 then
+    raise Exception.Create('Registro não Encontrado.');
+end;
+
+procedure TBaseConhController.Post;
+begin
+  if FModel.CDSCadastro.State in [dsEdit, dsInsert] then
+    FModel.CDSCadastro.Post;
+end;
+
+
+function TBaseConhController.ProximoId: Integer;
+var
+  Negocio: TServerMethods1Client;
+begin
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      Result := StrToInt(Negocio.ProximoId(CBaseConhPrograma).ToString);
+    except
+      On E: Exception do
+      begin
+        TFuncoes.Excessao(E, 'TBaseConhController.ProximoId');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.Salvar(AIdUsuario: Integer);
+var
+  Negocio: TServerMethods1Client;
+  lOperacao: TOperacao;
+begin
+  if TFuncoes.DataEmBrancoNula(FModel.CDSCadastroBas_Data.AsString) then
+    raise Exception.Create('Informe a Data!');
+
+  if FModel.CDSCadastroBas_Usuario.AsInteger = 0 then
+    raise Exception.Create('Informe o para Consultor!');
+
+  if Trim(FModel.CDSCadastroBas_Descricao.AsString) = '' then
+    raise Exception.Create('Informe a Descrição!');
+
+  if FModel.CDSCadastroBas_Status.AsInteger = 0 then
+    raise Exception.Create('Informe o Status!');
+
+  if FModel.CDSCadastroBas_Tipo.AsInteger = 0 then
+    raise Exception.Create('Informe o Tipo!');
+
+
+  if Trim(FModel.CDSCadastroBas_Anexo.asstring) <> '' then
+  begin
+    if not FileExists(FModel.CDSCadastroBas_Anexo.asstring) then
+      raise Exception.Create('Arquivo do Anexo não Existe');
+  end;
+
+  lOperacao := FOperacao;
+  try
+    Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+    try
+      Negocio.StartTransacao;
+
+      if FOperacao = opIncluir then
+        FModel.CDSCadastroBas_Id.AsInteger := Negocio.ProximoId(CBaseConhPrograma).AsInt;
+
+      Post();
+
+      if FModel.CDSCadastro.ChangeCount > 0 then
+        FModel.CDSCadastro.ApplyUpdates(0);
+
+      Negocio.Salvar(CBaseConhPrograma, DM.IdUsuario);
+
+      Negocio.Commit;
+
+      FOperacao := opNavegar;
+    except
+      ON E: Exception do
+      begin
+        FOperacao := lOperacao;
+        Negocio.Roolback;
+        TFuncoes.Excessao(E, 'TBaseConhController.Salvar');
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TBaseConhController.TipoUmRegistro;
+var
+  obj: TTipoController;
+  Model: TTipoVO;
+begin
+  obj := TTipoController.Create;
+  try
+    Model := obj.RetornoUmRegistro(prBase);
+    if Model.Id > 0 then
+    begin
+      FModel.CDSCadastroBas_Tipo.AsInteger := Model.Id;
+      FModel.CDSCadastroTip_Codigo.AsInteger := Model.Codigo;
+      FModel.CDSCadastroTip_Nome.AsString := Model.Nome;
+    end;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Model);
+  end;
+end;
+
+end.

@@ -1,0 +1,44 @@
+unit uPermissaoChamadoVO;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TPermissaoChamadoVO = class
+  private
+    FOcorrencia: Boolean;
+    FStatus: Boolean;
+    FAbertura: Boolean;
+    procedure SetAbertura(const Value: Boolean);
+    procedure SetOcorrencia(const Value: Boolean);
+    procedure SetStatus(const Value: Boolean);
+
+  public
+    property Abertura: Boolean read FAbertura write SetAbertura;
+    property Ocorrencia: Boolean read FOcorrencia write SetOcorrencia;
+    property Status: Boolean read FStatus write SetStatus;
+  end;
+
+implementation
+
+
+{ TPermissaoChamadoVO }
+
+procedure TPermissaoChamadoVO.SetAbertura(const Value: Boolean);
+begin
+  FAbertura := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetOcorrencia(const Value: Boolean);
+begin
+  FOcorrencia := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetStatus(const Value: Boolean);
+begin
+  FStatus := Value;
+end;
+
+end.

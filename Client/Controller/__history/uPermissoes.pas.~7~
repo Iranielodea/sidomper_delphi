@@ -1,0 +1,49 @@
+unit uPermissoes;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, uDepartamentoVO;
+
+type
+  TPermissoes = class
+  private
+    FIdUsuario: Integer;
+    FDepartamento: TDepartamentoVO;
+    procedure SetDepartamento(const Value: TDepartamentoVO);
+    procedure SetIdUsuario(const Value: Integer);
+
+  public
+    property IdUsuario: Integer read FIdUsuario write SetIdUsuario;
+    property Departamento: TDepartamentoVO read FDepartamento write SetDepartamento;
+    constructor Create(); overload;
+    destructor Destroy(); override;
+  end;
+
+implementation
+
+{ TPermissoes }
+
+constructor TPermissoes.Create;
+begin
+  inherited Create;
+  FDepartamento := TDepartamentoVO.Create;
+end;
+
+destructor TPermissoes.Destroy;
+begin
+  FreeAndNil(FDepartamento);
+  inherited;
+end;
+
+procedure TPermissoes.SetDepartamento(const Value: TDepartamentoVO);
+begin
+  FDepartamento := Value;
+end;
+
+procedure TPermissoes.SetIdUsuario(const Value: Integer);
+begin
+  FIdUsuario := Value;
+end;
+
+end.

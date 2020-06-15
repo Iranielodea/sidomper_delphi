@@ -1,0 +1,337 @@
+unit uClienteVO;
+
+interface
+
+uses
+  System.SysUtils, uRevendaVO, uUsuarioVO, uClienteEmailVO, System.Generics.Collections,
+  uClienteModuloVO, uCidadeVO, uTableName, uKeyField, uContatoVO;
+
+type
+  [TableName('Cliente')]
+  TClienteVO = class
+  private
+    FBairro: string;
+    FCEP: String;
+    FCidade: string;
+    FCNPJ: string;
+    FCodigo: Integer;
+    FContatoFinanceiro: string;
+    FContatoCompraVenda: string;
+    FEnquadramento: string;
+    FNomeFantasia: string;
+    FPendenciaFinanceira: string;
+    FRazaoSocial: string;
+    FRevenda: Integer;
+    FRua: string;
+    FSituacao: string;
+    FTelefone: string;
+    FUsuario: Integer;
+    FVersao: string;
+    FRevendaVO: TRevendaVO;
+    FAtivo: Boolean;
+    FRestricao: Boolean;
+    FId: Integer;
+    FUsuarioVO: TUsuarioVO;
+    FEndereco: string;
+    FClienteModulo: TObjectList<TClienteModuloVO>;
+    FClienteEmail: TObjectList<TClienteEmailVO>;
+    FContato: string;
+    FCidadeVO: TCidadeVO;
+    FContatoCompraVendaFone: string;
+    FContatoFinanceiroFone: string;
+    FFoneContatoFinanceiro: string;
+    FRepresentanteLegal: string;
+    FIE: string;
+    FFone2: string;
+    FOutroTelefone: string;
+    FFone1: string;
+    FRepresentanteLegalCPF: string;
+    FCelular: string;
+    FIdCidade: Integer;
+    FIdRevenda: Integer;
+    FListaContatoVO: TObjectList<TContatoVO>;
+    FLogradouro: string;
+    procedure SetAtivo(const Value: Boolean);
+    procedure SetEndereco(const Value: string);
+    procedure SetId(const Value: Integer);
+    procedure SetRestricao(const Value: Boolean);
+    procedure SetRevendaVO(const Value: TRevendaVO);
+    procedure SetUsuarioVO(const Value: TUsuarioVO);
+    procedure SetVersao(const Value: string);
+    procedure SetClienteEmail(const Value: TObjectList<TClienteEmailVO>);
+    procedure SetClienteModulo(const Value: TObjectList<TClienteModuloVO>);
+    procedure SetContato(const Value: string);
+    procedure SetCidadeVO(const Value: TCidadeVO);
+    procedure SetCelular(const Value: string);
+    procedure SetContatoCompraVendaFone(const Value: string);
+    procedure SetContatoFinanceiroFone(const Value: string);
+    procedure SetFone1(const Value: string);
+    procedure SetFone2(const Value: string);
+    procedure SetFoneContatoFinanceiro(const Value: string);
+    procedure SetIE(const Value: string);
+    procedure SetOutroTelefone(const Value: string);
+    procedure SetRepresentanteLegal(const Value: string);
+    procedure SetRepresentanteLegalCPF(const Value: string);
+    procedure SetIdCidade(const Value: Integer);
+    procedure SetIdRevenda(const Value: Integer);
+    procedure SetCEP(const Value: String);
+    procedure SetListaContatoVO(const Value: TObjectList<TContatoVO>);
+    procedure SetLogradouro(const Value: string);
+  public
+    [KeyField('Cli_Id')]
+    property Id: Integer read FId write SetId;
+    [FieldName('Cli_Ativo')]
+    property Ativo: Boolean read FAtivo write SetAtivo;
+    [FieldName('Cli_Restricao')]
+    property Restricao: Boolean read FRestricao write SetRestricao;
+    [FieldName('Cli_Revenda')]
+    property IdRevenda: Integer read FIdRevenda write SetIdRevenda;
+    [FieldName('Cli_Versao')]
+    property Versao: string read FVersao write SetVersao;
+    [FieldName('Cli_Bairro')]
+    property Bairro: string read FBairro write FBairro;
+    [FieldName('Cli_CEP')]
+    property CEP: String read FCEP write SetCEP;
+    [FieldNull('Cli_Cidade')]
+    property IdCidade: Integer read FIdCidade write SetIdCidade;
+    [FieldName('Cli_Dcto')]
+    property CNPJ: string read FCNPJ write FCNPJ;
+    [FieldName('Cli_Codigo')]
+    property Codigo: Integer read FCodigo write FCodigo;
+    [FieldName('Cli_ContatoFinanceiro')]
+    property ContatoFinanceiro: string read FContatoFinanceiro write FContatoFinanceiro;
+    [FieldName('Cli_ContatoCompraVenda')]
+    property ContatoCompraVenda: string read FContatoCompraVenda write
+        FContatoCompraVenda;
+    [FieldName('Cli_Enquadramento')]
+    property Enquadramento: string read FEnquadramento write FEnquadramento;
+    [FieldName('Cli_Fantasia')]
+    property NomeFantasia: string read FNomeFantasia write FNomeFantasia;
+    [FieldName('Cli_Nome')]
+    property RazaoSocial: string read FRazaoSocial write FRazaoSocial;
+    [FieldName('Cli_Endereco')]
+    property Rua: string read FRua write FRua;
+    [FieldName('Cli_Logradouro')]
+    property Logradouro: string read FLogradouro write SetLogradouro;
+    [FieldName('Cli_Telefone')]
+    property Telefone: string read FTelefone write FTelefone;
+    [FieldNull('Cli_Usuario')]
+    property Usuario: Integer read FUsuario write FUsuario;
+    [FieldName('Cli_Contato')]
+    property Contato: string read FContato write SetContato;
+    [FieldName('Cli_Fone1')]
+    property Fone1: string read FFone1 write SetFone1;
+    [FieldName('Cli_Fone2')]
+    property Fone2: string read FFone2 write SetFone2;
+    [FieldName('Cli_Celular')]
+    property Celular: string read FCelular write SetCelular;
+    [FieldName('Cli_FoneOutro')]
+    property OutroTelefone: string read FOutroTelefone write SetOutroTelefone;
+    [FieldName('Cli_ContatoFinanceiroFone')]
+    property ContatoFinanceiroFone: string read FContatoFinanceiroFone write SetContatoFinanceiroFone;
+    [FieldName('Cli_ContatoCompraVendaFone')]
+    property ContatoCompraVendaFone: string read FContatoCompraVendaFone write SetContatoCompraVendaFone;
+    [FieldName('Cli_IE')]
+    property IE: string read FIE write SetIE;
+    [FieldName('Cli_RepreLegal')]
+    property RepresentanteLegal: string read FRepresentanteLegal write SetRepresentanteLegal;
+    [FieldName('Cli_RepreLegalCPF')]
+    property RepresentanteLegalCPF: string read FRepresentanteLegalCPF write SetRepresentanteLegalCPF;
+
+    property Cidade: string read FCidade write FCidade;
+    property Revenda: Integer read FRevenda write FRevenda;
+    property Endereco: string read FEndereco write SetEndereco;
+    property PendenciaFinanceira: string read FPendenciaFinanceira write
+        FPendenciaFinanceira;
+    property Situacao: string read FSituacao write FSituacao;
+
+    property FoneContatoFinanceiro: string read FFoneContatoFinanceiro write SetFoneContatoFinanceiro;
+    property ClienteEmail: TObjectList<TClienteEmailVO> read FClienteEmail write SetClienteEmail;
+    property ClienteModulo: TObjectList<TClienteModuloVO> read FClienteModulo write SetClienteModulo;
+    property CidadeVO: TCidadeVO read FCidadeVO write SetCidadeVO;
+    property RevendaVO: TRevendaVO read FRevendaVO write SetRevendaVO;
+    property UsuarioVO: TUsuarioVO read FUsuarioVO write SetUsuarioVO;
+    property ListaContatoVO: TObjectList<TContatoVO> read FListaContatoVO write SetListaContatoVO;
+
+    constructor create;
+    destructor destroy; override;
+  end;
+
+  TEmailVO = class
+  private
+    FEmail: string;
+  public
+    property Email: string read FEmail write FEmail;
+  end;
+
+  TModuloVO = class
+  private
+    FCodigoModulo: Integer;
+    FCodigoProduto: integer;
+    FNomeModulo: string;
+    FNomeProduto: string;
+
+  public
+    property CodigoModulo: Integer read FCodigoModulo write FCodigoModulo;
+    property CodigoProduto: integer read FCodigoProduto write FCodigoProduto;
+    property NomeModulo: string read FNomeModulo write FNomeModulo;
+    property NomeProduto: string read FNomeProduto write FNomeProduto;
+  end;
+
+implementation
+
+{ TClienteVO }
+
+constructor TClienteVO.create;
+begin
+  FRevendaVO := TRevendaVO.Create;
+  FUsuarioVO := TUsuarioVO.Create;
+  FClienteEmail := TObjectList<TClienteEmailVO>.create();
+  FClienteModulo := TObjectList<TClienteModuloVO>.Create();
+  FCidadeVO := TCidadeVO.Create;
+  FListaContatoVO := TObjectList<TContatoVO>.Create();
+end;
+
+destructor TClienteVO.destroy;
+begin
+  FreeAndNil(FRevendaVO);
+  FreeAndNil(FUsuarioVO);
+  FreeAndNil(FClienteModulo);
+  FreeAndNil(FClienteEmail);
+  FreeAndNil(FCidadeVO);
+  FreeAndNil(FListaContatoVO);
+  inherited;
+end;
+
+procedure TClienteVO.SetAtivo(const Value: Boolean);
+begin
+  FAtivo := Value;
+end;
+
+procedure TClienteVO.SetCelular(const Value: string);
+begin
+  FCelular := Value;
+end;
+
+procedure TClienteVO.SetCEP(const Value: String);
+begin
+  FCEP := Value;
+end;
+
+procedure TClienteVO.SetCidadeVO(const Value: TCidadeVO);
+begin
+  FCidadeVO := Value;
+end;
+
+procedure TClienteVO.SetClienteEmail(const Value: TObjectList<TClienteEmailVO>);
+begin
+  FClienteEmail := Value;
+end;
+
+procedure TClienteVO.SetClienteModulo(
+  const Value: TObjectList<TClienteModuloVO>);
+begin
+  FClienteModulo := Value;
+end;
+
+procedure TClienteVO.SetContato(const Value: string);
+begin
+  FContato := Value;
+end;
+
+procedure TClienteVO.SetContatoCompraVendaFone(const Value: string);
+begin
+  FContatoCompraVendaFone := Value;
+end;
+
+procedure TClienteVO.SetContatoFinanceiroFone(const Value: string);
+begin
+  FContatoFinanceiroFone := Value;
+end;
+
+procedure TClienteVO.SetEndereco(const Value: string);
+begin
+  FEndereco := Value;
+end;
+
+procedure TClienteVO.SetFone1(const Value: string);
+begin
+  FFone1 := Value;
+end;
+
+procedure TClienteVO.SetFone2(const Value: string);
+begin
+  FFone2 := Value;
+end;
+
+procedure TClienteVO.SetFoneContatoFinanceiro(const Value: string);
+begin
+  FFoneContatoFinanceiro := Value;
+end;
+
+procedure TClienteVO.SetId(const Value: Integer);
+begin
+  FId := Value;
+end;
+
+procedure TClienteVO.SetIdCidade(const Value: Integer);
+begin
+  FIdCidade := Value;
+end;
+
+procedure TClienteVO.SetIdRevenda(const Value: Integer);
+begin
+  FIdRevenda := Value;
+end;
+
+procedure TClienteVO.SetIE(const Value: string);
+begin
+  FIE := Value;
+end;
+
+procedure TClienteVO.SetListaContatoVO(const Value: TObjectList<TContatoVO>);
+begin
+  FListaContatoVO := Value;
+end;
+
+procedure TClienteVO.SetLogradouro(const Value: string);
+begin
+  FLogradouro := Value;
+end;
+
+procedure TClienteVO.SetOutroTelefone(const Value: string);
+begin
+  FOutroTelefone := Value;
+end;
+
+procedure TClienteVO.SetRepresentanteLegal(const Value: string);
+begin
+  FRepresentanteLegal := Value;
+end;
+
+procedure TClienteVO.SetRepresentanteLegalCPF(const Value: string);
+begin
+  FRepresentanteLegalCPF := Value;
+end;
+
+procedure TClienteVO.SetRestricao(const Value: Boolean);
+begin
+  FRestricao := Value;
+end;
+
+procedure TClienteVO.SetRevendaVO(const Value: TRevendaVO);
+begin
+  FRevendaVO := Value;
+end;
+
+procedure TClienteVO.SetUsuarioVO(const Value: TUsuarioVO);
+begin
+  FUsuarioVO := Value;
+end;
+
+procedure TClienteVO.SetVersao(const Value: string);
+begin
+  FVersao := Value;
+end;
+
+end.

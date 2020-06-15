@@ -1,0 +1,23 @@
+unit uSolicitacaoStatusVO;
+
+interface
+
+type
+  TSolicitacaoStatusVO = class
+  private
+    FId: Integer;
+    FIdSolicitacao: Integer;
+    FData: TDate;
+    FIdStatus: Integer;
+    FDescricaoLiberacao: string;
+  public
+    property Id: Integer read FId write FId;
+    property IdSolicitacao: Integer read FIdSolicitacao write FIdSolicitacao;
+    property Data: TDate read FData write FData;
+    property IdStatus: Integer read FIdStatus write FIdStatus;
+    property DescricaoLiberacao: string read FDescricaoLiberacao write FDescricaoLiberacao;
+  end;
+
+implementation
+
+end.

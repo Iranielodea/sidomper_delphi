@@ -1,0 +1,741 @@
+unit uSolicitacaoDetalhes2;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, uSolicitacaoController,
+  Data.DB, Datasnap.DBClient, uDMSolicitacao, Vcl.DBCtrls, uSolicitacaoTempoVO,
+  System.Generics.Collections, uFuncoesSIDomper, uEnumerador,
+  uPermissaoSolicitacaoVO, uSolicitacaoOcorrenciaVO;
+
+const
+  COR_ABERTURA:       Integer = clRed;
+  COR_ANALISE:        Integer = clGreen;
+  COR_CRONOGRAMA:     Integer = clBlue;
+  COR_OCORR_GERAL:    Integer = clPurple;
+  COR_OCORR_TECNICA:  Integer = clBlack;
+  COR_STATUS:         Integer = clOlive;
+  COR_TITULO:         Integer = clRed;
+  COR_TEXTO:          Integer = clBlack;
+
+  TAMANHO_DIVISAO:    Integer = 164;
+  TRACO:              Char = '_';
+
+
+type
+  TfrmSolicitacaoDetalhes2 = class(TForm)
+    mmoObs: TRichEdit;
+    cdsDados: TClientDataSet;
+    cdsDadosTipo: TIntegerField;
+    cdsDadosData: TDateField;
+    cdsDadosHora: TStringField;
+    cdsDadosOperador: TStringField;
+    cdsDadosAnexo: TStringField;
+    cdsDadosDescricao: TStringField;
+    cdsDadosStatus: TStringField;
+    cdsDadosDescricaoMemo: TMemoField;
+    EditorDescLiberacao: TDBRichEdit;
+    dsAbertura: TDataSource;
+    EditorTecnico: TDBRichEdit;
+    dsTecnico: TDataSource;
+    cdsStatus: TClientDataSet;
+    cdsStatusData: TDateField;
+    cdsStatusStatus: TStringField;
+    cdsStatusOperador: TStringField;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+  private
+    { Private declarations }
+    FIdSolicitacao: Integer;
+    FStatus: string;
+    FController: TSolicitacaoController;
+    FTipoOcorrencia: TEnumSolicitacao;
+
+    FPermissaoAbertura: Boolean;
+    FPermissaoAnalise: Boolean;
+    FPermissaoOcorrenciaGeral: Boolean;
+    FPermissaoOcorrenciaTecnica: Boolean;
+    FPermissaoOcorrenciaRegra: Boolean;
+    FPermissaoStatusSolicitacao: Boolean;
+
+    procedure PreecherDados();
+
+    procedure ListarDadosAbertura(AObj: TSolicitacaoController);
+    procedure ListarDadosAnalista(AObj: TSolicitacaoController);
+    procedure ListarDadosCronograma(AObj: TSolicitacaoController);
+    procedure ListarDadosGeral;
+    procedure ListarDadosTecnicos;
+    procedure ListarDadosRegra;
+    procedure ListarStatus;
+
+    procedure DadosOcorrenciaGeral(AObj: TSolicitacaoController);
+    procedure DadosOcorrenciaTecnical(AObj: TSolicitacaoController);
+    procedure DadosOcorrenciaRegra(AObj: TSolicitacaoController);
+    procedure DadosStatus(AObj: TSolicitacaoController);
+    procedure DadosTempo();
+
+    procedure ListarDemaisDados;
+
+    procedure FormatarLinha(ACor: Integer; ATexto: string; ANegrito: Boolean = False); overload;
+    procedure FormatarLinha(var AMemo: TRichEdit; ACor: Integer; ATexto: string; ANegrito: Boolean = False); overload;
+    function ConverterRichTextToString(ATexto: AnsiString): AnsiString;
+
+  public
+    { Public declarations }
+    constructor Create(IdSolicitacao: Integer; AtipoOcorrencia: TEnumSolicitacao); overload;
+    constructor Create(IdSolicitacao: Integer); overload;
+  end;
+
+var
+  frmSolicitacaoDetalhes2: TfrmSolicitacaoDetalhes2;
+
+implementation
+
+{$R *.dfm}
+
+uses uDM, uFormatacaoMemo, uSolicitacaoVO;
+
+constructor TfrmSolicitacaoDetalhes2.Create(IdSolicitacao: Integer; AtipoOcorrencia: TEnumSolicitacao);
+var
+  PermissaoSolicitacao: TPermissaoSolicitacaoVO;
+begin
+  inherited Create(nil);
+
+  FController := TSolicitacaoController.Create;
+  dsAbertura.DataSet := FController.Model.CDSCadastro;
+  FIdSolicitacao := IdSolicitacao;
+  FTipoOcorrencia := AtipoOcorrencia;
+
+  PermissaoSolicitacao := FController.PermissoesSolicitacao(dm.IdUsuario);
+
+  FPermissaoAbertura := PermissaoSolicitacao.Abertura;
+  FPermissaoAnalise := PermissaoSolicitacao.Analise;
+  FPermissaoOcorrenciaGeral := PermissaoSolicitacao.OcorrenciaGeral;
+  FPermissaoOcorrenciaTecnica := PermissaoSolicitacao.OcorrenciaTecnica;
+  FPermissaoOcorrenciaRegra := PermissaoSolicitacao.OcorrenciaRegra;
+  FPermissaoStatusSolicitacao := PermissaoSolicitacao.StatusSolicitacao;
+
+  FreeAndNil(PermissaoSolicitacao);
+
+  cdsDados.CreateDataSet;
+  cdsStatus.CreateDataSet;
+//  cdsDados.IndexFieldNames := 'Tipo;Data';
+  cdsDados.IndexFieldNames := 'Data;Hora';
+  cdsStatus.IndexFieldNames := 'Data';
+
+  FController.LocalizarId(IdSolicitacao);
+
+  PreecherDados();
+  ListarDemaisDados();
+  DadosTempo();
+
+  FormatarLinha(mmoObs, COR_ABERTURA, FStatus);
+
+  mmoObs.SelStart := Perform(EM_LINEINDEX, 0, 0);
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDadosAbertura(AObj: TSolicitacaoController);
+var
+  sNivel: string;
+  sUsuario: string;
+  sAnexo: string;
+begin
+  if Aobj.Model.CDSCadastroSol_Nivel.AsInteger = 1 then
+    sNivel := 'Baixo'
+  else if AObj.Model.CDSCadastroSol_Nivel.AsInteger = 2 then
+    sNivel := 'Normal'
+  else if AObj.Model.CDSCadastroSol_Nivel.AsInteger = 3 then
+    sNivel := 'Alto'
+  else if AObj.Model.CDSCadastroSol_Nivel.AsInteger = 4 then
+    sNivel := 'Crítico';
+
+  sUsuario := ' - Usuário Abertura: ' + AObj.Model.CDSCadastroUAb_Nome.AsString;
+  sAnexo := ' - Anexo: ' + AObj.Model.CDSCadastroSol_Anexo.AsString;
+
+  sUsuario := ' - Usuário Abertura: ' + AObj.Model.CDSCadastroUAb_Nome.AsString;
+  sAnexo := ' - Anexo: ' + AObj.Model.CDSCadastroSol_Anexo.AsString;
+
+  mmoObs.Lines.Add('');
+  FormatarLinha(mmoObs,COR_TITULO, 'Descrição (descrever de forma simples e objetiva o que deve ser realizado na solicitação)', True);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Id: ' + FormatFloat('000000',AObj.Model.CDSCadastroSol_Id.AsFloat) + ' - Data: ' + AObj.Model.CDSCadastroSol_Data.AsString + ' - Hora: ' + FormatDateTime('hh:mm',AObj.Model.CDSCadastroSol_Hora.AsDateTime) + sUsuario + ' - Nível: ' + sNivel);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Cliente: ' + AObj.Model.CDSCadastroCli_Nome.AsString);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Título: ' + AObj.Model.CDSCadastroSol_Titulo.AsString);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Status: ' + AObj.Model.CDSCadastroSta_Nome.AsString);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Versão: ' + AObj.Model.CDSCadastroSol_Versao.AsString + sAnexo);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Módulo: ' + AObj.Model.CDSCadastroMod_Nome.AsString);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Produto: ' + AObj.Model.CDSCadastroProd_Nome.AsString);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Descrição: ' + AObj.Model.CDSCadastroSol_Descricao.AsString);
+  mmoObs.Lines.Add('');
+  FormatarLinha(mmoObs,COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+  mmoObs.Lines.Add('');
+  FStatus := 'Status Atual: ' + AObj.Model.CDSCadastroSta_Nome.AsString;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDadosAnalista(AObj: TSolicitacaoController);
+begin
+  FormatarLinha(mmoObs,COR_TITULO, 'ANÁLISE', True);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Analista: ' + AObj.Model.CDSCadastroAnal_Nome.AsString + ' - ' +
+    'Desenvolvedor: ' + AObj.Model.CDSCadastroDesenv_Nome.AsString + ' - ' +
+    'Tempo Previsto: ' + AObj.Model.CDSCadastroSol_TempoPrevisto.AsString);
+
+  FormatarLinha(mmoObs,COR_TEXTO, 'Previsão de Entrega: ' + AObj.Model.CDSCadastroSol_PrevisaoEntrega.AsString);
+  FormatarLinha(mmoObs,COR_TEXTO, 'Descrição: ' + EditorDescLiberacao.Text); //  AObj.Model.CDSCadastroSol_DescricaoLiberacao.AsString);
+
+  FormatarLinha(mmoObs,COR_TEXTO, 'Versão: ' + AObj.Model.CDSCadastroVer_Versao.AsString);
+
+  mmoObs.Lines.Add('');
+  FormatarLinha(mmoObs,COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+  mmoObs.Lines.Add('');
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDadosCronograma(
+  AObj: TSolicitacaoController);
+var
+  sHoraInicial: string;
+  sHoraFinal: string;
+  sOperador: string;
+  i: Integer;
+begin
+  i := 0;
+  AObj.LocalizarCronograma(FIdSolicitacao);
+  while not AObj.Model.CDSCronogramaConsulta.Eof do
+  begin
+    if i = 0 then
+      FormatarLinha(mmoObs,COR_TITULO,'CRONOGRAMA', True);
+
+    sHoraInicial := FormatDateTime('hh:mm', AObj.Model.CDSCronogramaConsultaSCro_HoraInicio.AsDateTime);
+    sHoraFinal := FormatDateTime('hh:mm', AObj.Model.CDSCronogramaConsultaSCro_HoraFim.AsDateTime);
+    sOperador := AObj.Model.CDSCronogramaConsultaUsu_Nome.AsString;
+
+    FormatarLinha(mmoObs,COR_TEXTO,'Previsão Início: ' + AObj.Model.CDSCronogramaConsultaSCro_Data.AsString + ' - Hora Início: ' + sHoraInicial + ' - Hora Fim: ' + sHoraFinal + ' - Operador: ' + sOperador);
+    AObj.Model.CDSCronogramaConsulta.Next;
+    Inc(i);
+  end;
+
+  if i > 0 then
+  begin
+    mmoObs.Lines.Add('');
+    FormatarLinha(mmoObs,COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+    mmoObs.Lines.Add('');
+  end;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDadosGeral;
+var
+  sHora: string;
+begin
+  sHora :=  cdsDadosHora.AsString;
+  FormatarLinha(mmoObs, COR_TITULO, 'OCORRÊNCIA GERAL ', True);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Data: ' + cdsDadosData.AsString + ' - Hora: ' + sHora + ' - Operador: ' + cdsDadosOperador.AsString);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Anexo: ' + cdsDadosAnexo.AsString);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Descricao: ' + cdsDadosDescricaoMemo.AsString);
+  mmoObs.Lines.Add('');
+  FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+  mmoObs.Lines.Add('');
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDadosRegra;
+var
+  sHora: string;
+begin
+//  Application.ProcessMessages;
+  sHora := cdsDadosHora.AsString;
+  FormatarLinha(mmoObs, COR_TITULO, 'OCORRÊNCIA DA REGRA', True);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Data: ' + cdsDadosData.AsString + ' - Hora: ' + sHora + ' - Operador: ' + cdsDadosOperador.AsString);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Anexo: ' + cdsDadosAnexo.AsString);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Descricao: ' + EditorTecnico.Text); // cdsDadosDescricaoMemo.AsString);
+  mmoObs.Lines.Add('');
+  FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+  mmoObs.Lines.Add('');
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDadosTecnicos;
+var
+  sHora: string;
+begin
+//  Application.ProcessMessages;
+  sHora := cdsDadosHora.AsString;
+  FormatarLinha(mmoObs, COR_TITULO, 'OCORRÊNCIA TÉCNICA', True);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Data: ' + cdsDadosData.AsString + ' - Hora: ' + sHora + ' - Operador: ' + cdsDadosOperador.AsString);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Anexo: ' + cdsDadosAnexo.AsString);
+  FormatarLinha(mmoObs, COR_TEXTO, 'Descricao: ' + EditorTecnico.Text); // cdsDadosDescricaoMemo.AsString);
+  mmoObs.Lines.Add('');
+  FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+  mmoObs.Lines.Add('');
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarDemaisDados;
+begin
+  cdsDados.First;
+  while not cdsDados.Eof do
+  begin
+    if FTipoOcorrencia = TEnumSolicitacao.solOcorrRegra then
+    begin
+      ListarDadosRegra();
+    end
+    else begin
+      case cdsDadosTipo.AsInteger of
+        1: ListarDadosGeral();
+        2: ListarDadosTecnicos();
+  //      3: ListarStatus();
+      end;
+
+      if FTipoOcorrencia = TEnumSolicitacao.solTodos then
+      begin
+        if cdsDadosTipo.AsInteger = 3 then
+          ListarDadosRegra();
+      end;
+    end;
+    cdsDados.Next;
+  end;
+
+  cdsStatus.First;
+  while not cdsStatus.Eof do
+  begin
+    ListarStatus();
+    cdsStatus.Next;
+  end;
+
+
+end;
+
+procedure TfrmSolicitacaoDetalhes2.ListarStatus;
+begin
+  if cdsStatusStatus.AsString <> '' then
+  begin
+    FormatarLinha(mmoObs, COR_TITULO, 'STATUS', True);
+    FormatarLinha(mmoObs, COR_TEXTO, 'Data: ' + cdsStatusData.AsString + ' - Status: ' + cdsStatusStatus.AsString);
+    FormatarLinha(mmoObs, COR_TEXTO, 'Operador: ' + cdsStatusOperador.AsString);
+    mmoObs.Lines.Add('');
+    FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+    mmoObs.Lines.Add('');
+  end;
+
+//  if cdsDadosStatus.AsString <> '' then
+//  begin
+//    FormatarLinha(mmoObs, COR_TITULO, 'STATUS', True);
+//    FormatarLinha(mmoObs, COR_TEXTO, 'Data: ' + cdsDadosData.AsString + ' - Status: ' + cdsDadosStatus.AsString);
+//    FormatarLinha(mmoObs, COR_TEXTO, 'Operador: ' + cdsDadosOperador.AsString);
+//    mmoObs.Lines.Add('');
+//    FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+//    mmoObs.Lines.Add('');
+//  end;
+end;
+
+function TfrmSolicitacaoDetalhes2.ConverterRichTextToString(
+  ATexto: AnsiString): AnsiString;
+var
+  rtfString: AnsiString;
+  stream: TMemoryStream;
+  Rich: TRichEdit;
+begin
+  Rich := TRichEdit.CreateParented(application.MainFormHandle);
+  stream := TMemoryStream.Create;
+  try
+    rtfString := ATexto;
+
+    stream.Clear;
+    stream.Write(PAnsiChar(rtfString)^, Length(rtfString));
+    stream.Position := 0;
+
+    //Load the stream into the RichEdit
+    Rich.PlainText := False;
+    Rich.Lines.LoadFromStream(stream);
+
+    stream.Free;
+    Result := Rich.Text;
+  finally
+    FreeAndNil(Rich);
+  end;
+end;
+
+constructor TfrmSolicitacaoDetalhes2.Create(IdSolicitacao: Integer);
+var
+  model: TObjectList<TSolicitacaoVO>;
+  Item: TSolicitacaoVO;
+  OcorrenciaRegra: TSolicitacaoOcorrenciaVO;
+  sNivel: string;
+  iContador: Integer;
+  sDescricaoLiberacao: AnsiString;
+  sHora: string;
+  sData: string;
+  Controller: TSolicitacaoController;
+  idCategoria: Integer;
+begin
+  inherited Create(nil);
+
+//  FController := TSolicitacaoController.Create;
+//  dsAbertura.DataSet := FController.Model.CDSCadastro;
+//  FIdSolicitacao := IdSolicitacao;
+
+  Controller := TSolicitacaoController.Create;
+  try
+    dsAbertura.DataSet := Controller.Model.CDSCadastro;
+    Controller.LocalizarId(IdSolicitacao);
+
+    idCategoria := Controller.Model.CDSCadastroSol_Categoria.AsInteger;
+    model := Controller.SolicitacaoPorCategoria(idCategoria, dm.IdUsuario);
+  finally
+    FreeAndNil(Controller);
+  end;
+
+  try
+    iContador := 1;
+
+    for item in model do
+    begin
+      if item.Nivel = '1' then
+        sNivel := 'Baixo'
+      else if item.Nivel = '2' then
+        sNivel := 'Normal'
+      else if item.Nivel = '3' then
+        sNivel := 'Alto'
+      else if item.Nivel = '4' then
+        sNivel := 'Crítico';
+
+      sData := '';
+      if Item.Data > 0 then
+        sData := DateToStr(item.Data);
+
+      if iContador = 1 then
+        FormatarLinha(mmoObs, COR_TEXTO, ' ');
+
+      FormatarLinha(mmoObs,COR_TITULO, 'ABERTURA', True);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Id: ' + FormatFloat('000000', Item.Id) + ' - Data: ' + sData + ' - Hora: ' + item.Hora + ' - Usuário Abertura: ' + item.UsuarioAberturaVO.Nome + ' - Nível: ' + sNivel);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Cliente: ' + item.Cliente.RazaoSocial);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Título: ' + item.Titulo);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Status: ' + item.Status.Nome);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Módulo: ' + item.Modulo.Nome);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Produto: ' + item.Produto.Nome);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Descrição: ' + item.Descricao);
+      FormatarLinha(mmoObs,COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+
+      sData := '';
+      if item.PrevisaoEntrega > 0 then
+        sData := DateToStr(item.PrevisaoEntrega);
+      FormatarLinha(mmoObs,COR_TITULO, 'ANÁLISE', True);
+      FormatarLinha(mmoObs,COR_TEXTO, 'Analista: ' + item.Analista.Nome + ' - ' + 'Desenvolvedor: ' + item.Desenvolvedor.Nome + ' - ' + 'Tempo Previsto: ' + FloatToStr(item.TempoPrevisto));
+      FormatarLinha(mmoObs,COR_TEXTO, 'Previsão de Entrega: ' + sData );
+
+      sDescricaoLiberacao := ConverterRichTextToString(item.DescricaoLiberacao);
+      FormatarLinha(mmoObs,COR_TEXTO, 'Descrição: ' + sDescricaoLiberacao);
+      FormatarLinha(mmoObs,COR_TEXTO, 'Versão: ' + Item.Versao);
+
+      mmoObs.Lines.Add('');
+      FormatarLinha(mmoObs,COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+      mmoObs.Lines.Add('');
+
+      for OcorrenciaRegra in Item.SolicitacoesOcorrencias do
+      begin
+        if OcorrenciaRegra.IdSolicitacao = item.Id then
+        begin
+          sHora := OcorrenciaRegra.Hora;
+
+          sData := '';
+          if OcorrenciaRegra.Data > 0 then
+            sData := DateToStr(OcorrenciaRegra.Data);
+
+          FormatarLinha(mmoObs, COR_TITULO, 'OCORRÊNCIA REGRA', True);
+          FormatarLinha(mmoObs, COR_TEXTO, 'Data: ' + sData + ' - Hora: ' + sHora + ' - Operador: ' + OcorrenciaRegra.Usuario.Nome);
+          FormatarLinha(mmoObs, COR_TEXTO, 'Anexo: ' + OcorrenciaRegra.Anexo);
+          sDescricaoLiberacao := ConverterRichTextToString(OcorrenciaRegra.Descricao);
+          FormatarLinha(mmoObs, COR_TEXTO, 'Descricao: ' + sDescricaoLiberacao); // cdsDadosDescricaoMemo.AsString);
+          mmoObs.Lines.Add('');
+          FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+          mmoObs.Lines.Add('');
+        end;
+      end;
+
+      Inc(iContador);
+    end;
+//    FormatarLinha(mmoObs, COR_ABERTURA, FStatus);
+  finally
+    FreeAndNil(model);
+  end;
+
+  mmoObs.SelStart := Perform(EM_LINEINDEX, 0, 0);
+end;
+
+procedure TfrmSolicitacaoDetalhes2.DadosOcorrenciaGeral(
+  AObj: TSolicitacaoController);
+var
+  sHora: string;
+begin
+  AObj.LocalizarOcorrenciaGeral(FIdSolicitacao);
+  while not AObj.Model.CDSOcorrenciaGeralConsulta.Eof do
+  begin
+    sHora := FormatDateTime('hh:mm', AObj.Model.CDSOcorrenciaGeralConsultaSOcor_Hora.AsDateTime);
+    cdsDados.Append;
+    cdsDadosTipo.AsInteger := 1;
+
+    if AObj.Model.CDSOcorrenciaGeralConsultaSOcor_Hora.AsString <> '' then
+      cdsDadosHora.AsString := sHora;
+
+    if AObj.Model.CDSOcorrenciaGeralConsultaSOcor_Data.AsString <> '' then
+      cdsDadosData.AsDateTime := AObj.Model.CDSOcorrenciaGeralConsultaSOcor_Data.AsDateTime;
+
+    cdsDadosOperador.AsString := AObj.Model.CDSOcorrenciaGeralConsultaUsu_Nome.AsString;
+    cdsDadosDescricaoMemo.AsString := AObj.Model.CDSOcorrenciaGeralConsultaSOcor_Descricao.AsString;
+    cdsDadosAnexo.AsString := AObj.Model.CDSOcorrenciaGeralConsultaSOcor_Anexo.AsString;
+    cdsDados.Post;
+
+    AObj.Model.CDSOcorrenciaGeralConsulta.Next;
+  end;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.DadosOcorrenciaRegra(
+  AObj: TSolicitacaoController);
+var
+  sHora: string;
+begin
+  AObj.LocalizarOcorrenciaRegra(FIdSolicitacao);
+  while not AObj.Model.CDSOcorrenciaRegraConsulta.Eof do
+  begin
+    sHora := FormatDateTime('hh:mm', AObj.Model.CDSOcorrenciaRegraConsultaSOcor_Hora.AsDateTime);
+    cdsDados.Append;
+    cdsDadosTipo.AsInteger := 3;
+
+    if AObj.Model.CDSOcorrenciaRegraConsultaSOcor_Hora.AsString <> '' then
+      cdsDadosHora.AsString := sHora;
+
+    if AObj.Model.CDSOcorrenciaRegraConsultaSOcor_Data.AsString <> '' then
+      cdsDadosData.AsDateTime := AObj.Model.CDSOcorrenciaRegraConsultaSOcor_Data.AsDateTime;
+
+    cdsDadosOperador.AsString := AObj.Model.CDSOcorrenciaRegraConsultaUsu_Nome.AsString;
+    cdsDadosDescricaoMemo.AsString := AObj.Model.CDSOcorrenciaRegraConsultaSOcor_Descricao.AsString;
+    cdsDadosAnexo.AsString := AObj.Model.CDSOcorrenciaRegraConsultaSOcor_Anexo.AsString;
+    cdsDados.Post;
+
+    AObj.Model.CDSOcorrenciaRegraConsulta.Next;
+  end;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.DadosOcorrenciaTecnical(
+  AObj: TSolicitacaoController);
+var
+  sHora: string;
+begin
+  AObj.LocalizarOcorrenciaTecnica(FIdSolicitacao);
+  while not AObj.Model.CDSOcorrenciaTecnicaConsulta.Eof do
+  begin
+    sHora := FormatDateTime('hh:mm', AObj.Model.CDSOcorrenciaTecnicaConsultaSOcor_Hora.AsDateTime);
+    cdsDados.Append;
+    cdsDadosTipo.AsInteger := 2;
+
+    if AObj.Model.CDSOcorrenciaTecnicaConsultaSOcor_Hora.AsString <> '' then
+      cdsDadosHora.AsString := sHora;
+
+    if AObj.Model.CDSOcorrenciaTecnicaConsultaSOcor_Data.AsString <> '' then
+      cdsDadosData.AsDateTime := AObj.Model.CDSOcorrenciaTecnicaConsultaSOcor_Data.AsDateTime;
+
+    cdsDadosOperador.AsString := AObj.Model.CDSOcorrenciaTecnicaConsultaUsu_Nome.AsString;
+    cdsDadosDescricaoMemo.AsString := AObj.Model.CDSOcorrenciaTecnicaConsultaSOcor_Descricao.AsString;
+    cdsDadosAnexo.AsString := AObj.Model.CDSOcorrenciaTecnicaConsultaSOcor_Anexo.AsString;
+    cdsDados.Post;
+
+    AObj.Model.CDSOcorrenciaTecnicaConsulta.Next;
+  end;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.DadosStatus(AObj: TSolicitacaoController);
+begin
+  AObj.LocalizarStatus(FIdSolicitacao);
+  while not AObj.Model.CDSStatusConsulta.Eof do
+  begin
+//    cdsDados.Append;
+//    cdsDadosTipo.AsInteger := 3;
+//    cdsDadosData.AsDateTime := AObj.Model.CDSStatusConsultaSSta_Data.AsDateTime;
+//    cdsDadosStatus.AsString := AObj.Model.CDSStatusConsultaSta_Nome.AsString;
+//    cdsDadosOperador.AsString := AObj.Model.CDSStatusConsultaUsu_nome.AsString;
+    cdsStatus.Append;
+    cdsStatusData.AsDateTime := AObj.Model.CDSStatusConsultaSSta_Data.AsDateTime;
+    cdsStatusStatus.AsString := AObj.Model.CDSStatusConsultaSta_Nome.AsString;
+    cdsStatusOperador.AsString := AObj.Model.CDSStatusConsultaUsu_nome.AsString;
+    cdsStatus.Post;
+
+//    cdsDados.Post;
+    AObj.Model.CDSStatusConsulta.Next;
+  end;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.DadosTempo();
+var
+  Item: TSolicitacaoTempoVO;
+  Lista: TObjectList<TSolicitacaoTempoVO>;
+  sTempo: string;
+  vTempo: Double;
+begin
+  if FTipoOcorrencia = TEnumSolicitacao.solOcorrRegra then
+    Exit;
+
+  if not FController.SolicitacaoTempoPermissao(dm.IdUsuario) then
+    Exit;
+
+  try
+    Lista := FController.SolicitacaoTempoRetornarAgrupadoStatus(FIdSolicitacao);
+    if Lista.Count > 0 then
+      FormatarLinha(mmoObs, COR_TITULO, 'TEMPO', True);
+
+    vTempo := 0;
+    for Item in Lista do
+    begin
+      vTempo := vTempo + Item.TotalHoras;
+      sTempo := TFuncoes.DecimalToHora(Item.TotalHoras);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Status: ' + Item.Status.Nome);
+      FormatarLinha(mmoObs, COR_TEXTO, 'Tempo : ' + sTempo);
+      mmoObs.Lines.Add('');
+    end;
+
+    if Lista.Count > 0 then
+    begin
+      sTempo := TFuncoes.DecimalToHora(vTempo);
+      FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+      mmoObs.Lines.Add('');
+      FormatarLinha(mmoObs, COR_TEXTO, 'TEMPO TOTAL: ' + sTempo, True);
+      FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+      mmoObs.Lines.Add('');
+    end;
+
+
+
+//    Lista := FController.SolicitacaoTempoLocalizarPorSolicitacao(FIdSolicitacao);
+//    if Lista.Count > 0 then
+//      FormatarLinha(mmoObs, COR_TITULO, 'TEMPO', True);
+//
+//    for Item in Lista do
+//    begin
+//      sTempo := TFuncoes.DecimalToHora(Item.TotalHoras);
+//      sTempo := FormatDateTime('dd:hh', StrToTime(sTempo));
+//      FormatarLinha(mmoObs, COR_TEXTO, 'Status: ' + Item.Status.Nome);
+//      FormatarLinha(mmoObs, COR_TEXTO, 'Tempo : ' + sTempo);
+//      mmoObs.Lines.Add('');
+//    end;
+//
+//    if Lista.Count > 0 then
+//      FormatarLinha(mmoObs, COR_TEXTO, StringOfChar(TRACO, TAMANHO_DIVISAO));
+
+  finally
+    FreeAndNil(Lista);
+  end;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.FormatarLinha(ACor: Integer; ATexto: string;
+  ANegrito: Boolean);
+begin
+  mmoObs.SelAttributes.Color := ACor;
+  if ANegrito then
+    mmoObs.SelAttributes.Style:=[fsBold];
+
+  mmoObs.Lines.Add(ATexto);
+  mmoObs.SelAttributes.Color:=Color;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.FormatarLinha(var AMemo: TRichEdit;
+  ACor: Integer; ATexto: string; ANegrito: Boolean);
+begin
+  AMemo.SelAttributes.Color := ACor;
+  if ANegrito then
+    AMemo.SelAttributes.Style:=[fsBold];
+
+  AMemo.Lines.Add(ATexto);
+  AMemo.SelAttributes.Color:=Color;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.FormDestroy(Sender: TObject);
+begin
+  if Assigned(FController) then
+    FreeAndNil(FController);
+end;
+
+procedure TfrmSolicitacaoDetalhes2.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if key = VK_ESCAPE then
+    Close;
+end;
+
+procedure TfrmSolicitacaoDetalhes2.PreecherDados;
+var
+  obj: TSolicitacaoController;
+  sNivel: string;
+  sUsuario: string;
+  sAnexo: string;
+  PermissaoOcorrenciaGeral: Boolean;
+  PermissaoOcorrenciaTecnica: Boolean;
+  PermissaoStatus: Boolean;
+begin
+  FStatus := '';
+  obj := TSolicitacaoController.Create;
+  try
+    obj.LocalizarId(FIdSolicitacao);
+    if FPermissaoAbertura then ListarDadosAbertura(obj);
+    if FPermissaoAnalise then ListarDadosAnalista(obj);
+
+    ListarDadosCronograma(obj);
+
+    if FTipoOcorrencia = TEnumSolicitacao.solOcorrRegra then
+    begin
+      if FPermissaoOcorrenciaRegra then
+        DadosOcorrenciaRegra(Obj);
+    end
+    else begin
+      if FTipoOcorrencia = TEnumSolicitacao.solTodos then
+      begin
+        if FPermissaoOcorrenciaRegra then
+          DadosOcorrenciaRegra(obj);
+      end;
+
+      if FPermissaoOcorrenciaGeral then DadosOcorrenciaGeral(obj);
+      if FPermissaoOcorrenciaTecnica then DadosOcorrenciaTecnical(obj);
+      if FPermissaoStatusSolicitacao then DadosStatus(obj);
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+
+//  obj := TSolicitacaoController.Create;
+//  try
+//    obj.LocalizarId(FIdSolicitacao);
+//    if obj.PermissaoAbertura(dm.IdUsuario) then ListarDadosAbertura(obj);
+//    if obj.PermissaoAnalise(dm.IdUsuario) then ListarDadosAnalista(obj);
+//
+//    ListarDadosCronograma(obj);
+//
+//    if FTipoOcorrencia = TEnumSolicitacao.solOcorrRegra then
+//    begin
+//      if obj.PermissaoOcorrenciaRegra(dm.IdUsuario) then
+//        DadosOcorrenciaRegra(Obj);
+//    end
+//    else begin
+//      if FTipoOcorrencia = TEnumSolicitacao.solTodos then
+//      begin
+//        if obj.PermissaoOcorrenciaRegra(dm.IdUsuario)
+//          then DadosOcorrenciaRegra(obj);
+//      end;
+//
+//      if obj.PermissaoOcorrenciaGeral(dm.IdUsuario) then DadosOcorrenciaGeral(obj);
+//      if obj.PermissaoOcorrenciaTecnica(dm.IdUsuario) then DadosOcorrenciaTecnical(obj);
+//      if obj.PermissaoStatus(dm.IdUsuario) then DadosStatus(obj);
+//    end;
+//  finally
+//    FreeAndNil(obj);
+//  end;
+
+
+// copiar de um richEdit para outro
+//  procedure TForm1.Button5Click(Sender: TObject);
+//var
+//  S : TStream;
+//begin
+//  S := TMemoryStream.Create;
+//  try
+//    RichEdit1.Lines.SaveToStream(S);
+//    S.Position := 0;
+//    RichEdit2.Lines.LoadFromStream(S);
+//  finally
+//    S.Free;
+//  end;
+//end;
+end;
+end.

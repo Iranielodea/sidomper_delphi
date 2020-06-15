@@ -1,0 +1,32 @@
+unit uDMMSS;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait,
+  FireDAC.Phys.ODBCBase, FireDAC.Phys.MSSQL, FireDAC.Comp.UI, Data.DB,
+  FireDAC.Comp.Client;
+
+type
+  TDMMSS = class(TDataModule)
+    Conexao: TFDConnection;
+    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
+    FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMMSS: TDMMSS;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

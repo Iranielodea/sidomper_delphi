@@ -1,0 +1,54 @@
+unit uTempoSolicitacao;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons;
+
+type
+  TfrmTempoSolicitacao = class(TForm)
+    lblCliente: TLabel;
+    lblIdSolicitacao: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    lblTitulo: TLabel;
+    Label5: TLabel;
+    lblNivel: TLabel;
+    Label7: TLabel;
+    Panel1: TPanel;
+    BitBtn1: TBitBtn;
+    procedure FormShow(Sender: TObject);
+  private
+    FIdSolicitacao: Integer;
+    { Private declarations }
+    procedure IniciarTempo;
+    procedure MostrarDados;
+  public
+    { Public declarations }
+    property IdSolicitacao: Integer read FIdSolicitacao write FIdSolicitacao;
+  end;
+
+var
+  frmTempoSolicitacao: TfrmTempoSolicitacao;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmTempoSolicitacao.FormShow(Sender: TObject);
+begin
+  //
+end;
+
+procedure TfrmTempoSolicitacao.IniciarTempo;
+begin
+
+end;
+
+procedure TfrmTempoSolicitacao.MostrarDados;
+begin
+
+end;
+
+end.

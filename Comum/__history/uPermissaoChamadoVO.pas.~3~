@@ -1,0 +1,66 @@
+unit uPermissaoChamadoVO;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TPermissaoChamadoVO = class
+  private
+    FOcorrenciaGeral: Boolean;
+    FAnalise: Boolean;
+    FOcorrenciaTecnica: Boolean;
+    FAbertura: Boolean;
+    FOcorrenciaRegra: Boolean;
+    FStatusSolicitacao: Boolean;
+    procedure SetAbertura(const Value: Boolean);
+    procedure SetAnalise(const Value: Boolean);
+    procedure SetOcorrenciaGeral(const Value: Boolean);
+    procedure SetOcorrenciaRegra(const Value: Boolean);
+    procedure SetOcorrenciaTecnica(const Value: Boolean);
+    procedure SetStatusSolicitacao(const Value: Boolean);
+  public
+    property Abertura: Boolean read FAbertura write SetAbertura;
+    property Analise: Boolean read FAnalise write SetAnalise;
+    property OcorrenciaGeral: Boolean read FOcorrenciaGeral write SetOcorrenciaGeral;
+    property OcorrenciaTecnica: Boolean read FOcorrenciaTecnica write SetOcorrenciaTecnica;
+    property OcorrenciaRegra: Boolean read FOcorrenciaRegra write SetOcorrenciaRegra;
+    property StatusSolicitacao: Boolean read FStatusSolicitacao write SetStatusSolicitacao;
+  end;
+
+implementation
+
+{ TPermissaoChamadoVO }
+
+procedure TPermissaoChamadoVO.SetAbertura(const Value: Boolean);
+begin
+  FAbertura := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetAnalise(const Value: Boolean);
+begin
+  FAnalise := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetOcorrenciaGeral(const Value: Boolean);
+begin
+  FOcorrenciaGeral := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetOcorrenciaRegra(const Value: Boolean);
+begin
+  FOcorrenciaRegra := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetOcorrenciaTecnica(const Value: Boolean);
+begin
+  FOcorrenciaTecnica := Value;
+end;
+
+procedure TPermissaoChamadoVO.SetStatusSolicitacao(const Value: Boolean);
+begin
+  FStatusSolicitacao := Value;
+end;
+
+end.

@@ -1,0 +1,318 @@
+unit uTabPreco;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface,
+  uTabelaPrecoVO, System.Generics.Collections, uFireDAC, uGenericDAO;
+
+  const CConsulta: string =
+    'SELECT Tab_Id, Tab_Nome FROM TabPreco ';
+
+type
+  TTabPreco = class(TInterfacedObject, ICadastroInterface)
+//  TTabPreco = class
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True; Id: Integer = 0): string; overload;
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string; overload;
+    function FiltrarCodigo(Codigo: Integer): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    procedure Salvar(Programa, IdUsuario: Integer);
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+
+    function ObterPorId(Id: Integer): TTabelaPrecoVO;
+    function FiltrarObj(Campo, Texto, Ativo: string; Contem: Boolean; Id: Integer = 0): TObjectList<TTabPrecoConsulta>;
+    function SalvarObj(Programa, IdUsuario: Integer; AModel: TTabelaPrecoVO): Integer;
+  end;
+
+implementation
+
+{ TCategoria }
+
+uses uUsuario;
+
+function TTabPreco.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TTabPreco.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  DM.ExecutarSQL('DELETE FROM TabPreco WHERE Tab_Id = ' + IntToStr(Id));
+end;
+
+function TTabPreco.Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True; Id: Integer = 0): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  if Id > 0 then
+    sConsulta := CConsulta + ' WHERE Tab_Id = ' + IntToStr(Id)
+  else begin
+    sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+    if Ativo <> 'T' then
+    begin
+      if Ativo = 'A' then
+        sConsulta := sConsulta + ' AND Tab_Ativo = 1'
+      else
+        sConsulta := sConsulta + ' AND Tab_Ativo = 0';
+    end;
+    sConsulta := sConsulta + ' ORDER BY ' + Campo;
+  end;
+
+  Result := sConsulta;
+end;
+
+function TTabPreco.Filtrar(Campo, Texto, Ativo: string;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+  if Ativo <> 'T' then
+  begin
+    if Ativo = 'A' then
+      sConsulta := sConsulta + ' AND Tab_Ativo = 1'
+    else
+      sConsulta := sConsulta + ' AND Tab_Ativo = 0';
+  end;
+  sConsulta := sConsulta + ' ORDER BY ' + Campo;
+
+  Result := sConsulta;
+
+end;
+
+function TTabPreco.FiltrarCodigo(Codigo: Integer): string;
+begin
+
+end;
+
+//function TTabPreco.FiltrarCodigo(Codigo: Integer): string;
+//begin
+////  Result := CConsulta + ' WHERE Cat_Codigo = ' + Codigo.ToString();
+//end;
+
+function TTabPreco.FiltrarObj(Campo, Texto, Ativo: string; Contem: Boolean; Id: Integer = 0): TObjectList<TTabPrecoConsulta>;
+var
+  TabPreco: TFireDAC;
+  model: TTabPrecoConsulta;
+  Lista: TObjectList<TTabPrecoConsulta>;
+  instrucaoSQL: string;
+begin
+  Lista := TObjectList<TTabPrecoConsulta>.Create();
+  TabPreco := TFireDAC.create();
+  try
+    instrucaoSQL := Filtrar(Campo, Texto, Ativo, Contem, Id);
+    TabPreco.OpenSQL(instrucaoSQL);
+    while not TabPreco.Model.Eof do
+    begin
+      model := TTabPrecoConsulta.Create;
+      model.Id := TabPreco.Model.FieldByName('Tab_Id').AsInteger;
+      model.Nome := TabPreco.Model.FieldByName('Tab_Nome').AsString;
+      Lista.Add(model);
+      TabPreco.Model.Next;
+    end;
+    Result := Lista;
+  finally
+    FreeAndNil(TabPreco);
+  end;
+end;
+
+procedure TTabPreco.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+begin
+//
+end;
+
+function TTabPreco.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+procedure TTabPreco.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TTabPreco.ObterPorId(Id: Integer): TTabelaPrecoVO;
+var
+  TabPreco: TFireDAC;
+  model: TTabelaPrecoVO;
+  Item: TTabPrecoModuloVO;
+  sb: TStringBuilder;
+begin
+  TabPreco := TFireDAC.create();
+  model := TTabelaPrecoVO.Create;
+  sb := TStringBuilder.Create;
+
+  try
+    sb.AppendLine(TGenericDAO.Select<TTabelaPrecoVO>(model));
+    sb.AppendLine(' Prod_Codigo,');
+    sb.AppendLine(' Prod_Nome,');
+    sb.AppendLine(' Sta_Codigo,');
+    sb.AppendLine(' Sta_Nome,');
+    sb.AppendLine(' Tip_Codigo,');
+    sb.AppendLine(' Tip_Nome, ');
+    sb.AppendLine(' TabM_Id,');
+    sb.AppendLine(' TabM_Modulo,');
+    sb.AppendLine(' Mod_Codigo,');
+    sb.AppendLine(' Mod_Nome ');
+    sb.AppendLine(' FROM TabPreco');
+    sb.AppendLine(' INNER JOIN TabPreco_Modulo ON TabM_TabPreco = Tab_Id');
+    sb.AppendLine(' INNER JOIN Modulo ON TabM_Modulo = Mod_Id');
+    sb.AppendLine(' INNER JOIN Produto ON Tab_Produto = Prod_Id');
+    sb.AppendLine(' INNER JOIN Status ON Tab_Status = Sta_Id');
+    sb.AppendLine(' INNER JOIN Tipo ON Tab_Tipo = Tip_Id');
+    sb.AppendLine(' WHERE Tab_Id = ' + IntToStr(id));
+
+    TabPreco.OpenSQL(sb.ToString());
+
+    model.Id := TabPreco.Model.FieldByName('Tab_Id').AsInteger;
+    model.Nome := TabPreco.Model.FieldByName('Tab_Nome').AsString;
+    model.Data := TabPreco.Model.FieldByName('Tab_Data').AsDateTime;
+    model.Referencia := TabPreco.Model.FieldByName('Tab_Referencia').AsString;
+    model.IdProduto := TabPreco.Model.FieldByName('Tab_Produto').AsInteger;
+    model.IdStatus := TabPreco.Model.FieldByName('Tab_Status').AsInteger;
+    model.IdTipo := TabPreco.Model.FieldByName('Tab_Tipo').AsInteger;
+    model.Ativo := TabPreco.Model.FieldByName('Tab_Ativo').AsBoolean;
+    model.ValorImplSimples := TabPreco.Model.FieldByName('Tab_ValorImplSimples').AsCurrency;
+    model.ValorMensalSimples := TabPreco.Model.FieldByName('Tab_ValorMensalSimples').AsCurrency;
+    model.ValorImplRegNormal := TabPreco.Model.FieldByName('Tab_ValorImplRegNormal').AsCurrency;
+    model.ValorMensalRegNormal := TabPreco.Model.FieldByName('Tab_ValorMensalRegNormal').AsCurrency;
+    model.Observacao := TabPreco.Model.FieldByName('Tab_Observacao').AsString;
+    model.Produto.Codigo := TabPreco.Model.FieldByName('Prod_Codigo').AsInteger;
+    model.Produto.Nome := TabPreco.Model.FieldByName('Prod_Nome').AsString;
+    model.Status.Codigo := TabPreco.Model.FieldByName('Sta_Codigo').AsInteger;
+    model.Status.Nome := TabPreco.Model.FieldByName('Sta_Nome').AsString;
+    model.Tipo.Codigo := TabPreco.Model.FieldByName('Tip_Codigo').AsInteger;
+    model.Tipo.Nome := TabPreco.Model.FieldByName('Tip_Nome').AsString;
+
+    while not TabPreco.Model.Eof do
+    begin
+      Item := TTabPrecoModuloVO.Create;
+      item.Id := TabPreco.Model.FieldByName('TabM_Id').AsInteger;
+      item.IdTabPreco := TabPreco.Model.FieldByName('Tab_Id').AsInteger;
+      item.IdModulo := TabPreco.Model.FieldByName('Mod_Id').AsInteger;
+      item.Modulo.Codigo := TabPreco.Model.FieldByName('Mod_Codigo').AsInteger;
+      item.Modulo.Nome := TabPreco.Model.FieldByName('Mod_Nome').AsString;
+      model.ItensTabela.Add(Item);
+      TabPreco.Model.Next;
+    end;
+
+    Result := model;
+  finally
+    FreeAndNil(sb);
+    FreeAndNil(TabPreco);
+  end;
+end;
+
+function TTabPreco.ProximoCodigo: Integer;
+begin
+//
+end;
+
+function TTabPreco.ProximoId: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT IDENT_CURRENT(''TabPreco'')';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TTabPreco.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TTabPreco.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TTabPreco.SalvarObj(Programa, IdUsuario: Integer; AModel: TTabelaPrecoVO): Integer;
+var
+  IdTabPreco: Integer;
+  Item: TTabPrecoModuloVO;
+begin
+  Salvar(Programa, IdUsuario);
+  dm.StartTransacao();
+  try
+    IdTabPreco := TGenericDAO.Save<TTabelaPrecoVO>(AModel);
+    for Item in AModel.ItensTabela do
+    begin
+      if Item.IdModulo = 0 then
+        raise Exception.Create('Informe o Módulo!');
+      TGenericDAO.Save<TTabPrecoModuloVO>(Item);
+      dm.Commit();
+    end;
+    Result := IdTabPreco;
+  except
+    dm.Roolback();
+  end;
+end;
+
+end.

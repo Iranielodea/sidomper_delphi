@@ -1,0 +1,538 @@
+unit uRecadoController;
+
+interface
+
+uses
+  System.SysUtils, uDMRecado, uRegras, uEnumerador, uDM, Data.DB, Vcl.Forms, uFuncoesSIDomper,
+  uGenericProperty, uRecadoVO, Data.DBXJSON, Data.DBXJSONReflect, uConverter,
+  uRecadoFiltro, uUsuarioController, uStatusVO, uContaEmailController,
+  uTipoController, uTipoVO, uRecadoQuadroViewModel, System.Generics.Collections;
+
+type
+  TRecadoController = class
+  private
+    FModel: TDMRecado;
+    FOperacao: TOperacao;
+    FModoAbrEnc: string;
+    procedure Post;
+    function StatusAbertura(): TStatusVO;
+    procedure BuscarUsuarioLogado();
+    procedure BuscarStatusAbertura();
+    procedure TipoUmRegistro();
+  public
+    procedure Filtrar(AFiltro: TRecadoFiltro; ACampo, ATexto: string; AContem: Boolean = False);
+    procedure LocalizarId(AId: Integer);
+    procedure Novo(AIdUsuario: Integer);
+    procedure Editar(AId: Integer; AFormulario: TForm);
+    function Salvar(AIdUsuario: Integer; AOperacao: string): Integer;
+    procedure Excluir(AIdUsuario, AId: Integer);
+    procedure Cancelar();
+    procedure Imprimir(AIdUsuario: Integer);
+    procedure FiltrarId(AId: Integer);
+    procedure Quadro(AIdUsuario, AIdRevenda: Integer);
+    procedure QuadroJSON(AIdUsuario, AIdRevenda: Integer);
+    function BuscarQuadroJSON(AIdUsuario, AIdRevenda: Integer): TObjectList<TRecadoQuadroViewModel>;
+    function TextoEmail(AId: Integer): string;
+    procedure EnviarEmail(AIdUsuarioOrigem, AIdUsuarioDestino, AId: Integer);
+    function PermissaoAcessar(AIdUsuario: Integer): Boolean;
+    function PermissaoAcessarQuadro(AIdUsuario: Integer): Boolean;
+    property Model: TDMRecado read FModel write FModel;
+    property ModoAbrEnc: string read FModoAbrEnc write FModoAbrEnc;
+
+    constructor Create();
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TRecadoController }
+
+procedure TRecadoController.BuscarStatusAbertura;
+var
+  StatusVO: TStatusVO;
+begin
+  try
+    StatusVO := StatusAbertura();
+
+    FModel.CDSCadastroRec_Status.AsInteger := StatusVO.Id;
+    FModel.CDSCadastroSta_Codigo.AsInteger := StatusVO.Codigo;
+    FModel.CDSCadastroSta_Nome.AsString := StatusVO.Nome;
+  finally
+    FreeAndNil(StatusVO);
+  end;
+end;
+
+procedure TRecadoController.BuscarUsuarioLogado;
+var
+  Usuario: TUsuarioController;
+begin
+  Usuario := TUsuarioController.Create;
+  try
+    Usuario.LocalizarId(dm.IdUsuario);
+    FModel.CDSCadastroRec_UsuarioLcto.AsInteger := Usuario.Model.CDSCadastroUsu_Id.AsInteger;
+    FModel.CDSCadastroUsu_CodigoLcto.AsInteger := Usuario.Model.CDSCadastroUsu_Codigo.AsInteger;
+    FModel.CDSCadastroNomeUsuarioLcto.AsString := Usuario.Model.CDSCadastroUsu_Nome.AsString;
+  finally
+    FreeAndNil(Usuario);
+  end;
+end;
+
+procedure TRecadoController.Cancelar;
+begin
+  if FModel.CDSCadastro.State in [dsEdit, dsInsert] then
+    FModel.CDSCadastro.Cancel;
+end;
+
+constructor TRecadoController.Create;
+begin
+  inherited Create;
+  FModel := TDMRecado.Create(nil);
+end;
+
+destructor TRecadoController.Destroy;
+begin
+  FreeAndNil(FModel);
+  inherited;
+end;
+
+procedure TRecadoController.Editar(AId: Integer; AFormulario: TForm);
+var
+  Negocio: TServerModule2Client;
+  Resultado: Boolean;
+begin
+  if AId = 0 then
+    raise Exception.Create('Não há Registro para Editar!');
+
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    FModel.CDSCadastro.Close;
+    Resultado :=  Negocio.Editar(CRecadoPrograma, dm.IdUsuario, AId);
+    FModel.CDSCadastro.Open;
+
+    TFuncoes.HabilitarCampo(AFormulario, Resultado);
+
+    FOperacao := opEditar;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.EnviarEmail(AIdUsuarioOrigem, AIdUsuarioDestino, AId: Integer);
+var
+  objContaEmail: TContaEmailController;
+  Usuario: TUsuarioController;
+  sEmail: string;
+  sAssunto: string;
+begin
+  if (AId = 0) or (AIdUsuarioOrigem = 0) or (AIdUsuarioDestino = 0) then
+    Exit;
+
+  sAssunto := 'Domper Recado - ' + FormatFloat('000000', AId);
+
+  Usuario := TUsuarioController.Create;
+  objContaEmail := TContaEmailController.Create;
+  try
+    Usuario.LocalizarId(AIdUsuarioDestino);
+
+    sEmail := Usuario.Model.CDSCadastroUsu_Email.AsString;
+
+    if sEmail.Trim <> '' then
+      objContaEmail.EnviarEmail(AIdUsuarioOrigem, sEmail, '', sAssunto, TextoEmail(AId), '');
+
+  finally
+    FreeAndNil(objContaEmail);
+    FreeAndNil(Usuario);
+  end;
+end;
+
+procedure TRecadoController.Excluir(AIdUsuario, AId: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  if AId = 0 then
+    raise Exception.Create('Não há Registro para Excluir!');
+
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    Negocio.Excluir(CRecadoPrograma, AIdUsuario, AId);
+    FModel.CDSConsulta.Delete;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.Filtrar(AFiltro: TRecadoFiltro; ACampo, ATexto: string;
+  AContem: Boolean);
+var
+  Negocio: TServerModule2Client;
+  oJSON: TJSONValue;
+begin
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    oJSON := TConverte.ObjectToJSON<TRecadoFiltro>(AFiltro);
+    FModel.CDSConsulta.Close;
+    Negocio.RecadoFiltrar(oJSON, ACampo, ATexto, AContem);
+    FModel.CDSConsulta.Open;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.FiltrarId(AId: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    FModel.CDSConsulta.Close;
+    Negocio.RecadoFiltrarId(AId);
+    FModel.CDSConsulta.Open;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.Imprimir(AIdUsuario: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    Negocio.Relatorio(CRecadoPrograma, AIdUsuario);
+//    FModel.Rel.Print;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.LocalizarId(AId: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    FModel.CDSCadastro.Close;
+    Negocio.LocalizarId(CRecadoPrograma, AId);
+    FModel.CDSCadastro.Open;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.Novo(AIdUsuario: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+
+    FModel.CDSCadastro.Close;
+    Negocio.Novo(CRecadoPrograma, AIdUsuario);
+    FModel.CDSCadastro.Open;
+
+    FModel.CDSCadastro.Append;
+
+    BuscarUsuarioLogado();
+    BuscarStatusAbertura();
+    TipoUmRegistro();
+
+    FModel.CDSCadastroRec_data.AsDateTime := Date;
+    FModel.CDSCadastroRec_Hora.AsDateTime := Time;
+
+    FOperacao := opIncluir;
+    FModoAbrEnc := 'A';
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+function TRecadoController.PermissaoAcessar(AIdUsuario: Integer): Boolean;
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    Result := Negocio.RecadoPermissaoUsuario(AIdUsuario, 'Acessar');
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+function TRecadoController.PermissaoAcessarQuadro(AIdUsuario: Integer): Boolean;
+var
+  Negocio: TServerMethods1Client;
+begin
+  Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
+  try
+    Result := Negocio.PermissaoRecadoQuadro(AIdUsuario);
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.Post;
+begin
+  if FModel.CDSConsulta.State in [dsEdit, dsInsert] then
+    FModel.CDSConsulta.Post;
+end;
+
+function TRecadoController.BuscarQuadroJSON(AIdUsuario,
+  AIdRevenda: Integer): TObjectList<TRecadoQuadroViewModel>;
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    try
+    Result := TConverte.JSONToObject<TListaRecadoQuadroViewModel>(Negocio.RecadoQuadroJSON(AIdUsuario, AIdRevenda));
+    except
+      ON E: Exception do
+      begin
+        raise Exception.Create(E.Message + '  TRecadoController.BuscarQuadroJSON');
+      end;
+
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.Quadro(AIdUsuario, AIdRevenda: Integer);
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
+  try
+    FModel.CDSQuadro.Close;
+    Negocio.RecadoQuadro(AIdUsuario, AIdRevenda);
+    FModel.CDSQuadro.Open;
+
+
+    FModel.CDSLcto.First;
+    while not FModel.CDSLcto.Eof do
+      FModel.CDSLcto.Delete;
+
+    FModel.CDSDestino.First;
+    while not FModel.CDSDestino.Eof do
+      FModel.CDSDestino.Delete;
+
+    FModel.CDSQuadro.First;
+    while not FModel.CDSQuadro.Eof do
+    begin
+      if FModel.CDSQuadroTipo.AsString = 'L' then
+      begin
+        FModel.CDSLcto.Append;
+        FModel.CDSLctoRec_Id.AsInteger := FModel.CDSQuadroRec_Id.AsInteger;
+        FModel.CDSLctoRec_Data.AsDateTime := FModel.CDSQuadroRec_Data.AsDateTime;
+        FModel.CDSLctoRec_Hora.AsDateTime := FModel.CDSQuadroRec_Hora.AsDateTime;
+        FModel.CDSLctoUsuarioLcto.AsString := FModel.CDSQuadroUsuarioLcto.AsString;
+        FModel.CDSLctoUsuarioDestino.AsString := FModel.CDSQuadroUsuarioDestino.AsString;
+        FModel.CDSLctoRec_Nivel.AsInteger := FModel.CDSQuadroRec_Nivel.AsInteger;
+        FModel.CDSLctoRec_RazaoSocial.AsString := FModel.CDSQuadroRec_RazaoSocial.AsString;
+        FModel.CDSLctoRec_Telefone.AsString := FModel.CDSQuadroRec_Telefone.AsString;
+        FModel.CDSLctoRec_UsuarioLcto.AsInteger := FModel.CDSQuadroRec_UsuarioLcto.AsInteger;
+        FModel.CDSLctoRec_UsuarioDestino.AsInteger := FModel.CDSQuadroRec_UsuarioDestino.AsInteger;
+        FModel.CDSLcto.Post;
+      end
+      else begin
+        FModel.CDSDestino.Append;
+        FModel.CDSDestinoRec_Id.AsInteger := FModel.CDSQuadroRec_Id.AsInteger;
+        FModel.CDSDestinoRec_Data.AsDateTime := FModel.CDSQuadroRec_Data.AsDateTime;
+        FModel.CDSDestinoRec_Hora.AsDateTime := FModel.CDSQuadroRec_Hora.AsDateTime;
+        FModel.CDSDestinoUsuarioLcto.AsString := FModel.CDSQuadroUsuarioLcto.AsString;
+        FModel.CDSDestinoUsuarioDestino.AsString := FModel.CDSQuadroUsuarioDestino.AsString;
+        FModel.CDSDestinoRec_Nivel.AsInteger := FModel.CDSQuadroRec_Nivel.AsInteger;
+        FModel.CDSDestinoRec_RazaoSocial.AsString := FModel.CDSQuadroRec_RazaoSocial.AsString;
+        FModel.CDSDestinoRec_Telefone.AsString := FModel.CDSQuadroRec_Telefone.AsString;
+        FModel.CDSDestino.Post;
+      end;
+      FModel.CDSQuadro.Next;
+    end;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+procedure TRecadoController.QuadroJSON(AIdUsuario, AIdRevenda: Integer);
+var
+  Item: TRecadoQuadroViewModel;
+  Lista: TObjectList<TRecadoQuadroViewModel>;
+begin
+  Lista := BuscarQuadroJSON(AIdUsuario, AIdRevenda);
+  try
+    FModel.CDSLcto.First;
+    while not FModel.CDSLcto.Eof do
+      FModel.CDSLcto.Delete;
+
+    FModel.CDSDestino.First;
+    while not FModel.CDSDestino.Eof do
+      FModel.CDSDestino.Delete;
+
+    for Item in Lista do
+    begin
+      if Item.TipoLan = 'L' then
+      begin
+        FModel.CDSLcto.Append;
+        FModel.CDSLctoRec_Id.AsInteger := Item.Id;
+        FModel.CDSLctoRec_Data.AsDateTime := Item.Data;
+        FModel.CDSLctoRec_Hora.AsDateTime := Item.Hora;
+        FModel.CDSLctoUsuarioLcto.AsString := Item.UsuarioLcto;
+        FModel.CDSLctoUsuarioDestino.AsString := Item.UsuarioDestino;
+        FModel.CDSLctoRec_Nivel.AsInteger := Item.Nivel;
+        FModel.CDSLctoRec_RazaoSocial.AsString := Item.RazaoSocial;
+        FModel.CDSLctoRec_Telefone.AsString := Item.Telefone;
+        FModel.CDSLctoRec_UsuarioLcto.AsInteger := Item.Rec_UsuarioLcto;
+        FModel.CDSLctoRec_UsuarioDestino.AsInteger := Item.Rec_UsuarioDestino;
+        FModel.CDSLcto.Post;
+      end
+      else begin
+        FModel.CDSDestino.Append;
+        FModel.CDSDestinoRec_Id.AsInteger := Item.Id;
+        FModel.CDSDestinoRec_Data.AsDateTime := Item.Data;
+        FModel.CDSDestinoRec_Hora.AsDateTime := Item.Hora;
+        FModel.CDSDestinoUsuarioLcto.AsString := Item.UsuarioLcto;
+        FModel.CDSDestinoUsuarioDestino.AsString := Item.UsuarioDestino;
+        FModel.CDSDestinoRec_Nivel.AsInteger := Item.Nivel;
+        FModel.CDSDestinoRec_RazaoSocial.AsString := Item.RazaoSocial;
+        FModel.CDSDestinoRec_Telefone.AsString := Item.Telefone;
+        FModel.CDSDestino.Post;
+      end;
+    end;
+  finally
+    FreeAndNil(Lista);
+  end;
+end;
+
+function TRecadoController.Salvar(AIdUsuario: Integer; AOperacao: string): Integer;
+var
+  Negocio: TServerModule2Client;
+  ConsultaSQL: string;
+  id: Integer;
+  ObjVO: TRecadoVO;
+  oObjetoJSON : TJSONValue;
+begin
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      Post();
+
+      ObjVO := TRecadoVO.create;
+
+      ObjVO.Operacao := AOperacao;
+      ObjVO.Id := FModel.CDSCadastroRec_Id.AsInteger;
+      ObjVO.Data := FModel.CDSCadastroRec_data.AsDateTime;
+      ObjVO.Hora := FModel.CDSCadastroRec_Hora.AsDateTime;
+      ObjVO.IdUsuarioLcto := FModel.CDSCadastroRec_UsuarioLcto.AsInteger;
+      ObjVO.Nivel := FModel.CDSCadastroRec_Nivel.AsInteger;
+      ObjVO.IdCliente := FModel.CDSCadastroRec_Cliente.AsInteger;
+      ObjVO.RazaoSocial := FModel.CDSCadastroRec_RazaoSocial.AsString;
+      ObjVO.Fantasia := FModel.CDSCadastroRec_Fantasia.AsString;
+      ObjVO.Endereco := FModel.CDSCadastroRec_Endereco.AsString;
+      ObjVO.Telefone := FModel.CDSCadastroRec_Telefone.AsString;
+      ObjVO.Contato := FModel.CDSCadastroRec_Contato.AsString;
+      ObjVO.IdUsuarioDestino := FModel.CDSCadastroRec_UsuarioDestino.AsInteger;
+      ObjVO.IdTipo := FModel.CDSCadastroRec_Tipo.AsInteger;
+      ObjVO.IdStatus := FModel.CDSCadastroRec_Status.AsInteger;
+      ObjVO.DescricaoInicial := FModel.CDSCadastroRec_DescricaoInicial.AsString;
+      ObjVO.DataFinal := FModel.CDSCadastroRec_DataFinal.AsDateTime;
+      ObjVO.HoraFinal := FModel.CDSCadastroRec_HoraFinal.AsDateTime;
+      ObjVO.DescricaoFinal := FModel.CDSCadastroRec_DescricaoFinal.AsString;
+
+//      TGenericProperty.SetProperty<TRecadoVO>(ObjVO, FModel.CDSCadastro);
+
+      oObjetoJSON := TConverte.ObjectToJSON<TRecadoVO>(ObjVO);
+
+      Result := StrToIntDef(Negocio.RecadoSalvar(oObjetoJSON).ToString(), 0);
+
+      FOperacao := opNavegar;
+    except
+      on E: Exception do
+      begin
+        TFuncoes.MensagemErroBanco(E.Message);
+        Abort;
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+    FreeAndNil(ObjVO);
+  end;
+end;
+
+function TRecadoController.StatusAbertura: TStatusVO;
+var
+  Negocio: TServerModule2Client;
+begin
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    Result := TConverte.JSONToObject<TStatusVO>(Negocio.StatusAberturaRecados);
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
+function TRecadoController.TextoEmail(AId: Integer): string;
+var
+  sTexto: string;
+  sStatus: string;
+begin
+  if AId = 0 then
+  begin
+    Result := '';
+    Exit;
+  end;
+
+  LocalizarId(AId);
+
+  if Self.ModoAbrEnc = '' then
+  begin
+    if Trim(FModel.CDSCadastroRec_DescricaoFinal.AsString) = '' then
+      Self.ModoAbrEnc := 'A'
+    else
+      Self.ModoAbrEnc := 'E';
+  end;
+
+  sStatus := '(Encerrado)';
+  if Self.ModoAbrEnc = 'A' then
+    sStatus := '(Aberto)';
+
+  sTexto := 'Recado Sistema Domper: ' + sStatus +'<br><br>';
+  sTexto := sTexto + 'Id: ' + FormatFloat('000000', FModel.CDSCadastroRec_Id.AsFloat) + '<br>';
+  sTexto := sTexto + 'Data: ' + FModel.CDSCadastroRec_data.AsString + ' Hora: ' + FModel.CDSCadastroRec_Hora.AsString + '<br>';
+  sTexto := sTexto + 'Usuário Lcto: ' + FModel.CDSCadastroNomeUsuarioLcto.AsString + '<br>';
+  sTexto := sTexto + 'Nivel: ' + FModel.CDSCadastroRec_Nivel.AsString + '<br>';
+  sTexto := sTexto + 'Razão Social: ' + FModel.CDSCadastroRec_RazaoSocial.AsString + '<br>';
+  sTexto := sTexto + 'Endereço: ' + FModel.CDSCadastroRec_Endereco.AsString + '<br>';
+  sTexto := sTexto + 'Telefone: ' + FModel.CDSCadastroRec_Telefone.AsString + '<br>';
+  sTexto := sTexto + 'Contato: ' + FModel.CDSCadastroRec_Contato.AsString + '<br>';
+  sTexto := sTexto + 'Usuário Destino: ' + FModel.CDSCadastroNomeUsuarioDest.AsString + '<br>';
+  sTexto := sTexto + 'Tipo: ' + FModel.CDSCadastroTip_Nome.AsString + '<br>';
+  sTexto := sTexto + 'Status: ' + FModel.CDSCadastroSta_Nome.AsString + '<br>';
+
+  sTexto := sTexto + 'Descrição: <br>' + FModel.CDSCadastroRec_DescricaoInicial.AsString;
+  if Self.ModoAbrEnc = 'E' then // em Encerrado
+    sTexto := sTexto + '<br><br> Descrição Encerramento: <br>' + FModel.CDSCadastroRec_DescricaoFinal.AsString;
+
+  Result := sTexto;
+end;
+
+procedure TRecadoController.TipoUmRegistro;
+var
+  obj: TTipoController;
+  Model: TTipoVO;
+begin
+  obj := TTipoController.Create;
+  try
+    Model := obj.RetornoUmRegistro(prRecado);
+    if Model.Id > 0 then
+    begin
+      FModel.CDSCadastroRec_Tipo.AsInteger := Model.Id;
+      FModel.CDSCadastroTip_Codigo.AsInteger := Model.Codigo;
+      FModel.CDSCadastroTip_Nome.AsString := Model.Nome;
+    end;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Model);
+  end;
+end;
+
+end.

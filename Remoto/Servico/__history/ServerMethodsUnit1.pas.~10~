@@ -1,0 +1,76 @@
+unit ServerMethodsUnit1;
+
+interface
+
+uses System.SysUtils, System.Classes, Datasnap.DSServer, Datasnap.DSAuth, Data.DBXJSON,
+  ULicenca, ULicencaVO, uLicencaItensVO, uGenericDAO, System.Generics.Collections,
+  uConverter, uDM;
+
+type
+  TServerMethods1 = class(TDSServerModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    function EchoString(Value: string): string;
+    function ReverseString(Value: string): string;
+
+    function FBLicencasListar(): TJSONValue;
+    function FBLicencasListarItens(): TJSONValue;
+  end;
+
+implementation
+
+{$R *.dfm}
+
+uses System.StrUtils;
+
+function TServerMethods1.EchoString(Value: string): string;
+begin
+  Result := Value;
+end;
+
+function TServerMethods1.FBLicencasListar: TJSONValue;
+var
+  obj: TLicenca;
+  Lista: TObjectList<TLicencaVO>;
+begin
+  obj := TLicenca.create;
+  try
+    try
+      DM.AbrirConexao();
+      Lista := obj.ListarTodos();
+      Result := TConverte.ObjectToJSON(Lista);
+      DM.FecharConexao();
+    except
+      Result := nil;
+    end;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Lista);
+  end;
+end;
+
+function TServerMethods1.FBLicencasListarItens: TJSONValue;
+var
+  obj: TLicenca;
+  Lista: TObjectList<TLicencaItensVO>;
+begin
+  obj := TLicenca.create;
+  try
+    dm.AbrirConexao();
+    Lista := obj.ListarTodosItens();
+    Result := TConverte.ObjectToJSON(Lista);
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Lista);
+  end;
+end;
+
+function TServerMethods1.ReverseString(Value: string): string;
+begin
+  Result := System.StrUtils.ReverseString(Value);
+end;
+
+end.
+

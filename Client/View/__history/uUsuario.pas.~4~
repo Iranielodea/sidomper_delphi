@@ -1,0 +1,674 @@
+unit uUsuario;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uBaseCadastro, Data.DB, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, uDMUsuario,
+  uUsuarioController, Vcl.Mask, Vcl.DBCtrls, uFuncoesSIDomper, uFraRevenda, uFraCliente,
+  uFraDepartamento, uGrade, uUsuarioPermissaoController, System.Generics.Collections;
+
+type
+  TfrmUsuario = class(TfrmBaseCadastro)
+    Label11: TLabel;
+    DBEdit8: TDBEdit;
+    tsRevenda: TTabSheet;
+    tsCliente: TTabSheet;
+    tsDepartamento: TTabSheet;
+    Panel7: TPanel;
+    Panel8: TPanel;
+    Panel9: TPanel;
+    FraRevenda: TFraRevenda;
+    FraCliente: TFraCliente;
+    FraDepartamento: TFraDepartamento;
+    PageControl1: TPageControl;
+    tsPrincipal: TTabSheet;
+    Panel10: TPanel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    btnRevenda: TSpeedButton;
+    Label10: TLabel;
+    btnCliente: TSpeedButton;
+    edtCodigo: TDBEdit;
+    edtNome: TDBEdit;
+    DBEdit1: TDBEdit;
+    DBEdit2: TDBEdit;
+    DBEdit3: TDBEdit;
+    edtRevenda: TDBEdit;
+    DBEdit4: TDBEdit;
+    edtCliente: TDBEdit;
+    DBEdit6: TDBEdit;
+    GroupBox2: TGroupBox;
+    DBCheckBox2: TDBCheckBox;
+    DBCheckBox3: TDBCheckBox;
+    Ativo: TDBCheckBox;
+    tsPermissao: TTabSheet;
+    Panel11: TPanel;
+    lstPermissao: TListBox;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    dbPermissao: TDBGrid;
+    Label12: TLabel;
+    dsPermissao: TDataSource;
+    Label13: TLabel;
+    Label14: TLabel;
+    edtCodContaEmail: TDBEdit;
+    DBEdit5: TDBEdit;
+    btnContaEmail: TSpeedButton;
+    btnDepartamento: TSpeedButton;
+    edtDepartamento: TDBEdit;
+    Label15: TLabel;
+    DBEdit7: TDBEdit;
+    lblDataInicial: TLabel;
+    lblDataFinal: TLabel;
+    medtDataInicial: TMaskEdit;
+    medtDataFinal: TMaskEdit;
+    lblDiasUteis: TLabel;
+    edtDias: TEdit;
+    grp1: TGroupBox;
+    lbl4: TLabel;
+    cbbModelo: TComboBox;
+    procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnFiltroClick(Sender: TObject);
+    procedure dbDadosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure btnFecharEdicaoClick(Sender: TObject);
+    procedure btnImprimirClick(Sender: TObject);
+    procedure btnRevendaClick(Sender: TObject);
+    procedure edtRevendaExit(Sender: TObject);
+    procedure btnDepartamentoClick(Sender: TObject);
+    procedure edtDepartamentoExit(Sender: TObject);
+    procedure edtClienteExit(Sender: TObject);
+    procedure btnClienteClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure edtRevendaKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbDadosTitleClick(Column: TColumn);
+    procedure dbPermissaoDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton4Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure btnContaEmailClick(Sender: TObject);
+    procedure edtCodContaEmailExit(Sender: TObject);
+    procedure tsGeralShow(Sender: TObject);
+    procedure cbbModeloClick(Sender: TObject);
+  private
+    { Private declarations }
+    FController: TUsuarioController;
+    FIdUsuario: Integer;
+    procedure Localizar(ATexto: string);
+    procedure BuscarRevenda(AId, ACodigo: Integer);
+    procedure BuscarDepartamento(AId, ACodigo: Integer);
+    procedure BuscarCliente(AId, ACodigo: Integer);
+    procedure BuscarContaEmail(AId, ACodigo: Integer);
+    procedure PreencherLista;
+    procedure TransferirParaGridSelecionados();
+    procedure TransferirParaGridTodos();
+    function ExistePemissao(APermissao: string): Boolean;
+    procedure ExcluirUmaPermissao;
+    procedure ExcluirTodasPermissoes;
+    procedure ExibirFiltro;
+    procedure Iniciar(APesquisar: Boolean);
+  public
+    { Public declarations }
+    constructor create(APesquisar: Boolean = False); overload;
+    constructor create(AIdUsuario: Integer; APesquisar: Boolean = False); overload;
+  end;
+
+var
+  frmUsuario: TfrmUsuario;
+
+implementation
+
+{$R *.dfm}
+
+uses uDM, uRevendaController, uRevenda, uDepartamentoController,
+  uDepartamento, uCliente, uClienteController, uImagens, uFiltroUsuario,
+  uContaEmailController, uContaEmail;
+
+procedure TfrmUsuario.btnClienteClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmCliente.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarCliente(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmUsuario.btnContaEmailClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmContaEmail.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarContaEmail(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmUsuario.btnDepartamentoClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmDepartamento.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarDepartamento(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmUsuario.btnEditarClick(Sender: TObject);
+begin
+  FController.Editar(dbDados.Columns[0].Field.AsInteger, Self);
+  PageControl1.ActivePageIndex := 0;
+  inherited;
+  if edtNome.Enabled then
+    edtNome.SetFocus;
+end;
+
+procedure TfrmUsuario.btnExcluirClick(Sender: TObject);
+begin
+  if TFuncoes.Confirmar('Excluir Registro?') then
+  begin
+    FController.Excluir(dm.IdUsuario, dbDados.Columns[0].Field.AsInteger);
+    inherited;
+  end;
+end;
+
+procedure TfrmUsuario.btnFecharEdicaoClick(Sender: TObject);
+begin
+  FController.Cancelar;
+  inherited;
+end;
+
+procedure TfrmUsuario.btnFiltroClick(Sender: TObject);
+begin
+  inherited;
+  Localizar(edtDescricao.Text);
+end;
+
+procedure TfrmUsuario.btnImprimirClick(Sender: TObject);
+begin
+  FController.RelatorioPermissao(dm.IdUsuario);
+  if cbbModelo.ItemIndex = 0 then
+  begin
+    Localizar(edtDescricao.Text);
+    FController.Imprimir(dm.IdUsuario);
+  end
+  else begin
+    FController.RelatorioRendimentos(medtDataInicial.Text, medtDataFinal.Text, edtDias.Text);
+  end;
+  inherited;
+end;
+
+procedure TfrmUsuario.btnNovoClick(Sender: TObject);
+begin
+  FController.Novo(dm.IdUsuario);
+  PageControl1.ActivePageIndex := 0;
+  inherited;
+  edtCodigo.SetFocus;
+end;
+
+procedure TfrmUsuario.btnRevendaClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmRevenda.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarRevenda(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmUsuario.btnSalvarClick(Sender: TObject);
+begin
+  FController.Salvar(dm.IdUsuario);
+  FController.FiltrarCodigo(FController.CodigoAtual());
+  inherited;
+end;
+
+procedure TfrmUsuario.BuscarCliente(AId, ACodigo: Integer);
+var
+  ClienteController: TClienteController;
+begin
+  ClienteController := TClienteController.Create;
+  try
+    try
+      ClienteController.APesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCliente.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroUsu_Cliente.AsString := ClienteController.Model.CDSCadastroCli_Id.AsString;
+    FController.Model.CDSCadastroCli_Codigo.AsString := ClienteController.Model.CDSCadastroCli_Codigo.AsString;
+    FController.Model.CDSCadastroCli_Nome.AsString := ClienteController.Model.CDSCadastroCli_Nome.AsString;
+
+    FreeAndNil(ClienteController);
+  end;
+  edtCliente.Modified := False;
+end;
+
+procedure TfrmUsuario.BuscarContaEmail(AId, ACodigo: Integer);
+var
+  obj: TContaEmailController;
+begin
+  obj := TContaEmailController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodContaEmail.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroUsu_ContaEmail.AsString := obj.Model.CDSCadastroCtaEm_Id.AsString;
+    FController.Model.CDSCadastroCtaEm_Codigo.AsString := obj.Model.CDSCadastroCtaEm_Codigo.AsString;
+    FController.Model.CDSCadastroCtaEm_Nome.AsString := obj.Model.CDSCadastroCtaEm_Nome.AsString;
+
+    FreeAndNil(obj);
+  end;
+  edtCodContaEmail.Modified := False;
+end;
+
+procedure TfrmUsuario.BuscarDepartamento(AId, ACodigo: Integer);
+var
+  DepartamentoController: TDepartamentoController;
+begin
+  DepartamentoController := TDepartamentoController.Create;
+  try
+    try
+      DepartamentoController.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtDepartamento.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroUsu_Departamento.AsString := DepartamentoController.Model.CDSCadastroDep_Id.AsString;
+    FController.Model.CDSCadastroDep_Codigo.AsString := DepartamentoController.Model.CDSCadastroDep_Codigo.AsString;
+    FController.Model.CDSCadastroDep_Nome.AsString := DepartamentoController.Model.CDSCadastroDep_Nome.AsString;
+
+    FreeAndNil(DepartamentoController);
+  end;
+  edtDepartamento.Modified := False;
+end;
+
+procedure TfrmUsuario.BuscarRevenda(AId, ACodigo: Integer);
+var
+  RevendaController: TRevendaController;
+begin
+  RevendaController := TRevendaController.Create;
+  try
+    try
+      RevendaController.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtRevenda.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroUsu_Revenda.AsString := RevendaController.Model.CDSCadastroRev_Id.AsString;
+    FController.Model.CDSCadastroRev_Codigo.AsString := RevendaController.Model.CDSCadastroRev_Codigo.AsString;
+    FController.Model.CDSCadastroRev_Nome.AsString := RevendaController.Model.CDSCadastroRev_Nome.AsString;
+
+    FreeAndNil(RevendaController);
+  end;
+  edtRevenda.Modified := False;
+end;
+
+procedure TfrmUsuario.cbbModeloClick(Sender: TObject);
+begin
+  inherited;
+  ExibirFiltro();
+end;
+
+constructor TfrmUsuario.create(AIdUsuario: Integer; APesquisar: Boolean);
+begin
+  FIdUsuario := AIdUsuario;
+  Iniciar(APesquisar);
+end;
+
+constructor TfrmUsuario.create(APesquisar: Boolean);
+begin
+  inherited create(nil);
+  FController := TUsuarioController.Create;
+  dsPesquisa.DataSet := FController.Model.CDSConsulta;
+  dsCad.DataSet := FController.Model.CDSCadastro;
+  dsPermissao.DataSet := FController.Model.CDSListarPermissaoListar;
+
+  TGrade.RetornaCamposGrid(dbDados, cbbCampos);
+  Localizar('ABCDE');
+
+  if APesquisar then
+  begin
+    cbbSituacao.ItemIndex := 0;
+    Pesquisa := APesquisar;
+  end;
+end;
+
+procedure TfrmUsuario.ExcluirTodasPermissoes;
+begin
+  if not dsPermissao.DataSet.IsEmpty then
+  begin
+    dsPermissao.DataSet.DisableControls;
+    try
+      dsPermissao.DataSet.First;
+      while not dsPermissao.DataSet.Eof do
+        dsPermissao.DataSet.Delete;
+    finally
+      dsPermissao.DataSet.EnableControls;
+    end;
+    FController.ModoEdicaoInsercao();
+  end;
+end;
+
+procedure TfrmUsuario.ExcluirUmaPermissao;
+begin
+  if not dsPermissao.DataSet.IsEmpty then
+  begin
+    dsPermissao.DataSet.Delete;
+    FController.ModoEdicaoInsercao();
+  end;
+end;
+
+procedure TfrmUsuario.dbDadosKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    dbDadosDblClick(Self);
+    if edtCodigo.Enabled then
+      edtCodigo.SetFocus;
+  end;
+end;
+
+procedure TfrmUsuario.dbDadosTitleClick(Column: TColumn);
+begin
+  inherited;
+  TFuncoes.OrdenarCamposGrid(FController.Model.cdsconsulta, Column.FieldName);
+end;
+
+procedure TfrmUsuario.dbPermissaoDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.Zebrar(dsPermissao.DataSet, dbPermissao, Sender, Rect, DataCol, Column, State);
+end;
+
+procedure TfrmUsuario.edtClienteExit(Sender: TObject);
+begin
+  inherited;
+  if edtCliente.Modified then
+    BuscarCliente(0, StrToIntDef(edtCliente.Text, 0));
+end;
+
+procedure TfrmUsuario.edtCodContaEmailExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodContaEmail.Modified then
+    BuscarContaEmail(0, StrToIntDef(edtCodContaEmail.Text, 0));
+end;
+
+procedure TfrmUsuario.edtDepartamentoExit(Sender: TObject);
+begin
+  inherited;
+  if edtDepartamento.Modified then
+    BuscarDepartamento(0, StrToIntDef(edtDepartamento.Text, 0));
+end;
+
+procedure TfrmUsuario.edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+    Localizar(edtDescricao.Text);
+end;
+
+procedure TfrmUsuario.edtRevendaExit(Sender: TObject);
+begin
+  inherited;
+  if edtRevenda.Modified then
+    BuscarRevenda(0, StrToIntDef(edtRevenda.Text, 0));
+end;
+
+procedure TfrmUsuario.edtRevendaKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_F9 then
+  begin
+    if Sender = edtRevenda then
+      btnRevendaClick(Self)
+    else if Sender = edtCliente then
+      btnClienteClick(Self)
+    else if Sender = edtDepartamento then
+      btnDepartamentoClick(Self)
+    else if Sender = edtCodContaEmail then
+      btnContaEmailClick(Self);
+  end;
+end;
+
+procedure TfrmUsuario.ExibirFiltro;
+var
+  bModelo: Boolean;
+begin
+  bModelo := cbbModelo.ItemIndex > 0;
+  lblDataInicial.Visible := bModelo;
+  lblDataFinal.Visible := bModelo;
+//  lblDiasUteis.Visible := bModelo;
+
+  medtDataInicial.Visible := bModelo;
+  medtDataFinal.Visible := bModelo;
+//  edtDias.Visible := bModelo;
+
+end;
+
+function TfrmUsuario.ExistePemissao(APermissao: string): Boolean;
+begin
+  Result := False;
+  dsPermissao.DataSet.DisableControls;
+  try
+    dsPermissao.DataSet.First;
+    while not dsPermissao.DataSet.Eof do
+    begin
+      if dsPermissao.DataSet.FieldByName('UsuP_Sigla').AsString = APermissao then
+      begin
+        Result := True;
+        Break;
+      end;
+      dsPermissao.DataSet.Next;
+    end;
+  finally
+    dsPermissao.DataSet.EnableControls;
+  end;
+end;
+
+procedure TfrmUsuario.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  FreeAndNil(FController);
+end;
+
+procedure TfrmUsuario.FormShow(Sender: TObject);
+var
+  Img: TfrmImagens;
+begin
+  inherited;
+
+  Img := TfrmImagens.Create(Self);
+  try
+    btnRevenda.Glyph := Img.btnProcurar.Glyph;
+    btnCliente.Glyph := Img.btnProcurar.Glyph;
+    btnDepartamento.Glyph := Img.btnProcurar.Glyph;
+    btnContaEmail.Glyph := Img.btnProcurar.Glyph;
+  finally
+    FreeAndNil(Img);
+  end;
+
+  PageControl2.ActivePageIndex := 0;
+  PageControl1.ActivePageIndex := 0;
+
+  FraCliente.Inicializar();
+  FraRevenda.Inicializar();
+  FraDepartamento.Inicializar();
+
+  PreencherLista();
+
+end;
+
+procedure TfrmUsuario.Iniciar(APesquisar: Boolean);
+begin
+  FController := TUsuarioController.Create;
+  dsPesquisa.DataSet := FController.Model.CDSConsulta;
+  dsCad.DataSet := FController.Model.CDSCadastro;
+  dsPermissao.DataSet := FController.Model.CDSListarPermissaoListar;
+
+  TGrade.RetornaCamposGrid(dbDados, cbbCampos);
+  Localizar('ABCDE');
+
+  if APesquisar then
+  begin
+    cbbSituacao.ItemIndex := 0;
+    Pesquisa := APesquisar;
+  end;
+
+end;
+
+procedure TfrmUsuario.Localizar(ATexto: string);
+var
+  sCampo: string;
+  sSituacao: string;
+  bContem: Boolean;
+  Filtro: TFiltroUsuario;
+begin
+  sCampo := TGrade.FiltrarCampo(dbDados, cbbCampos);
+  sSituacao := Copy(cbbSituacao.Items.Strings[cbbSituacao.ItemIndex], 1, 1);
+  bContem := (cbbPesquisa.ItemIndex = 1);
+
+  Filtro := TFiltroUsuario.Create;
+  try
+    Filtro.IdCliente := FraCliente.RetornoSelecao();
+    Filtro.IdRevenda := FraRevenda.RetornoSelecao();
+    Filtro.IdDepartamento := FraDepartamento.RetornoSelecao();
+
+    FController.Filtrar(Filtro, dm.IdUsuario,  sCampo, ATexto, sSituacao, bContem);
+  finally
+    FreeAndNil(Filtro);
+  end;
+
+//  FController.Filtrar(sCampo, Texto, sSituacao, bContem);
+end;
+
+procedure TfrmUsuario.PreencherLista;
+var
+  Lista: TList<string>;
+  i: Integer;
+begin
+  Lista := FController.RetornarPermissaoUsuario();
+  try
+    for I := 0 to Lista.Count -1 do
+      lstPermissao.Items.Add(Lista.Items[i]);
+  finally
+    Lista.Free;
+  end;
+end;
+
+procedure TfrmUsuario.SpeedButton1Click(Sender: TObject);
+begin
+  TransferirParaGridSelecionados();
+end;
+
+procedure TfrmUsuario.SpeedButton2Click(Sender: TObject);
+begin
+  inherited;
+  TransferirParaGridTodos();
+end;
+
+procedure TfrmUsuario.SpeedButton3Click(Sender: TObject);
+begin
+  inherited;
+  ExcluirUmaPermissao;
+end;
+
+procedure TfrmUsuario.SpeedButton4Click(Sender: TObject);
+begin
+  inherited;
+  ExcluirTodasPermissoes();
+end;
+
+procedure TfrmUsuario.TransferirParaGridSelecionados();
+var
+  i: Integer;
+  Selecionado: Boolean;
+begin
+  Selecionado := False;
+  for i := 0 to lstPermissao.Count -1 do
+  begin
+    if lstPermissao.Selected[i] then
+    begin
+      if ExistePemissao(lstPermissao.Items[i]) then
+      begin
+        ShowMessage(lstPermissao.Items[i] + ' Já Informada!');
+        Continue;
+      end;
+      FController.Model.CDSListarPermissaoListar.Append;
+      FController.Model.CDSListarPermissaoListarUsuP_Sigla.AsString := lstPermissao.Items[i];
+      FController.Model.CDSListarPermissaoListar.Post;
+      Selecionado := True;
+    end;
+  end;
+
+  if Selecionado then
+    FController.ModoEdicaoInsercao();
+end;
+
+procedure TfrmUsuario.TransferirParaGridTodos;
+var
+  i: Integer;
+  Selecionado: Boolean;
+begin
+  Selecionado := False;
+  for i := 0 to lstPermissao.Count -1 do
+  begin
+    if ExistePemissao(lstPermissao.Items[i]) then
+    begin
+      ShowMessage(lstPermissao.Items[i] + ' Já Informada!');
+      Continue;
+    end;
+    FController.Model.CDSListarPermissaoListar.Append;
+    FController.Model.CDSListarPermissaoListarUsuP_Sigla.AsString := lstPermissao.Items[i];
+    FController.Model.CDSListarPermissaoListar.Post;
+    Selecionado := True;
+  end;
+
+  if Selecionado then
+    FController.ModoEdicaoInsercao();
+end;
+
+procedure TfrmUsuario.tsGeralShow(Sender: TObject);
+begin
+  inherited;
+  ExibirFiltro();
+end;
+
+end.

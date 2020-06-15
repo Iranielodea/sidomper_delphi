@@ -1,0 +1,1233 @@
+unit uVisita;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, uUsuario,
+  uFiltroVisita, uDMVisita, uFireDAC, uFuncoesServidor, DateUtils, uCliente,
+  uParametros, uTipo, uTipoVO, uChamadoVO, System.Generics.Collections;
+
+  const CConsulta: string =
+  ' SELECT'
+	+'  Vis_Id,'
+	+'  Vis_Dcto,'
+	+'  Vis_Data,'
+  +'  Vis_Status,'
+	+'  Cli_Codigo,'
+	+'  Cli_Nome,'
+  +'  Cli_Fantasia,'
+	+'  Usu_Codigo,'
+	+'  Usu_Nome'
+  +' FROM Visita'
+	+' INNER JOIN Cliente ON Vis_Cliente = Cli_Id'
+	+' INNER JOIN Usuario ON Vis_Usuario = Usu_Id'
+  +' INNER JOIN Revenda ON Cli_Revenda = Rev_Id';
+
+
+type
+  TVisita = class(TInterfacedObject, ICadastroInterface)
+  private
+    function DataIngles(Data: string): string;
+    function FiltrarRelatorio(AFiltro: TFiltroVisita; AIdUsuario: integer): string;
+    procedure RelatorioModeloMeses_05(AFiltro: TFiltroVisita; AIdUsuario: integer;
+      AUsu_IdUsuario: Integer);
+    procedure RelatorioModeloMeses_06(AFiltro: TFiltroVisita; AIdUsuario: integer;
+      ATip_Id, ARev_Id: Integer);
+
+    function SqlString(AValor: string): string;
+    function SqlInt(AValor: Integer): string;
+    function SqlDouble(AValor: Double): string;
+    function FiltroRelatorio(AFiltro: TFiltroVisita): string;
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string;
+    function FiltrarUsuario(Filtro: TFiltroVisita; Campo, Texto: string; IdUsuario:
+        Integer; Contem: Boolean = True): string;
+    function FiltrarCodigo(Codigo: integer): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    procedure Salvar(Programa, IdUsuario: Integer);
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+    function UsuarioIgualCadastro(AId, AIdUsuario, ATipoOperacao: Integer): Boolean;
+    function AtualizaVersao(AIdCliente, AIdTipo: Integer; AVersao: string): string;
+//------------------------------------------------------------------------------
+// Relatórios
+//------------------------------------------------------------------------------
+    function RelatorioModelo_01(Filtro: TFiltroVisita; IdUsuario: integer): string;
+    function RelatorioModelo_02(Filtro: TFiltroVisita; IdUsuario: integer; Ordem:
+        string): string;
+    function RelatorioModelo_03(Filtro: TFiltroVisita; IdUsuario: integer; Ordem:
+        string): string;
+    function RelatorioModelo_04(Filtro: TFiltroVisita; IdUsuario: integer; Ordem:
+        string): string;
+    procedure RelatorioModelo_05(Filtro: TFiltroVisita; IdUsuario: integer; Ordem:
+        string);
+    procedure RelatorioModelo_06(Filtro: TFiltroVisita; IdUsuario: integer; Ordem:
+        string);
+    function RelatorioModelo_07(AFiltro: TFiltroVisita; AIdUsuario: Integer):
+      TObjectList<TRelChamadoVO>;
+  end;
+
+implementation
+
+{ TSolicitacao }
+
+
+function TVisita.AtualizaVersao(AIdCliente, AIdTipo: Integer; AVersao: string): string;
+var
+  Cliente: TCliente;
+  Parametro: TParametros;
+  Tipo: TTipo;
+  TipoModel: TTipoVO;
+  bResult: Boolean;
+begin
+  Cliente := TCliente.Create;
+  Parametro := TParametros.Create;
+  Tipo := TTipo.Create;
+  try
+    try
+      TipoModel := Tipo.LocalizarPorId(AIdTipo);
+      bResult := Parametro.VisitaTipoObrigatorio(TipoModel.Codigo.ToString());
+
+      if (bResult = True) and (AVersao.Trim() = '') then
+        raise Exception.Create('Informe a Versão!');
+
+      Cliente.AtualizaVersao(AIdCliente, AVersao);
+    except
+      On E: Exception do
+      begin
+        Result := E.Message;
+      end;
+    end;
+  finally
+    FreeAndNil(Cliente);
+    FreeAndNil(Parametro);
+    FreeAndNil(Tipo);
+    FreeAndNil(TipoModel);
+  end;
+end;
+
+function TVisita.DataIngles(Data: string): string;
+begin
+  try
+    Result := QuotedStr(FormatDateTime('YYYY-MM-DD', StrToDate(Data)));
+  except
+    raise Exception.Create('Data Inválida.');
+  end;
+end;
+
+function TVisita.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TVisita.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+  DM.ExecutarSQL('DELETE FROM Visita WHERE Vis_Id = ' + IntToStr(Id));
+end;
+
+function TVisita.Filtrar(Campo, Texto, Ativo: string; Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+
+  Result := sConsulta;
+end;
+
+function TVisita.FiltrarCodigo(Codigo: integer): string;
+begin
+  Result := CConsulta + ' WHERE Vis_Id = ' + Codigo.ToString();
+end;
+
+function TVisita.FiltrarRelatorio(AFiltro: TFiltroVisita;
+  AIdUsuario: integer): string;
+var
+  sConsulta: string;
+  Usuario: TUsuario;
+begin
+//  sConsulta :=  ' WHERE Vis_Id > 0';
+  sConsulta := '';
+  Usuario := TUsuario.Create;
+  try
+    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario);
+  finally
+    FreeAndNil(Usuario);
+  end;
+
+  if Trim(AFiltro.DataInicial) <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Vis_Data >= ' + DataIngles(AFiltro.DataInicial);
+
+  if Trim(AFiltro.DataFinal) <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Vis_Data <= ' + DataIngles(AFiltro.DataFinal);
+
+  if AFiltro.IdCliente <> '' then
+    sConsulta := sConsulta + ' AND Vis_Cliente IN' + AFiltro.IdCliente;
+
+  if AFiltro.IdTipo <> '' then
+    sConsulta := sConsulta + ' AND Vis_Tipo IN' + AFiltro.IdTipo;
+
+  if AFiltro.IdStatus <> '' then
+    sConsulta := sConsulta + ' AND Vis_Status IN' + AFiltro.IdStatus;
+
+  if AFiltro.IdUsuario <> '' then
+    sConsulta := sConsulta + ' AND Vis_Usuario IN' + AFiltro.IdUsuario;
+
+  if AFiltro.Revenda.IdStr <> '' then
+    sConsulta := sConsulta + ' AND Rev_Id IN' + AFiltro.Revenda.IdStr;
+
+  if AFiltro.Id > 0 then
+    sConsulta := sConsulta + ' AND Vis_Id = ' + AFiltro.Id.ToString();
+
+  if AFiltro.IdCidade <> '' then
+    sConsulta := sConsulta + ' AND Cli_Cidade in ' + AFiltro.IdCidade;
+
+  if AFiltro.Perfil.Trim() <> '' then
+    sConsulta := sConsulta + ' AND Cli_Perfil = ' + QuotedStr(AFiltro.Perfil);
+
+
+//  sConsulta := sConsulta + ' ORDER BY Cli_Nome, Cli_Codigo, Vis_Data';
+
+  Result := sConsulta;
+
+end;
+
+function TVisita.FiltrarUsuario(Filtro: TFiltroVisita; Campo, Texto: string;
+    IdUsuario: Integer; Contem: Boolean = True): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+  sConsulta := sConsulta + FiltrarRelatorio(Filtro, IdUsuario);
+  Result := sConsulta;
+end;
+
+function TVisita.FiltroRelatorio(AFiltro: TFiltroVisita): string;
+var
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    if AFiltro.IdCliente <> '' then
+      sb.AppendLine(' AND Cli_Id IN' + AFiltro.IdCliente);
+
+    if AFiltro.IdUsuario <> '' then
+      sb.AppendLine(' AND Cli_Usuario IN' + AFiltro.IdUsuario);
+
+    if AFiltro.Revenda.IdStr <> '' then
+      sb.AppendLine(' AND Cli_Revenda IN' + AFiltro.Revenda.IdStr);
+
+    if AFiltro.IdCidade <> '' then
+      sb.AppendLine(' AND Cli_Cidade IN' + AFiltro.IdCidade);
+
+    if AFiltro.Perfil.Trim() <> '' then
+      sb.AppendLine(' AND Cli_Perfil =' + QuotedStr(AFiltro.Perfil));
+
+    Result := sb.ToString();
+  finally
+    FreeAndNil(sb);
+  end;
+end;
+
+procedure TVisita.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+begin
+//
+end;
+
+function TVisita.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+procedure TVisita.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TVisita.ProximoCodigo: Integer;
+begin
+  Result := 0;
+end;
+
+function TVisita.ProximoId: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT IDENT_CURRENT(''Visita'')';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TVisita.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TVisita.RelatorioModeloMeses_05(AFiltro: TFiltroVisita; AIdUsuario,
+  AUsu_IdUsuario: Integer);
+var
+  obj: TFireDAC;
+  objInsert: TFireDAC;
+  sConsulta: string;
+//  iContador: Integer;
+  Qtde: array[1..12] of Integer;
+  Horas: array[1..12] of Double;
+  Valor: array[1..12] of Double;
+  Mes: array[1..12] of Integer;
+  Ano: array[1..12] of Integer;
+  MesAno: array[1..12] of string;
+  sb: TStringBuilder;
+  sHoras: string;
+  iMes: Word;
+  iAno: Word;
+  i: Word;
+  sDataInicial: string;
+  sDataFinal: string;
+  sMesAnoFim: string;
+  sMesAno2: string;
+begin
+  sDataInicial := AFiltro.DataInicial;
+  sDataFinal := AFiltro.DataFinal;
+
+  iMes := MonthOf(StrToDate(sDataInicial));
+  iAno := YearOf(StrToDate(sDataInicial));
+
+  sMesAnoFim := '01/' + IntToStr(MonthOf(StrToDate(sDataFinal))) + '/' + IntToStr(YearOf(StrToDate(sDataFinal)));
+
+  for i := 1 to 12 do
+  begin
+    Qtde[i]   := 0;
+    Horas[i]  := 0;
+    Valor[i]  := 0;
+    Mes[i]    := 0;
+    Ano[i]    := 0;
+    MesAno[i] := '';
+  end;
+
+  AFiltro.DataInicial := DataEmBranco;
+  AFiltro.DataFinal := DataEmBranco;
+
+  sConsulta := ' WHERE Vis_Id > 0';
+  sConsulta := sConsulta + FiltrarRelatorio(AFiltro, AIdUsuario);
+
+  AFiltro.DataInicial := sDataInicial;
+  AFiltro.DataFinal := sDataFinal;
+
+  objInsert := TFireDAC.create;
+  obj := TFireDAC.create;
+  sb := TStringBuilder.Create;
+
+  try
+    for I := 1 to 12 do
+    begin
+
+      if iMes > 12 then
+      begin
+        iMes := 1;
+        Inc(iAno);
+      end;
+
+      sMesAno2 := '01/' + IntToStr(iMes) + '/' + IntToStr(iAno);
+
+      if StrToDate(sMesAno2) > StrToDate(sMesAnoFim) then
+      begin
+        break;
+//        inc(iMes);
+//        Continue;
+      end;
+
+      obj.Lista.Clear;
+      obj.Lista.Add(' SELECT');
+      obj.Lista.Add(' 	COUNT(Vis_Id) AS QtdeChamados,');
+      obj.Lista.Add(' 	SUM(Vis_TotalHoras) TotalHoras,');
+      obj.Lista.Add('   SUM(Vis_Valor) AS TotalValor');
+      obj.Lista.Add(' FROM Visita');
+      obj.Lista.Add(' 	INNER JOIN Cliente ON Vis_Cliente = Cli_Id');
+      obj.Lista.Add(' 	INNER JOIN Status ON Vis_Status = Sta_Id');
+      obj.Lista.Add(' 	INNER JOIN Tipo ON Vis_Tipo = Tip_Id');
+      obj.Lista.Add(' 	INNER JOIN Usuario ON Vis_Usuario = Usu_Id');
+      obj.Lista.Add(' 	INNER JOIN Revenda ON Cli_Revenda = Rev_Id');
+      obj.Lista.Add(sConsulta);
+      obj.Lista.Add(' 	AND Usu_Id = ' + IntToStr(AUsu_IdUsuario));
+      obj.Lista.Add('   AND MONTH(Vis_Data) = ' + IntToStr(iMes));
+      obj.Lista.Add('   AND YEAR(Vis_Data) = ' + IntToStr(iAno));
+
+      obj.OpenSQL();
+
+      Qtde[i] := obj.Model.FieldByName('QtdeChamados').AsInteger;
+      Mes[i]  := iMes;
+      Ano[i]  := iAno;
+      Horas[i] := obj.Model.FieldByName('TotalHoras').AsFloat;
+      Valor[i] := obj.Model.FieldByName('TotalValor').AsFloat;
+
+      MesAno[i] := FormatFloat('00', iMes) + '/' + IntToStr(iAno);
+
+      Inc(iMes);
+    end;
+
+    sHoras := SqlDouble(Valor[12]);
+    sHoras := Copy(sHoras, 1, Length(sHoras) -1);
+    if sHoras = '' then
+      sHoras := '0';
+
+    sb.Append('INSERT INTO Rel_Chamado_Temp(');
+    sb.Append('RelCha_Usuario,');
+    sb.Append('RelCha_Revenda,');
+    sb.Append('RelCha_Tipo,');
+    sb.Append('MES1,');
+    sb.Append('MES2,');
+    sb.Append('MES3,');
+    sb.Append('MES4,');
+    sb.Append('MES5,');
+    sb.Append('MES6,');
+    sb.Append('MES7,');
+    sb.Append('MES8,');
+    sb.Append('MES9,');
+    sb.Append('MES10,');
+    sb.Append('MES11,');
+    sb.Append('MES12,');
+    sb.Append('QTDE1,');
+    sb.Append('QTDE2,');
+    sb.Append('QTDE3,');
+    sb.Append('QTDE4,');
+    sb.Append('QTDE5,');
+    sb.Append('QTDE6,');
+    sb.Append('QTDE7,');
+    sb.Append('QTDE8,');
+    sb.Append('QTDE9,');
+    sb.Append('QTDE10,');
+    sb.Append('QTDE11,');
+    sb.Append('QTDE12,');
+    sb.Append('Horas1,');
+    sb.Append('Horas2,');
+    sb.Append('Horas3,');
+    sb.Append('Horas4,');
+    sb.Append('Horas5,');
+    sb.Append('Horas6,');
+    sb.Append('Horas7,');
+    sb.Append('Horas8,');
+    sb.Append('Horas9,');
+    sb.Append('Horas10,');
+    sb.Append('Horas11,');
+    sb.Append('Horas12,');
+    sb.Append('Valor1,');
+    sb.Append('Valor2,');
+    sb.Append('Valor3,');
+    sb.Append('Valor4,');
+    sb.Append('Valor5,');
+    sb.Append('Valor6,');
+    sb.Append('Valor7,');
+    sb.Append('Valor8,');
+    sb.Append('Valor9,');
+    sb.Append('Valor10,');
+    sb.Append('Valor11,');
+    sb.Append('Valor12');
+    sb.Append(') VALUES (');
+    sb.Append(SqlInt(AUsu_IdUsuario));
+    sb.Append(SqlInt(0));
+    sb.Append(SqlInt(0));
+    sb.Append(SqlString(MesAno[1]));
+    sb.Append(SqlString(MesAno[2]));
+    sb.Append(SqlString(MesAno[3]));
+    sb.Append(SqlString(MesAno[4]));
+    sb.Append(SqlString(MesAno[5]));
+    sb.Append(SqlString(MesAno[6]));
+    sb.Append(SqlString(MesAno[7]));
+    sb.Append(SqlString(MesAno[8]));
+    sb.Append(SqlString(MesAno[9]));
+    sb.Append(SqlString(MesAno[10]));
+    sb.Append(SqlString(MesAno[11]));
+    sb.Append(SqlString(MesAno[12]));
+    sb.Append(SqlInt(Qtde[1]));
+    sb.Append(SqlInt(Qtde[2]));
+    sb.Append(SqlInt(Qtde[3]));
+    sb.Append(SqlInt(Qtde[4]));
+    sb.Append(SqlInt(Qtde[5]));
+    sb.Append(SqlInt(Qtde[6]));
+    sb.Append(SqlInt(Qtde[7]));
+    sb.Append(SqlInt(Qtde[8]));
+    sb.Append(SqlInt(Qtde[9]));
+    sb.Append(SqlInt(Qtde[10]));
+    sb.Append(SqlInt(Qtde[11]));
+    sb.Append(SqlInt(Qtde[12]));
+    sb.Append(SqlDouble(Horas[1]));
+    sb.Append(SqlDouble(Horas[2]));
+    sb.Append(SqlDouble(Horas[3]));
+    sb.Append(SqlDouble(Horas[4]));
+    sb.Append(SqlDouble(Horas[5]));
+    sb.Append(SqlDouble(Horas[6]));
+    sb.Append(SqlDouble(Horas[7]));
+    sb.Append(SqlDouble(Horas[8]));
+    sb.Append(SqlDouble(Horas[9]));
+    sb.Append(SqlDouble(Horas[10]));
+    sb.Append(SqlDouble(Horas[11]));
+    sb.Append(SqlDouble(Horas[12]));
+    sb.Append(SqlDouble(Valor[1]));
+    sb.Append(SqlDouble(Valor[2]));
+    sb.Append(SqlDouble(Valor[3]));
+    sb.Append(SqlDouble(Valor[4]));
+    sb.Append(SqlDouble(Valor[5]));
+    sb.Append(SqlDouble(Valor[6]));
+    sb.Append(SqlDouble(Valor[7]));
+    sb.Append(SqlDouble(Valor[8]));
+    sb.Append(SqlDouble(Valor[9]));
+    sb.Append(SqlDouble(Valor[10]));
+    sb.Append(SqlDouble(Valor[11]));
+    sb.Append(sHoras + ')');
+
+    objInsert.ExecutarSQL(sb.ToString);
+
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(objInsert);
+    FreeAndNil(sb);
+  end;
+end;
+
+procedure TVisita.RelatorioModeloMeses_06(AFiltro: TFiltroVisita; AIdUsuario,
+  ATip_Id, ARev_Id: Integer);
+var
+  obj: TFireDAC;
+  objInsert: TFireDAC;
+  sConsulta: string;
+  Qtde: array[1..12] of Integer;
+  Horas: array[1..12] of Double;
+  Valor: array[1..12] of Double;
+  Mes: array[1..12] of Integer;
+  Ano: array[1..12] of Integer;
+  MesAno: array[1..12] of string;
+  sb: TStringBuilder;
+  sHoras: string;
+  iMes: Word;
+  iAno: Word;
+  i: Word;
+  sDataInicial: string;
+  sDataFinal: string;
+  sMesAnoFim: string;
+  sMesAno2: string;
+begin
+  sDataInicial := AFiltro.DataInicial;
+  sDataFinal := AFiltro.DataFinal;
+
+  iMes := MonthOf(StrToDate(sDataInicial));
+  iAno := YearOf(StrToDate(sDataInicial));
+
+  sMesAnoFim := '01/' + IntToStr(MonthOf(StrToDate(sDataFinal))) + '/' + IntToStr(YearOf(StrToDate(sDataFinal)));
+
+  for i := 1 to 12 do
+  begin
+    Qtde[i]   := 0;
+    Horas[i]  := 0;
+    Valor[i]  := 0;
+    Mes[i]    := 0;
+    Ano[i]    := 0;
+    MesAno[i] := '';
+  end;
+
+  AFiltro.DataInicial := DataEmBranco;
+  AFiltro.DataFinal := DataEmBranco;
+
+  sConsulta := ' WHERE Vis_Id > 0';
+  sConsulta := sConsulta + FiltrarRelatorio(AFiltro, AIdUsuario);
+
+  AFiltro.DataInicial := sDataInicial;
+  AFiltro.DataFinal := sDataFinal;
+
+  objInsert := TFireDAC.create;
+  obj := TFireDAC.create;
+  sb := TStringBuilder.Create;
+
+  try
+    for I := 1 to 12 do
+    begin
+
+      if iMes > 12 then
+      begin
+        iMes := 1;
+        Inc(iAno);
+      end;
+
+      sMesAno2 := '01/' + IntToStr(iMes) + '/' + IntToStr(iAno);
+
+      if StrToDate(sMesAno2) > StrToDate(sMesAnoFim) then
+      begin
+        break;
+//        inc(iMes);
+//        Continue;
+      end;
+
+      obj.Lista.Clear;
+
+      obj.Lista.Add(' SELECT');
+      obj.Lista.Add(' 	COUNT(Vis_Id) AS QtdeChamados,');
+      obj.Lista.Add(' 	SUM(Vis_TotalHoras) TotalHoras,');
+      obj.Lista.Add('   SUM(Vis_Valor) AS TotalValor');
+      obj.Lista.Add(' FROM Visita');
+      obj.Lista.Add(' 	INNER JOIN Cliente ON Vis_Cliente = Cli_Id');
+      obj.Lista.Add(' 	INNER JOIN Usuario ON Vis_Usuario  = Usu_Id');
+      obj.Lista.Add(' 	INNER JOIN Status ON Vis_Status = Sta_Id');
+      obj.Lista.Add(' 	INNER JOIN Tipo ON Vis_Tipo = Tip_Id');
+      obj.Lista.Add(' 	INNER JOIN Revenda ON Cli_Revenda = Rev_Id');
+      obj.Lista.Add(sConsulta);
+      obj.Lista.Add(' 	AND Tip_Codigo = ' + IntToStr(ATip_Id));
+      obj.Lista.Add('   AND Rev_Codigo = ' + IntToStr(ARev_Id));
+      obj.Lista.Add('   AND MONTH(Vis_Data) = ' + IntToStr(iMes));
+      obj.Lista.Add('   AND YEAR(Vis_Data) = ' + IntToStr(iAno));
+
+      obj.OpenSQL();
+
+      Qtde[i] := obj.Model.FieldByName('QtdeChamados').AsInteger;
+      Mes[i]  := iMes;
+      Ano[i]  := iAno;
+      Horas[i] := obj.Model.FieldByName('TotalHoras').AsFloat;
+      Valor[i] := obj.Model.FieldByName('TotalValor').AsFloat;
+
+      MesAno[i] := FormatFloat('00', iMes) + '/' + IntToStr(iAno);
+
+      Inc(iMes);
+    end;
+
+    sHoras := SqlDouble(Valor[12]);
+    sHoras := Copy(sHoras, 1, Length(sHoras) -1);
+    if sHoras = '' then
+      sHoras := '0';
+
+    sb.Append('INSERT INTO Rel_Chamado_Temp(');
+    sb.Append('RelCha_Usuario,');
+    sb.Append('RelCha_Revenda,');
+    sb.Append('RelCha_Tipo,');
+    sb.Append('MES1,');
+    sb.Append('MES2,');
+    sb.Append('MES3,');
+    sb.Append('MES4,');
+    sb.Append('MES5,');
+    sb.Append('MES6,');
+    sb.Append('MES7,');
+    sb.Append('MES8,');
+    sb.Append('MES9,');
+    sb.Append('MES10,');
+    sb.Append('MES11,');
+    sb.Append('MES12,');
+    sb.Append('QTDE1,');
+    sb.Append('QTDE2,');
+    sb.Append('QTDE3,');
+    sb.Append('QTDE4,');
+    sb.Append('QTDE5,');
+    sb.Append('QTDE6,');
+    sb.Append('QTDE7,');
+    sb.Append('QTDE8,');
+    sb.Append('QTDE9,');
+    sb.Append('QTDE10,');
+    sb.Append('QTDE11,');
+    sb.Append('QTDE12,');
+    sb.Append('Horas1,');
+    sb.Append('Horas2,');
+    sb.Append('Horas3,');
+    sb.Append('Horas4,');
+    sb.Append('Horas5,');
+    sb.Append('Horas6,');
+    sb.Append('Horas7,');
+    sb.Append('Horas8,');
+    sb.Append('Horas9,');
+    sb.Append('Horas10,');
+    sb.Append('Horas11,');
+    sb.Append('Horas12,');
+    sb.Append('Valor1,');
+    sb.Append('Valor2,');
+    sb.Append('Valor3,');
+    sb.Append('Valor4,');
+    sb.Append('Valor5,');
+    sb.Append('Valor6,');
+    sb.Append('Valor7,');
+    sb.Append('Valor8,');
+    sb.Append('Valor9,');
+    sb.Append('Valor10,');
+    sb.Append('Valor11,');
+    sb.Append('Valor12');
+    sb.Append(') VALUES (');
+    sb.Append(SqlInt(AIdUsuario));
+    sb.Append(SqlInt(ARev_Id));
+    sb.Append(SqlInt(ATip_Id));
+    sb.Append(SqlString(MesAno[1]));
+    sb.Append(SqlString(MesAno[2]));
+    sb.Append(SqlString(MesAno[3]));
+    sb.Append(SqlString(MesAno[4]));
+    sb.Append(SqlString(MesAno[5]));
+    sb.Append(SqlString(MesAno[6]));
+    sb.Append(SqlString(MesAno[7]));
+    sb.Append(SqlString(MesAno[8]));
+    sb.Append(SqlString(MesAno[9]));
+    sb.Append(SqlString(MesAno[10]));
+    sb.Append(SqlString(MesAno[11]));
+    sb.Append(SqlString(MesAno[12]));
+    sb.Append(SqlInt(Qtde[1]));
+    sb.Append(SqlInt(Qtde[2]));
+    sb.Append(SqlInt(Qtde[3]));
+    sb.Append(SqlInt(Qtde[4]));
+    sb.Append(SqlInt(Qtde[5]));
+    sb.Append(SqlInt(Qtde[6]));
+    sb.Append(SqlInt(Qtde[7]));
+    sb.Append(SqlInt(Qtde[8]));
+    sb.Append(SqlInt(Qtde[9]));
+    sb.Append(SqlInt(Qtde[10]));
+    sb.Append(SqlInt(Qtde[11]));
+    sb.Append(SqlInt(Qtde[12]));
+    sb.Append(SqlDouble(Horas[1]));
+    sb.Append(SqlDouble(Horas[2]));
+    sb.Append(SqlDouble(Horas[3]));
+    sb.Append(SqlDouble(Horas[4]));
+    sb.Append(SqlDouble(Horas[5]));
+    sb.Append(SqlDouble(Horas[6]));
+    sb.Append(SqlDouble(Horas[7]));
+    sb.Append(SqlDouble(Horas[8]));
+    sb.Append(SqlDouble(Horas[9]));
+    sb.Append(SqlDouble(Horas[10]));
+    sb.Append(SqlDouble(Horas[11]));
+    sb.Append(SqlDouble(Horas[12]));
+    sb.Append(SqlDouble(Valor[1]));
+    sb.Append(SqlDouble(Valor[2]));
+    sb.Append(SqlDouble(Valor[3]));
+    sb.Append(SqlDouble(Valor[4]));
+    sb.Append(SqlDouble(Valor[5]));
+    sb.Append(SqlDouble(Valor[6]));
+    sb.Append(SqlDouble(Valor[7]));
+    sb.Append(SqlDouble(Valor[8]));
+    sb.Append(SqlDouble(Valor[9]));
+    sb.Append(SqlDouble(Valor[10]));
+    sb.Append(SqlDouble(Valor[11]));
+    sb.Append(sHoras + ')');
+
+    objInsert.ExecutarSQL(sb.ToString);
+
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(objInsert);
+    FreeAndNil(sb);
+  end;
+end;
+
+function TVisita.RelatorioModelo_01(Filtro: TFiltroVisita;
+  IdUsuario: integer): string;
+var
+  sConsulta: string;
+  lRelatorio: TDMVisita;
+begin
+  sConsulta :=  ' WHERE Vis_Id > 0';
+  sConsulta := sConsulta + FiltrarRelatorio(Filtro, IdUsuario);
+  sConsulta := sConsulta + ' ORDER BY Cli_Nome, Cli_Codigo, Vis_Data';
+
+  lRelatorio := TDMVisita.Create(nil);
+  try
+    Result := lRelatorio.QRelVisitaModelo01.SQL.Text + sConsulta;
+  finally
+    FreeAndNil(lRelatorio);
+  end;
+end;
+
+function TVisita.RelatorioModelo_02(Filtro: TFiltroVisita; IdUsuario: integer;
+  Ordem: string): string;
+var
+  sConsulta: string;
+  lRelatorio: TDMVisita;
+//  Usuario: TUsuario;
+begin
+  sConsulta :=  ' WHERE Vis_Id > 0';
+  sConsulta := sConsulta + FiltrarRelatorio(Filtro, IdUsuario);
+//
+//  Usuario := TUsuario.Create;
+//  try
+//    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(IdUsuario);
+//  finally
+//    FreeAndNil(Usuario);
+//  end;
+//
+//  if Trim(Filtro.DataInicial) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Vis_Data >= ' + DataIngles(Filtro.DataInicial);
+//
+//  if Trim(Filtro.DataFinal) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Vis_Data <= ' + DataIngles(Filtro.DataFinal);
+//
+//  if Filtro.IdCliente <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Cliente IN' + Filtro.IdCliente;
+//
+//  if Filtro.IdTipo <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Tipo IN' + Filtro.IdTipo;
+//
+//  if Filtro.IdStatus <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Status IN' + Filtro.IdStatus;
+//
+//  if Filtro.IdUsuario <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Usuario IN' + Filtro.IdUsuario;
+//
+//  if Filtro.Revenda.IdStr <> '' then
+//    sConsulta := sConsulta + ' AND Rev_Id IN' + Filtro.Revenda.IdStr;
+//
+  sConsulta := sConsulta + 'GROUP BY	Cli_Codigo,	Cli_Nome,	Rev_Codigo,	Rev_Nome';
+
+  sConsulta := sConsulta + ' ORDER BY ' + Ordem;
+
+  lRelatorio := TDMVisita.Create(nil);
+  try
+    Result := lRelatorio.QRelVisitaModelo02.SQL.Text + sConsulta;
+  finally
+    FreeAndNil(lRelatorio);
+  end;
+end;
+
+function TVisita.RelatorioModelo_03(Filtro: TFiltroVisita; IdUsuario: integer;
+  Ordem: string): string;
+var
+  sConsulta: string;
+  lRelatorio: TDMVisita;
+//  Usuario: TUsuario;
+begin
+  sConsulta :=  ' WHERE Vis_Id > 0';
+  sConsulta := sConsulta + FiltrarRelatorio(Filtro, IdUsuario);
+
+//  Usuario := TUsuario.Create;
+//  try
+//    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(IdUsuario);
+//  finally
+//    FreeAndNil(Usuario);
+//  end;
+//
+//  if Trim(Filtro.DataInicial) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Vis_Data >= ' + DataIngles(Filtro.DataInicial);
+//
+//  if Trim(Filtro.DataFinal) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Vis_Data <= ' + DataIngles(Filtro.DataFinal);
+//
+//  if Filtro.IdCliente <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Cliente IN' + Filtro.IdCliente;
+//
+//  if Filtro.IdTipo <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Tipo IN' + Filtro.IdTipo;
+//
+//  if Filtro.IdStatus <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Status IN' + Filtro.IdStatus;
+//
+//  if Filtro.IdUsuario <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Usuario IN' + Filtro.IdUsuario;
+//
+//  if Filtro.Revenda.IdStr <> '' then
+//    sConsulta := sConsulta + ' AND Rev_Id IN' + Filtro.Revenda.IdStr;
+
+  sConsulta := sConsulta + 'GROUP BY Usu_Id, Usu_Codigo,	Usu_Nome';
+
+  sConsulta := sConsulta + ' ORDER BY ' + Ordem;
+
+  lRelatorio := TDMVisita.Create(nil);
+  try
+    Result := lRelatorio.QRelVisitaModelo03.SQL.Text + sConsulta;
+  finally
+    FreeAndNil(lRelatorio);
+  end;
+end;
+
+function TVisita.RelatorioModelo_04(Filtro: TFiltroVisita; IdUsuario: integer;
+  Ordem: string): string;
+var
+  sConsulta: string;
+  lRelatorio: TDMVisita;
+  Usuario: TUsuario;
+begin
+  sConsulta :=  ' WHERE Vis_Id > 0';
+  sConsulta := sConsulta + FiltrarRelatorio(Filtro, IdUsuario);
+//  Usuario := TUsuario.Create;
+//  try
+//    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(IdUsuario);
+//  finally
+//    FreeAndNil(Usuario);
+//  end;
+//
+//  if Trim(Filtro.DataInicial) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Vis_Data >= ' + DataIngles(Filtro.DataInicial);
+//
+//  if Trim(Filtro.DataFinal) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Vis_Data <= ' + DataIngles(Filtro.DataFinal);
+//
+//  if Filtro.IdCliente <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Cliente IN' + Filtro.IdCliente;
+//
+//  if Filtro.IdTipo <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Tipo IN' + Filtro.IdTipo;
+//
+//  if Filtro.IdStatus <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Status IN' + Filtro.IdStatus;
+//
+//  if Filtro.IdUsuario <> '' then
+//    sConsulta := sConsulta + ' AND Vis_Usuario IN' + Filtro.IdUsuario;
+//
+//  if Filtro.Revenda.IdStr <> '' then
+//    sConsulta := sConsulta + ' AND Rev_Id IN' + Filtro.Revenda.IdStr;
+
+  sConsulta := sConsulta + ' GROUP BY	Tip_Codigo,	Tip_Nome,	Rev_Codigo,	Rev_Nome';
+
+  sConsulta := sConsulta + ' ORDER BY ' + Ordem;
+
+
+  lRelatorio := TDMVisita.Create(nil);
+  try
+    Result := lRelatorio.QRelVisitaModelo04.SQL.Text + sConsulta;
+  finally
+    FreeAndNil(lRelatorio);
+  end;
+end;
+
+procedure TVisita.RelatorioModelo_05(Filtro: TFiltroVisita; IdUsuario: integer;
+  Ordem: string);
+var
+  sb: TStringBuilder;
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  sb := TStringBuilder.Create;
+  try
+    try
+      dm.StartTransacao();
+      obj.ExecutarSQL('DELETE FROM Rel_Chamado_Temp');
+
+      sb.Append(' SELECT');
+      sb.Append('   Usu_Id,');
+      sb.Append('   Usu_Codigo,');
+      sb.Append('   Usu_Nome,');
+      sb.Append('   COUNT(Vis_Id) AS QtdeChamados,');
+      sb.Append('   SUM(Vis_TotalHoras) TotalHoras,');
+      sb.Append('   SUM(Vis_Valor) AS TotalValor');
+      sb.Append(' FROM Visita');
+      sb.Append('   INNER JOIN Cliente ON Vis_Cliente = Cli_Id');
+      sb.Append('   INNER JOIN Status ON Vis_Status = Sta_Id');
+      sb.Append('   INNER JOIN Tipo ON Vis_Tipo = Tip_Id');
+      sb.Append('   INNER JOIN Usuario ON Vis_Usuario = Usu_Id');
+      sb.Append('   INNER JOIN Revenda ON Cli_Revenda = Rev_Id');
+      sb.Append(' WHERE Vis_Id > 0');
+      sb.Append( FiltrarRelatorio(Filtro, IdUsuario));
+      sb.Append(' GROUP BY');
+      sb.Append('   Usu_Id,');
+      sb.Append('   Usu_Codigo,');
+      sb.Append('   Usu_Nome');
+      sb.Append(' ORDER BY Usu_Nome');
+
+      obj.OpenSQL(sb.ToString());
+
+      while not obj.Model.Eof do
+      begin
+        RelatorioModeloMeses_05(Filtro, IdUsuario, obj.Model.FieldByName('Usu_Id').AsInteger);
+        obj.Model.Next;
+      end;
+      dm.Commit();
+    except
+      on E: Exception do
+      begin
+        dm.Roolback();
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(sb);
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TVisita.RelatorioModelo_06(Filtro: TFiltroVisita; IdUsuario: integer;
+  Ordem: string);
+var
+  sb: TStringBuilder;
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  sb := TStringBuilder.Create;
+  try
+    try
+      dm.StartTransacao();
+      obj.ExecutarSQL('DELETE FROM Rel_Chamado_Temp');
+
+      sb.Append(' SELECT');
+      sb.Append(' 	Tip_Id,');
+      sb.Append(' 	Rev_Id,');
+      sb.Append(' 	Tip_Codigo,');
+      sb.Append(' 	Tip_Nome,');
+      sb.Append(' 	Rev_Codigo,');
+      sb.Append(' 	Rev_Nome,');
+      sb.Append(' 	COUNT(Vis_Id) AS QtdeChamados,');
+      sb.Append(' 	SUM(Vis_TotalHoras) TotalHoras,');
+      sb.Append('   SUM(Vis_Valor) AS TotalValor');
+      sb.Append(' FROM Visita');
+      sb.Append(' 	INNER JOIN Cliente ON Vis_Cliente = Cli_Id');
+      sb.Append(' 	INNER JOIN Usuario ON Vis_Usuario  = Usu_Id');
+      sb.Append(' 	INNER JOIN Status ON Vis_Status = Sta_Id');
+      sb.Append(' 	INNER JOIN Tipo ON Vis_Tipo = Tip_Id');
+      sb.Append(' 	INNER JOIN Revenda ON Cli_Revenda = Rev_Id');
+      sb.Append(' WHERE Vis_Id > 0');
+      sb.Append( FiltrarRelatorio(Filtro, IdUsuario));
+      sb.Append(' GROUP BY');
+      sb.Append(' 	Tip_Codigo,');
+      sb.Append(' 	Tip_Nome,');
+      sb.Append(' 	Rev_Codigo,');
+      sb.Append(' 	Rev_Nome,');
+      sb.Append(' 	Tip_Id,');
+      sb.Append(' 	Rev_Id');
+      sb.Append(' ORDER BY Rev_Nome, Tip_Nome');
+
+      obj.OpenSQL(sb.ToString());
+
+      while not obj.Model.Eof do
+      begin
+        RelatorioModeloMeses_06(Filtro, IdUsuario, obj.Model.FieldByName('Tip_Codigo').AsInteger, obj.Model.FieldByName('Rev_Codigo').AsInteger);
+        obj.Model.Next;
+      end;
+      dm.Commit();
+    except
+      on E: Exception do
+      begin
+        dm.Roolback();
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(sb);
+    FreeAndNil(obj);
+  end;
+end;
+
+function TVisita.RelatorioModelo_07(AFiltro: TFiltroVisita;
+  AIdUsuario: Integer): TObjectList<TRelChamadoVO>;
+var
+  sb: TStringBuilder;
+  obj: TFireDAC;
+  model: TRelChamadoVO;
+  Lista: TObjectList<TRelChamadoVO>;
+  Usuario: TUsuario;
+  sFiltro: string;
+begin
+  sb := TStringBuilder.Create;
+  obj := TFireDAC.create;
+  Usuario := TUsuario.Create;
+  try
+    sb.AppendLine(' SELECT');
+    sb.AppendLine(' 	Rev_Codigo,');
+    sb.AppendLine(' 	Rev_Nome,');
+    sb.AppendLine(' 	Usu_Codigo,');
+    sb.AppendLine(' 	Usu_Nome,');
+    sb.AppendLine(' 	Cli_Codigo,');
+    sb.AppendLine(' 	Cli_Fantasia,');
+    sb.AppendLine(' 	Cli_Nome,');
+    sb.AppendLine(' 	Cli_Perfil,');
+    sb.AppendLine(' 	(dbo.Visita_Ultima(Cli_Id)) AS Dias_Sem_Visita,');
+
+    sb.AppendLine(' 	( ');
+    sb.AppendLine(' 		SELECT TOP(1) DATEDIFF(DAY, Cha_DataAbertura, CAST(GETDATE() AS date)) FROM Chamado ');
+    sb.AppendLine(' 			WHERE Cli_Id = Cha_Cliente ');
+    sb.AppendLine(' 			AND Cha_TipoMovimento = 1 ');
+    sb.AppendLine(' 			ORDER BY Cha_DataAbertura DESC ');
+    sb.AppendLine(' 	) AS Dias_Sem_Chamado, ');
+
+    sb.AppendLine(' 	( ');
+    sb.AppendLine(' 		SELECT TOP(1) Cha_DataAbertura FROM Chamado ');
+    sb.AppendLine(' 			WHERE Cli_Id = Cha_Cliente ');
+    sb.AppendLine(' 			AND Cha_TipoMovimento = 1 ');
+    sb.AppendLine(' 			ORDER BY Cha_DataAbertura DESC ');
+    sb.AppendLine(' 	) AS Data_Ultimo_Chamado ');
+
+    sb.AppendLine('  FROM Cliente ');
+    sb.AppendLine('  INNER JOIN Revenda ON Cli_Revenda = Rev_Id ');
+    sb.AppendLine('  LEFT JOIN Usuario ON Cli_Usuario = Usu_Id ');
+
+    sb.AppendLine('  WHERE EXISTS( ');
+    sb.AppendLine(' 	SELECT 1 FROM Visita ');
+    sb.AppendLine(' 	WHERE Cli_Id = Vis_Cliente ');
+    sb.AppendLine(' 	AND (dbo.Visita_Ultima(Cli_Id) >= ' + IntToStr(AFiltro.QtdeDias) + ')');
+    sb.AppendLine(')');
+    sb.AppendLine(' AND ((Cli_EmpresaVinculada IS NULL) OR (Cli_EmpresaVinculada = 0))');
+    sb.AppendLine(' AND Cli_Ativo = 1');
+
+    sFiltro := FiltroRelatorio(AFiltro);    sb.AppendLine(sFiltro);
+
+    sb.Append(Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario));
+
+
+    sb.AppendLine(' UNION ');
+    sb.AppendLine('  SELECT ');
+    sb.AppendLine('  	Rev_Codigo, ');
+    sb.AppendLine('  	Rev_Nome, ');
+    sb.AppendLine('  	Usu_Codigo, ');
+    sb.AppendLine('  	Usu_Nome, ');
+    sb.AppendLine('  	Cli_Codigo, ');
+    sb.AppendLine('  	Cli_Fantasia, ');
+    sb.AppendLine('  	Cli_Nome, ');
+    sb.AppendLine(' 	0 AS Dias_Sem_Visita, ');
+
+    sb.AppendLine(' 	( ');
+    sb.AppendLine(' 		SELECT TOP(1) DATEDIFF(DAY, Cha_DataAbertura, CAST(GETDATE() AS date)) FROM Chamado ');
+    sb.AppendLine(' 			WHERE Cli_Id = Cha_Cliente ');
+    sb.AppendLine(' 			AND Cha_TipoMovimento = 1 ');
+    sb.AppendLine(' 			ORDER BY Cha_DataAbertura DESC ');
+    sb.AppendLine(' 	) AS Dias_Sem_Chamado, ');
+
+    sb.AppendLine(' 	( ');
+    sb.AppendLine(' 		SELECT TOP(1) Cha_DataAbertura FROM Chamado ');
+    sb.AppendLine(' 			WHERE Cli_Id = Cha_Cliente ');
+    sb.AppendLine(' 			AND Cha_TipoMovimento = 1 ');
+    sb.AppendLine(' 			ORDER BY Cha_DataAbertura DESC ');
+    sb.AppendLine(' 	) AS Data_Ultimo_Chamado ');
+
+    sb.AppendLine('  FROM Cliente ');
+    sb.AppendLine('   INNER JOIN Revenda ON Cli_Revenda = Rev_Id ');
+    sb.AppendLine('   LEFT JOIN Usuario ON Cli_Usuario = Usu_Id ');
+    sb.AppendLine(' 	WHERE NOT EXISTS ');
+    sb.AppendLine(' 	( ');
+    sb.AppendLine(' 		SELECT 1 FROM Visita WHERE Cli_Id = Vis_Cliente ');
+    sb.AppendLine(' 	) ');
+    sb.AppendLine('   AND Cli_Ativo = 1');
+    sb.AppendLine(' AND ((Cli_EmpresaVinculada IS NULL) OR (Cli_EmpresaVinculada = 0))');
+    sb.AppendLine(sFiltro);
+    sb.Append(Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario));
+
+    sb.AppendLine(' 	ORDER BY Rev_Nome, Rev_Codigo ASC, Dias_Sem_Visita DESC, Cli_Nome ASC ');
+
+    obj.OpenSQL(sb.ToString);
+
+    Lista := TObjectList<TRelChamadoVO>.Create;
+
+    while not obj.Model.Eof do
+    begin
+      model := TRelChamadoVO.Create;
+      model.RevendaCodigo := obj.Model.FieldByName('Rev_Codigo').AsInteger;
+      model.RevendaNome := obj.Model.FieldByName('Rev_Nome').AsString;
+      model.ClienteCodigo := obj.Model.FieldByName('Cli_Codigo').AsInteger;
+      model.ClienteNome := obj.Model.FieldByName('Cli_Nome').AsString;
+      model.UsuCodigo := obj.Model.FieldByName('Usu_Codigo').AsInteger;
+      model.UsuNome := obj.Model.FieldByName('Usu_Nome').AsString;
+      model.QtdeDiasSemVisita := obj.Model.FieldByName('Dias_Sem_Visita').AsInteger;
+      model.QtdeDiasSemChamado := obj.Model.FieldByName('Dias_Sem_Chamado').AsInteger;
+
+      if obj.Model.FieldByName('Data_Ultimo_Chamado').AsDateTime > StrToDate('01/01/1900') then
+        model.DataUltChamado := obj.Model.FieldByName('Data_Ultimo_Chamado').AsString
+      else
+        model.DataUltChamado := '';
+
+      Lista.Add(model);
+      obj.Model.Next;
+    end;
+    Result := Lista;
+  finally
+    FreeAndNil(sb);
+    FreeAndNil(obj);
+    FreeAndNil(Usuario);
+  end;
+end;
+
+procedure TVisita.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TVisita.SqlDouble(AValor: Double): string;
+var
+  sValor: string;
+begin
+  sValor := FloatToStr(AValor);
+  sValor := TFuncoes.TrocaCaracter(sValor, '.', '');
+  sValor := TFuncoes.TrocaCaracter(sValor, ',', '.');
+  Result := sValor + ',';
+end;
+
+function TVisita.SqlInt(AValor: Integer): string;
+var
+  sValor: string;
+begin
+  sValor := IntToStr(AValor);
+  sValor := TFuncoes.TrocaCaracter(sValor, '.', '');
+  sValor := TFuncoes.TrocaCaracter(sValor, ',', '.');
+  Result := sValor + ',';
+end;
+
+function TVisita.SqlString(AValor: string): string;
+begin
+  Result := QuotedStr(AValor) + ',';
+end;
+
+function TVisita.UsuarioIgualCadastro(AId, AIdUsuario,
+  ATipoOperacao: Integer): Boolean;
+var
+  obj: TFireDAC;
+begin
+{
+   ATipoOperacao = 2-Edicao 3-Exclusao
+}
+  Result := True;
+  if (ATipoOperacao = 2) or (ATipoOperacao = 3) then
+  begin
+    obj := TFireDAC.create;
+    try
+      obj.OpenSQL('SELECT Vis_Usuario FROM VISITA WHERE Vis_Id = ' + IntToStr(AId));
+      Result  := (obj.Model.FieldByName('Vis_Usuario').AsInteger = AIdUsuario);
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+end.

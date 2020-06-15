@@ -1,0 +1,952 @@
+unit uLerXML;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, StdCtrls,  shellAPI, xmldom, XMLIntf,
+  msxmldom, XMLDoc, uClienteVO, System.Generics.Collections, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, Vcl.FileCtrl, uDM, uParametros,
+  uGenericDAO, uCliente, uContatoVO, uCidadeVO,
+  uClienteEmail, uClienteEmailVO, uProdutoVO, uContato, uClienteModuloVO;
+
+const
+  QUEBRA_LINHA: string = #13 + #10;
+
+type
+  TLerXML = class
+  private
+    FArquivo: string;
+    procedure GravarModulo(listaModulo: TObjectList<TClienteModuloVO>);
+    procedure GravarProduto(listaModulo: TObjectList<TClienteModuloVO>);
+    procedure GravarCliente(Cliente: TClienteVO);
+    procedure GravarClienteII(Cliente: TClienteVO);
+    function GravarCidade(Cliente: TClienteVO): Integer;
+//    procedure GravarEmails(Cliente: TClienteVO; listaEmail: TObjectList<TEmailVO>);
+    procedure GravarModuloProduto(Cliente: TClienteVO);
+
+    function LocalizarClienteCodigo(Codigo: integer): Integer;
+    function LocalizarModuloCodigo(Codigo: integer): Integer;
+    function LocalizarProdutoCodigo(Codigo: integer): Integer;
+    function LocalizarUsuarioCodigo(Codigo: Integer): Integer;
+    function LocalizarRevendaCodigo(Codigo: Integer): Integer;
+    function LocalizarCidadeCodigo(Codigo: integer): Integer;
+
+    procedure ExcluirEmail(IdCliente: integer);
+    procedure ExcluirModuloProduto(IdCliente: integer);
+
+    function ValidarArquivo(cliente: TClienteVO;
+        listaModulo: TObjectList<TModuloVO>): Boolean;
+    procedure GravarDados(cliente: TClienteVO; listaModulo: TObjectList<TModuloVO>);
+    procedure GravarDadosClientes(cliente: TClienteVO);
+
+    procedure CriarArquivoLogs(ListagemErros: TList<string>);
+    procedure ExcluirArquivoXML;
+    function SomenteNumeros(Valor: string): string;
+    procedure LerArquivoXML;
+  public
+    procedure ListarArquivos(Formulario: TForm);
+  end;
+
+implementation
+
+{ TLerXML }
+
+uses uClassValidacao;
+
+procedure TLerXML.CriarArquivoLogs(ListagemErros: TList<string>);
+var
+  Arq: Text;
+  sCaminho: string;
+  sArquivo: string;
+  i: Integer;
+begin
+  sCaminho := ExtractFilePath(FArquivo);
+  sArquivo := ExtractFileName(FArquivo);
+  sArquivo := Copy(sArquivo, 1, Length(sArquivo) -3);
+  sArquivo := sArquivo + 'log';
+
+  if DirectoryExists(sCaminho) then
+  begin
+    try
+      AssignFile(Arq, sCaminho + '\' + sArquivo);
+      Rewrite(Arq);
+
+      for I := 0 to ListagemErros.count -1 do
+        Writeln(Arq, ListagemErros[i]);
+    finally
+      CloseFile(Arq);
+    end;
+  end;
+end;
+
+procedure TLerXML.ExcluirArquivoXML;
+begin
+  if FileExists(FArquivo) then
+    DeleteFile(FArquivo);
+end;
+
+procedure TLerXML.ExcluirEmail(IdCliente: integer);
+var
+//  Qry: TFDQuery;
+  obj: TClienteEmail;
+begin
+  obj := TClienteEmail.Create;
+  try
+    obj.ExcluirRegistrosCliente(IdCliente);
+  finally
+    FreeAndNil(obj);
+  end;
+
+//  Qry := TFDQuery.Create(nil);
+//  try
+//    Qry.Connection := DM.Conexao;
+//    Qry.SQL.Text := 'DELETE FROM Cliente_Email WHERE CliEm_Cliente = ' + IdCliente.ToString();
+//    Qry.ExecSQL();
+//  finally
+//    FreeAndNil(Qry);
+//  end;
+end;
+
+procedure TLerXML.ExcluirModuloProduto(IdCliente: integer);
+var
+  Qry: TFDQuery;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'DELETE FROM Cliente_Modulo WHERE CliMod_Cliente = ' + IdCliente.ToString();
+    Qry.ExecSQL();
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+procedure TLerXML.GravarCliente(Cliente: TClienteVO);
+var
+  Qry: TFDQuery;
+  sContato: string;
+  sUsuario: string;
+  sEndereco: string;
+  IdRevenda: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.add(' EXECUTE Cliente_sp_IncluirAlterar');
+    Qry.SQL.add(' :Codigo,');
+    Qry.SQL.add(' :Nome,');
+    Qry.SQL.add(' :Fantasia,');
+    Qry.SQL.add(' :Dcto,');
+    Qry.SQL.add(' :Enquadramento,');
+    Qry.SQL.add(' :Endereco,');
+    Qry.SQL.add(' :Telefone,');
+    Qry.SQL.add(' :Contato,');
+    Qry.SQL.add(' :Revenda,');
+    Qry.SQL.add(' :Restricao,');
+    Qry.SQL.add(' :Ativo,');
+    Qry.SQL.add(' :Usuario');
+
+    if Cliente.Codigo > 0 then
+    begin
+      sEndereco := Cliente.Rua;
+      if Cliente.Bairro <> '' then
+        sEndereco := sEndereco + QUEBRA_LINHA + Cliente.Bairro;
+      if Cliente.CEP <> '' then
+        sEndereco := sEndereco + QUEBRA_LINHA + Cliente.CEP;
+      if Cliente.Cidade <> '' then
+        sEndereco := sEndereco + QUEBRA_LINHA + Cliente.Cidade;
+
+      sContato := Cliente.ContatoFinanceiro;
+      if Cliente.ContatoCompraVenda <> '' then
+        sContato := sContato + QUEBRA_LINHA + Cliente.ContatoCompraVenda;
+
+      sUsuario := '';
+      if Cliente.Usuario > 0 then
+        sUsuario := IntToStr(LocalizarUsuarioCodigo(Cliente.Usuario));
+
+      IdRevenda := LocalizarRevendaCodigo(Cliente.Revenda);
+
+      Qry.Close;
+      Qry.ParamByName('Codigo').AsInteger := Cliente.Codigo;
+      Qry.ParamByName('Nome').AsString := Cliente.RazaoSocial;
+      Qry.ParamByName('Fantasia').AsString := Cliente.NomeFantasia;
+      Qry.ParamByName('Dcto').AsString := Cliente.CNPJ;
+      Qry.ParamByName('Enquadramento').AsString := Cliente.Enquadramento;
+      Qry.ParamByName('Endereco').AsString := sEndereco;
+      Qry.ParamByName('Telefone').AsString := Cliente.Telefone;
+      Qry.ParamByName('Contato').AsString := sContato;
+      Qry.ParamByName('Revenda').AsInteger := IdRevenda;
+      Qry.ParamByName('Restricao').AsBoolean := (Cliente.PendenciaFinanceira = 'S');
+      Qry.ParamByName('Ativo').AsBoolean := (Cliente.Situacao = 'A');
+      Qry.ParamByName('Usuario').AsString := sUsuario;
+
+      Qry.ExecSQL();
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+procedure TLerXML.GravarClienteII(Cliente: TClienteVO);
+var
+  objCliente: TCliente;
+  objClienteEmail: TClienteEmail;
+  objClienteContato: TContato;
+begin
+  Cliente.Id := LocalizarClienteCodigo(Cliente.Codigo);
+  Cliente.IdRevenda := LocalizarRevendaCodigo(Cliente.Revenda);
+
+  if Cliente.Usuario > 0 then
+    Cliente.Usuario := LocalizarUsuarioCodigo(Cliente.Usuario);
+
+  if Cliente.CidadeVO.Codigo > 0 then
+    Cliente.IdCidade := GravarCidade(Cliente);
+
+  cliente.Ativo     := (Cliente.Situacao = 'A');
+  Cliente.Restricao := (Cliente.PendenciaFinanceira = 'S');
+
+  if Cliente.Id > 0 then
+  begin
+    objClienteEmail := TClienteEmail.Create;
+    objClienteContato := TContato.Create;
+    try
+      objClienteEmail.ExcluirRegistrosCliente(Cliente.Id);
+      objClienteContato.ExcluirPorCliente(Cliente.Id);
+    finally
+      FreeAndNil(objClienteEmail);
+      FreeAndNil(objClienteContato);
+    end;
+  end;
+
+  objCliente := TCliente.Create;
+  try
+    Cliente.Id := objCliente.Salvar(Cliente);
+  finally
+    FreeAndNil(objCliente);
+  end;
+
+end;
+
+function TLerXML.GravarCidade(Cliente: TClienteVO): Integer;
+begin
+  Cliente.CidadeVO.Id := LocalizarCidadeCodigo(Cliente.CidadeVO.Codigo);
+  Result := TGenericDAO.Save<TCidadeVO>(Cliente.CidadeVO);
+end;
+
+procedure TLerXML.GravarDados(cliente: TClienteVO; listaModulo: TObjectList<TModuloVO>);
+begin
+//  GravarModulo(listaModulo);
+//  GravarProduto(listaModulo);
+//  GravarCidade(cliente);
+//  GravarClienteII(cliente);
+//  GravarModuloProduto(Cliente, listaModulo);
+end;
+
+procedure TLerXML.GravarDadosClientes(cliente: TClienteVO);
+begin
+  GravarModulo(cliente.ClienteModulo);
+  GravarProduto(cliente.ClienteModulo);
+  GravarCidade(cliente);
+  GravarClienteII(cliente);
+  GravarModuloProduto(Cliente);
+end;
+
+//procedure TLerXML.GravarEmails(Cliente: TClienteVO; listaEmail: TObjectList<TEmailVO>);
+//var
+//  Qry: TFDQuery;
+//  i: Integer;
+//  iCont: Integer;
+//begin
+//  if listaEmail = nil then
+//  begin
+//    ExcluirEmail(Cliente.Id);
+//    Exit;
+//  end;
+//
+//  Qry := TFDQuery.Create(nil);
+//  try
+//    Qry.Connection := dm.Conexao;
+//    Qry.SQL.Add('INSERT INTO Cliente_Email(CliEm_Cliente, CliEm_Email, CliEm_Notificar)');
+//    Qry.SQL.Add(' VALUES(:IdCliente, :Email, :Notificar)');
+//
+//    iCont := listaEmail.Count;
+//
+//    if iCont > 0 then
+//      ExcluirEmail(Cliente.Id);
+//
+//    for I := 0 to iCont -1 do
+//    begin
+//      if I > 50 then
+//        Break;
+//
+//      if listaEmail[i].Email.Trim <> '' then
+//      begin
+//        if Cliente.Id > 0 then
+//        begin
+//          Qry.Close;
+//          Qry.ParamByName('IdCliente').AsInteger := Cliente.Id;
+//          Qry.ParamByName('Email').AsString := listaEmail[i].Email;
+//          Qry.ParamByName('Notificar').AsBoolean := True;
+//          Qry.ExecSQL();
+//        end;
+//      end;
+//    end;
+//  finally
+//    FreeAndNil(Qry);
+//  end;
+//end;
+
+procedure TLerXML.GravarModulo(listaModulo: TObjectList<TClienteModuloVO>);
+var
+  Qry: TFDQuery;
+//  i: Integer;
+//  iCont: Integer;
+  Item: TClienteModuloVO;
+begin
+  if listaModulo = nil then
+    Exit;
+
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'EXECUTE Modulo_sp_IncluirAlterar :Codigo, :Nome';
+
+    for Item in listaModulo do
+    begin
+      if Item.Modulo.Codigo > 0 then
+      begin
+        Qry.Close;
+        Qry.ParamByName('Codigo').AsInteger := Item.Modulo.Codigo;
+        Qry.ParamByName('Nome').AsString := Item.Modulo.Nome;
+        Qry.ExecSQL();
+      end;
+    end;
+
+//    iCont := listaModulo.Count;
+//    for I := 0 to iCont -1 do
+//    begin
+//      if listaModulo[i].CodigoModulo > 0 then
+//      begin
+//        Qry.Close;
+//        Qry.ParamByName('Codigo').AsInteger := listaModulo[i].CodigoModulo;
+//        Qry.ParamByName('Nome').AsString := listaModulo[i].NomeModulo;
+//        Qry.ExecSQL();
+//      end;
+//    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+procedure TLerXML.GravarModuloProduto(Cliente: TClienteVO);
+var
+  Qry: TFDQuery;
+//  i: Integer;
+  iCont: Integer;
+  IdModulo: Integer;
+  IdProduto: Integer;
+  Item: TClienteModuloVO;
+//  ClienteModulo: TClienteModuloVO;
+//  objClienteModulo: TClienteModulo;
+begin
+  if Cliente.ClienteModulo = nil then
+  begin
+    ExcluirModuloProduto(Cliente.Id);
+    Exit;
+  end;
+
+//  objClienteModulo := TClienteModulo.create;
+//  try
+//    for ClienteModulo in Cliente.ClienteModulo do
+//    begin
+//      ClienteModulo.IdCliente := Cliente.Id;
+//      objClienteModulo.Salvar(ClienteModulo);
+//    end;
+//  finally
+//    FreeAndNil(objClienteModulo);
+//  end;
+
+
+
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Add('INSERT INTO Cliente_Modulo(CliMod_Modulo, CliMod_Produto, CliMod_Cliente)');
+    Qry.SQL.Add(' VALUES(:IdModulo, :IdProduto, :IdCliente)');
+
+    iCont := Cliente.ClienteModulo.Count;
+
+    if iCont > 0 then
+        ExcluirModuloProduto(Cliente.Id);
+    try
+      for Item in Cliente.ClienteModulo do
+      begin
+        if (Item.Modulo.Codigo > 0) then
+        begin
+          if (Cliente.Id > 0) then
+          begin
+            IdModulo  := LocalizarModuloCodigo(Item.Modulo.Codigo);
+            IdProduto := LocalizarProdutoCodigo(Item.Produto.Codigo);
+
+            if (IdModulo > 0) then
+            begin
+              Qry.Close;
+              Qry.ParamByName('IdCliente').AsInteger := Cliente.Id;
+              Qry.ParamByName('IdModulo').AsInteger := IdModulo;
+
+              if IdProduto > 0 then
+                Qry.ParamByName('IdProduto').AsInteger := IdProduto
+              else begin
+                Qry.ParamByName('IdProduto').DataType := ftInteger;
+                Qry.ParamByName('IdProduto').Value := null;
+              end;
+              Qry.ExecSQL();
+            end;
+          end;
+        end;
+      end;
+    except
+      On E: Exception do
+      begin
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+
+
+//    iCont := listaModulo.Count;
+//
+//    try
+//      for I := 0 to iCont -1 do
+//      begin
+//        if listaModulo[i].CodigoModulo > 0 then
+//        begin
+//          if Cliente.Id > 0 then
+//          begin
+//
+//            IdModulo  := LocalizarModuloCodigo(listaModulo[i].CodigoModulo);
+//            IdProduto := LocalizarProdutoCodigo(listaModulo[i].CodigoProduto);
+//
+//            if (IdModulo > 0) then
+//            begin
+//              Qry.Close;
+//              Qry.ParamByName('IdCliente').AsInteger := Cliente.Id;
+//              Qry.ParamByName('IdModulo').AsInteger := IdModulo;
+//
+//              if IdProduto > 0 then
+//                Qry.ParamByName('IdProduto').AsInteger := IdProduto
+//              else begin
+//                Qry.ParamByName('IdProduto').DataType := ftInteger;
+//                Qry.ParamByName('IdProduto').Value := null;
+//              end;
+//              Qry.ExecSQL();
+//            end;
+//          end;
+//        end;
+//      end;
+//    except
+//      On E: Exception do
+//      begin
+//        raise Exception.Create(E.Message);
+//      end;
+//    end;
+//  finally
+//    FreeAndNil(Qry);
+//  end;
+end;
+
+procedure TLerXML.GravarProduto(listaModulo: TObjectList<TClienteModuloVO>);
+var
+  Qry: TFDQuery;
+//  i: Integer;
+//  iCont: Integer;
+  Item: TClienteModuloVO;
+begin
+  if listaModulo = nil then
+    Exit;
+
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'EXECUTE Produto_sp_IncluirAlterar :Codigo, :Nome';
+
+    for Item in listaModulo do
+    begin
+      if Item.Produto.Codigo > 0 then
+      begin
+        Qry.Close;
+        Qry.ParamByName('Codigo').AsInteger := Item.Produto.Codigo;
+        Qry.ParamByName('Nome').AsString := Item.Produto.Nome;
+        Qry.ExecSQL();
+      end;
+    end;
+
+//    iCont := listaModulo.Count;
+//    for I := 0 to iCont -1 do
+//    begin
+//      if listaModulo[i].CodigoProduto > 0 then
+//      begin
+//        Qry.Close;
+//        Qry.ParamByName('Codigo').AsInteger := listaModulo[i].CodigoProduto;
+//        Qry.ParamByName('Nome').AsString := listaModulo[i].NomeProduto;
+//        Qry.ExecSQL();
+//      end;
+//    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+procedure TLerXML.LerArquivoXML();
+var
+  XMLDoc: IXMLDocument;
+  nCliente,
+  nPrincipal,
+  nEmail,
+  nModulo,
+  nContato: IXMLNode;
+
+  iContador,
+  iCodigoProduto,
+  iCodigoModulo: Integer;
+
+  sEmail: string;
+  sDocumento: string;
+  sEnquadramento: string;
+
+  ListaModulo: TObjectList<TModuloVO>;
+  ClienteEmailVO: TClienteEmailVO;
+  Modulo: TModuloVO;
+  objEmail: TEmailVO;
+  Cliente: TClienteVO;
+  Contato: TContatoVO;
+  sDiretorio: string;
+  sArquivoXML: string;
+  sArquivoLog: string;
+  iPosicao: Integer;
+  i: Integer;
+  sNomeContato: string;
+  bAchouEmail: Boolean;
+  iCount: Integer;
+begin
+  if not (FileExists(FArquivo)) then
+    Exit;
+
+  sDiretorio := ExtractFilePath(FArquivo);
+  sArquivoXML := ExtractFileName(FArquivo);
+
+  iPosicao := Pos('.', sArquivoXML);
+  sArquivoLog := Copy(sArquivoXML, 1, iPosicao) + 'log';
+
+  if FileExists(sDiretorio + sArquivoLog) then
+    Exit;
+
+  XMLDoc := TXMLDocument.Create(nil);
+  XMLDoc.Active := True;
+  XMLDoc.LoadFromFile(FArquivo);
+
+//    nCliente := XMLDoc.DocumentElement.ChildNodes.FindNode('Cliente');
+//==============================================================================
+// dados do cliente
+//==============================================================================
+  Cliente := TClienteVO.Create;
+  try
+    nPrincipal := XMLDoc.DocumentElement.ChildNodes.FindNode('Principal');
+
+    sDocumento := nPrincipal.ChildNodes['CNPJ'].Text;
+    if sDocumento = '' then
+      sDocumento := nPrincipal.ChildNodes['CPF'].Text;
+
+    sEnquadramento := nPrincipal.ChildNodes['Enquadramento'].Text;
+
+    if (sEnquadramento <> '01') and (sEnquadramento <> '02') and (sEnquadramento <> '03') then
+      sEnquadramento := '00';
+
+    Cliente.Codigo              := StrToIntDef(nPrincipal.ChildNodes['Codigo'].Text, 0);
+    Cliente.RazaoSocial         := nPrincipal.ChildNodes['Razao'].Text;
+    Cliente.NomeFantasia        := nPrincipal.ChildNodes['Fantasia'].Text;
+    Cliente.CNPJ                := sDocumento;
+    Cliente.Enquadramento       := sEnquadramento;
+    Cliente.Rua                 := nPrincipal.ChildNodes['Rua'].Text;
+    Cliente.Bairro              := nPrincipal.ChildNodes['Bairro'].Text;
+    Cliente.CEP                 := nPrincipal.ChildNodes['CEP'].Text;
+    Cliente.Cidade              := nPrincipal.ChildNodes['Cidade'].Text;
+    Cliente.Telefone            := nPrincipal.ChildNodes['Telefone'].Text;
+    Cliente.ContatoFinanceiro   := nPrincipal.ChildNodes['Contato_Financeiro'].Text;
+    Cliente.ContatoCompraVenda  := nPrincipal.ChildNodes['Contato_Compra_Venda'].Text;
+    Cliente.Usuario             := StrToIntDef(nPrincipal.ChildNodes['Consultor'].Text,0);
+    Cliente.Revenda             := StrToIntDef(nPrincipal.ChildNodes['Revenda'].Text,0);
+    Cliente.PendenciaFinanceira := nPrincipal.ChildNodes['Pendencia_Fin'].Text;
+    Cliente.Situacao            := nPrincipal.ChildNodes['Situacao'].Text;
+//==============================================================================
+// Novos campos
+
+    Cliente.Logradouro            := Cliente.Rua;
+    Cliente.Fone1                 := nPrincipal.ChildNodes['Fone1'].Text;
+    Cliente.Fone2                 := nPrincipal.ChildNodes['Fone2'].Text;
+    Cliente.Celular               := nPrincipal.ChildNodes['Celular'].Text;
+    Cliente.OutroTelefone         := nPrincipal.ChildNodes['OutroFone'].Text;
+    Cliente.ContatoFinanceiroFone := nPrincipal.ChildNodes['Contato_Financeiro_Fone'].Text;
+    Cliente.ContatoCompraVendaFone:= nPrincipal.ChildNodes['Contato_Compra_Venda_Fone'].Text;
+    Cliente.IE                    := nPrincipal.ChildNodes['IE'].Text;
+    Cliente.RepresentanteLegal    := nPrincipal.ChildNodes['Representante_Legal'].Text;
+    Cliente.RepresentanteLegalCPF := nPrincipal.ChildNodes['Representante_Legal_CPF'].Text;
+//==============================================================================
+// dados da cidade
+
+    Cliente.CidadeVO.Codigo := StrToIntDef(nPrincipal.ChildNodes['Codigo_IBGE'].Text,0);
+    Cliente.CidadeVO.Nome   := nPrincipal.ChildNodes['Nome_Cidade'].Text;
+    Cliente.CidadeVO.UF     := nPrincipal.ChildNodes['UF'].Text;
+    Cliente.CidadeVO.Ativo  := true;
+//==============================================================================
+// dados dos emails
+
+    nEmail := XMLDoc.DocumentElement.ChildNodes.FindNode('Registro_EMail');
+    if nEmail <> nil then
+    begin
+      iContador := 0;
+      nEmail.ChildNodes.First;
+      repeat
+        if iContador = 0 then
+          sEmail :=  nEmail.ChildNodes['Email'].Text
+        else
+          sEmail :=  nEmail.ChildNodes['Email' + iContador.ToString].Text;
+
+        if trim(sEmail) = '' then
+          break;
+
+        ClienteEmailVO := TClienteEmailVO.Create;
+        ClienteEmailVO.Id         := 0;
+        ClienteEmailVO.IdCliente  := Cliente.Id;
+        ClienteEmailVO.Email      := sEmail;
+        ClienteEmailVO.Notificar  := True;
+
+        if not Cliente.ClienteEmail.Contains(ClienteEmailVO) then
+          Cliente.ClienteEmail.Add(ClienteEmailVO);
+
+        if iContador >= 50 then
+          break;
+
+        inc(iContador);
+//        nEmail := nEmail.NextSibling;
+      until nEmail = nil;
+    end;
+//==============================================================================
+// dados dos Módulos e Produtos
+
+    nModulo := XMLDoc.DocumentElement.ChildNodes.FindNode('Registro_Modulo');
+    if nModulo <> nil then
+    begin
+      ListaModulo := TObjectList<TModuloVO>.Create();
+      iContador := 1;
+      nModulo.ChildNodes.First;
+      repeat
+        iCodigoModulo  := StrToIntDef(nModulo.ChildNodes['Cod_Grupo' + iContador.ToString].Text,0);
+        iCodigoProduto := StrToIntDef(nModulo.ChildNodes['Cod_Produto' + iContador.ToString].Text,0);
+
+        if (iCodigoModulo = 0) then
+          Break;
+
+        if iContador > 50 then
+          Break;
+
+        Modulo := TModuloVO.Create;
+        Modulo.CodigoModulo  := iCodigoModulo;
+        Modulo.CodigoProduto := iCodigoProduto;
+        Modulo.NomeModulo    := nModulo.ChildNodes['Nome_Grupo' + iContador.ToString].Text;
+        Modulo.NomeProduto   := nModulo.ChildNodes['Nome_Produto' + iContador.ToString].Text;
+        ListaModulo.Add(Modulo);
+
+        Inc(iContador);
+//        nModulo := nModulo.NextSibling;
+      until nModulo = nil;
+    end;
+
+//==============================================================================
+// Contatos
+
+    nContato := XMLDoc.DocumentElement.ChildNodes.FindNode('Registro_Contato');
+    if nContato <> nil then
+    begin
+      iContador := 1;
+      nContato.ChildNodes.First;
+      repeat
+
+        if iContador > 50 then
+          Break;
+
+        sNomeContato := nContato.ChildNodes['Contato_Nome' + iContador.ToString].Text;
+        if Trim(sNomeContato) = '' then
+          Break;
+
+        Contato := TContatoVO.Create;
+        Contato.Nome          := nContato.ChildNodes['Contato_Nome' + iContador.ToString].Text;
+        Contato.Fone1         := nContato.ChildNodes['Contato_Fone1' + iContador.ToString].Text;
+        Contato.Fone2         := nContato.ChildNodes['Contato_Fone2' + iContador.ToString].Text;
+        Contato.Departamento  := nContato.ChildNodes['Contato_Depto' + iContador.ToString].Text;
+        Contato.Email         := nContato.ChildNodes['Contato_Email' + iContador.ToString].Text;
+
+        Cliente.ListaContatoVO.Add(Contato);
+        Inc(iContador);
+
+      until nContato = nil;
+    end;
+
+//==============================================================================
+// Validar e gravar dados
+
+    if ValidarArquivo(Cliente, ListaModulo) then
+      GravarDadosClientes(Cliente);
+//      GravarDados(Cliente, ListaModulo);
+  finally
+    if Cliente <> nil then
+      FreeAndNil(Cliente);
+
+    if ListaModulo <> nil then
+      FreeAndNil(ListaModulo);
+  end;
+end;
+
+
+procedure TLerXML.ListarArquivos(Formulario: TForm);
+var
+  Lista: TFileListBox;
+  I: Integer;
+  sDiretorio: string;
+  Parametro: TParametros;
+  Arq: TextFile;
+begin
+  Parametro := TParametros.Create;
+  try
+    sDiretorio := Parametro.BuscarCaminhoImportacaoXML();
+  finally
+    FreeAndNil(Parametro);
+  end;
+
+  if not DirectoryExists(sDiretorio) then
+    Exit;
+
+  Lista := TFileListBox.Create(nil);
+  try
+    try
+      Lista.Parent := Formulario;
+      Lista.Mask := '*.XML';
+      Lista.Directory := sDiretorio;
+      for I := 0 to Lista.Count-1 do
+      begin
+        FArquivo := sDiretorio + '\' +  Lista.Items[i];
+        LerArquivoXML();
+      end;
+    except
+      on E: Exception do
+      begin
+        AssignFile(Arq, sDiretorio + '\Erro.txt');
+        Rewrite(Arq);
+        Writeln(Arq, 'Arq: ' + Lista.Items[i] + ' - ' + E.Message);
+        CloseFile(Arq);
+      end;
+    end;
+  finally
+    FreeAndNil(Lista);
+  end;
+end;
+
+function TLerXML.LocalizarCidadeCodigo(Codigo: integer): Integer;
+var
+  Qry: TFDQuery;
+  i: Integer;
+  iCont: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'SELECT Cid_Id FROM Cidade WHERE Cid_Codigo = ' + Codigo.ToString;
+    Qry.Open();
+
+    Result := Qry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TLerXML.LocalizarClienteCodigo(Codigo: integer): Integer;
+var
+  Qry: TFDQuery;
+  i: Integer;
+  iCont: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'SELECT Cli_Id FROM Cliente WHERE Cli_Codigo = ' + Codigo.ToString;
+    Qry.Open();
+
+    Result := Qry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TLerXML.LocalizarModuloCodigo(Codigo: integer): Integer;
+var
+  Qry: TFDQuery;
+  i: Integer;
+  iCont: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'SELECT Mod_Id FROM Modulo WHERE Mod_Codigo = ' + Codigo.ToString;
+    Qry.Open();
+
+    Result := Qry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TLerXML.LocalizarProdutoCodigo(Codigo: integer): Integer;
+var
+  Qry: TFDQuery;
+  i: Integer;
+  iCont: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'SELECT Prod_Id FROM Produto WHERE Prod_Codigo = ' + Codigo.ToString;
+    Qry.Open();
+
+    Result := Qry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TLerXML.LocalizarRevendaCodigo(Codigo: Integer): Integer;
+var
+  Qry: TFDQuery;
+  i: Integer;
+  iCont: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'SELECT Rev_Id FROM Revenda WHERE Rev_Codigo = ' + Codigo.ToString;
+    Qry.Open();
+
+    Result := Qry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TLerXML.LocalizarUsuarioCodigo(Codigo: Integer): Integer;
+var
+  Qry: TFDQuery;
+  i: Integer;
+  iCont: Integer;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := dm.Conexao;
+    Qry.SQL.Text := 'SELECT Usu_Id FROM Usuario WHERE Usu_Codigo = ' + Codigo.ToString;
+    Qry.Open();
+
+    Result := Qry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TLerXML.SomenteNumeros(Valor: string): string;
+var
+  i: Integer;
+  s: string;
+  a: string;
+begin
+  a := '';
+  for I := 1 to Length(Valor) do
+  begin
+    s := Copy(Valor, i, 1);
+    if (s = '0') or (s = '1') or (s = '2') or (s = '3') or (s = '4') or (s = '5') or (s = '6') or (s = '7')  or (s = '8') or (s = '9') then
+      a := a + s;
+  end;
+  Result := a;
+end;
+
+function TLerXML.ValidarArquivo(cliente: TClienteVO; listaModulo: TObjectList<TModuloVO>): Boolean;
+var
+  ListaErros: TList<string>;
+  i: Integer;
+  Id: Integer;
+  sDocumento: string;
+begin
+  ListaErros := TList<string>.Create;
+  try
+    if Cliente.Codigo = 0 then
+      ListaErros.Add('Código Cliente......: - Não Informado');
+
+    if Cliente.RazaoSocial.Trim() = '' then
+      ListaErros.Add('Razão Social........: - Não Informado');
+
+    if Cliente.CNPJ.Trim() = '' then
+      ListaErros.Add('CNPJ/CPF............: - Não Informado');
+
+    if Cliente.Usuario > 0 then
+    begin
+      Id := LocalizarUsuarioCodigo(cliente.Usuario);
+      if Id <= 0 then
+        ListaErros.Add('Usuário.............: - Não Cadastrado');
+    end;
+
+    if Cliente.Revenda = 0 then
+      ListaErros.Add('Revenda.............: - Não Informado')
+    else begin
+      Id := LocalizarRevendaCodigo(cliente.Revenda);
+      if Id = 0 then
+        ListaErros.Add('Revenda.............: - Não Cadastrada');
+    end;
+
+    if Cliente.PendenciaFinanceira.Trim() = '' then
+      ListaErros.Add('Pendência Financeira: - Não Informado');
+
+    if Cliente.Situacao.Trim() = '' then
+      ListaErros.Add('Situação............: - Não Informado');
+
+    sDocumento := SomenteNumeros(cliente.CNPJ);
+    if Length(sDocumento) > 0 then
+    begin
+      try
+        if Length(sDocumento) = 11 then
+          TValidacao.ValidaCPF(sDocumento)
+        else
+          TValidacao.ValidaCNPJ(sDocumento);
+      except
+        ON E: Exception do
+        begin
+          ListaErros.Add('CNPJ/CPF............: - Inválido');
+        end;
+      end;
+    end;
+
+
+    Result := True;
+    if ListaErros.Count > 0 then
+    begin
+      CriarArquivoLogs(ListaErros);
+      Result := False;
+    end
+    else
+      ExcluirArquivoXML();
+
+  finally
+    FreeAndNil(ListaErros);
+  end;
+
+end;
+
+end.

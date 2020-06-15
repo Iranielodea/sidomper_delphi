@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{25F780B8-4691-4755-932C-B389B50E8EB8}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Server\SIDomperServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Client\SIDomper.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SIDomperServer">
+        <MSBuild Projects="Server\SIDomperServer.dproj"/>
+    </Target>
+    <Target Name="SIDomperServer:Clean">
+        <MSBuild Projects="Server\SIDomperServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SIDomperServer:Make">
+        <MSBuild Projects="Server\SIDomperServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SIDomper">
+        <MSBuild Projects="Client\SIDomper.dproj"/>
+    </Target>
+    <Target Name="SIDomper:Clean">
+        <MSBuild Projects="Client\SIDomper.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SIDomper:Make">
+        <MSBuild Projects="Client\SIDomper.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SIDomperServer;SIDomper"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SIDomperServer:Clean;SIDomper:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SIDomperServer:Make;SIDomper:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

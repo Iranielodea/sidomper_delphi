@@ -1,0 +1,15 @@
+unit uIExportar;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  IExportar = interface
+    procedure ExportarParametrosTexto;
+  end;
+
+implementation
+
+end.

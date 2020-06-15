@@ -1,0 +1,1240 @@
+unit uVisita;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uBaseCadastro, Data.DB, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, uDMVisita,
+  uVisitaController, Vcl.Mask, Vcl.DBCtrls, uFuncoesSIDomper, Vcl.OleCtnrs, uFraCliente,
+  uFraUsuario, uFraTipo, uFraStatus, uEnumerador, uFraRevenda, Vcl.Menus,
+  uParametrosController, uAgendamentoController, uPosicaoBotao, uFiltroVisita,
+  System.Generics.Collections, uStatusVO, uFraCidade;
+
+type
+  TfrmVisita = class(TfrmBaseCadastro)
+    PageControl1: TPageControl;
+    tsPrincipal: TTabSheet;
+    Panel7: TPanel;
+    edtCodigo: TDBEdit;
+    Label4: TLabel;
+    Label5: TLabel;
+    edtNome: TDBEdit;
+    Label6: TLabel;
+    edtData: TDBEdit;
+    DBEdit2: TDBEdit;
+    Label7: TLabel;
+    DBEdit3: TDBEdit;
+    Label8: TLabel;
+    edtCodCliente: TDBEdit;
+    Label9: TLabel;
+    DBEdit5: TDBEdit;
+    btnCliente: TSpeedButton;
+    edtCodUsuario: TDBEdit;
+    Label10: TLabel;
+    DBEdit7: TDBEdit;
+    DBEdit8: TDBEdit;
+    Label11: TLabel;
+    edtCodTipo: TDBEdit;
+    Label12: TLabel;
+    DBEdit10: TDBEdit;
+    btnTipo: TSpeedButton;
+    edtCodStatus: TDBEdit;
+    Label13: TLabel;
+    DBEdit12: TDBEdit;
+    btnStatus: TSpeedButton;
+    Label14: TLabel;
+    DBMemo1: TDBMemo;
+    Label15: TLabel;
+    edtNomeArquivo: TDBEdit;
+    btnAnexar: TSpeedButton;
+    btnVisualizar: TSpeedButton;
+    dlgAbrirArquivo: TOpenDialog;
+    tsFiltroCliente: TTabSheet;
+    Panel8: TPanel;
+    FraCliente: TFraCliente;
+    tsFiltroUsuario: TTabSheet;
+    Panel9: TPanel;
+    FraUsuario: TFraUsuario;
+    tsFiltroTipo: TTabSheet;
+    tsFiltroStatus: TTabSheet;
+    Panel10: TPanel;
+    Panel11: TPanel;
+    FraTipo: TFraTipo;
+    FraStatus: TFraStatus;
+    lblDataInicial: TLabel;
+    edtDataInicial: TMaskEdit;
+    edtDataFinal: TMaskEdit;
+    lblDataFinal: TLabel;
+    lblMensagem: TLabel;
+    Label16: TLabel;
+    DBEdit4: TDBEdit;
+    DBMemo2: TDBMemo;
+    Label17: TLabel;
+    GroupBox2: TGroupBox;
+    Label23: TLabel;
+    lblOrdemRelatorio: TLabel;
+    cbbModelo: TComboBox;
+    cbbOrdemRelatorio: TComboBox;
+    tsRevenda: TTabSheet;
+    Panel12: TPanel;
+    FraRevenda: TFraRevenda;
+    pmConsulta: TPopupMenu;
+    EnviodeEmail1: TMenuItem;
+    edtIdFiltro: TEdit;
+    lbl1: TLabel;
+    Label18: TLabel;
+    DBEdit1: TDBEdit;
+    lblAcimaDias: TLabel;
+    edtDias: TEdit;
+    tsCidade: TTabSheet;
+    Panel13: TPanel;
+    FraCidade: TFraCidade;
+    Label19: TLabel;
+    edtPerfil: TEdit;
+    procedure btnAnexarClick(Sender: TObject);
+    procedure btnClienteClick(Sender: TObject);
+    procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnFiltroClick(Sender: TObject);
+    procedure dbDadosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure btnFecharEdicaoClick(Sender: TObject);
+    procedure btnImprimirClick(Sender: TObject);
+    procedure btnStatusClick(Sender: TObject);
+    procedure btnTipoClick(Sender: TObject);
+    procedure btnVisualizarClick(Sender: TObject);
+    procedure cbbCamposChange(Sender: TObject);
+    procedure cbbModeloClick(Sender: TObject);
+    procedure DBMemo1Enter(Sender: TObject);
+    procedure DBMemo1Exit(Sender: TObject);
+    procedure DBMemo1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtCodClienteExit(Sender: TObject);
+    procedure edtCodClienteKeyDown(Sender: TObject; var Key: Word; Shift:
+        TShiftState);
+    procedure edtCodStatusExit(Sender: TObject);
+    procedure edtCodTipoExit(Sender: TObject);
+    procedure edtCodUsuarioExit(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure tsFiltroShow(Sender: TObject);
+    procedure tsGeralShow(Sender: TObject);
+    procedure dbDadosTitleClick(Column: TColumn);
+    procedure EnviodeEmail1Click(Sender: TObject);
+    procedure FraTipoedtCodigoEnter(Sender: TObject);
+    procedure FraTipobtnProcClick(Sender: TObject);
+    procedure FraStatusedtCodigoEnter(Sender: TObject);
+    procedure FraStatusbtnProcClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtIdFiltroExit(Sender: TObject);
+    procedure btnFiltrarClick(Sender: TObject);
+  private
+    { Private declarations }
+    FController: TVisitaController;
+    FQuadro: Boolean;
+    FEncerrarAgendamento: Boolean;
+    FIdClienteAgendamento: Integer;
+    FIdAgendamento: Integer;
+    FIdVisita: Integer;
+    FEditar: Boolean;
+    FCaminhoAnexo: string;
+    procedure Localizar(ATexto: string);
+
+    procedure BuscarCliente(AId, ACodigo: Integer);
+    procedure BuscarUsuario(AId, ACodigo: Integer);
+    procedure BuscarTipo(AId, ACodigo: Integer);
+    procedure BuscarStatus(AId, ACodigo: Integer);
+
+    procedure RelatorioModelo_01;
+    procedure RelatorioModelo_02;
+    procedure RelatorioModelo_03;
+    procedure RelatorioModelo_04;
+    procedure RelatorioModelo_05;
+    procedure RelatorioModelo_06;
+    procedure RelatorioModelo_07;
+    procedure RelatorioModelo_08;
+    procedure FiltrarRelatorio(AFiltro: TFiltroVisita);
+
+    procedure OrdemRelatorioModelo02;
+    procedure OrdemRelatorioModelo03;
+    procedure OrdemRelatorioModelo04;
+    procedure OrdemRelatorioModelo08;
+
+    procedure EnvioEmail(AIdVisita, AIdStatus: Integer);
+    procedure BuscarObservacao;
+    procedure StatusAgendamento;
+    procedure AbrirObservacao;
+    procedure BuscarClienteAgendamento;
+    procedure BuscarTextoAgendamento;
+    procedure Iniciar(APesquisar, AQuadro, AEncerrarAGenda: Boolean;
+      AIdCliente, AIdAgenda: Integer);
+    procedure CaminhoAnexo;
+    procedure MostrarAnexo;
+    procedure MostrarFiltro;
+  public
+    { Public declarations }
+    constructor create(APesquisar: Boolean = False; AQuadro: Boolean = False;
+      AEncerrarAgenda: Boolean=False; AIdCliente: Integer=0; AIdAgenda: Integer=0); overload;
+
+    constructor create(AId: Integer; AEditar: Boolean=False); overload;
+  end;
+
+var
+  frmVisita: TfrmVisita;
+
+implementation
+
+{$R *.dfm}
+
+uses uGrade, uDM, uImagens, uClienteController, uUsuario, uCliente,
+  uUsuarioController, uTipo, uTipoController, uStatusController, uStatus,
+  uEmailBase, uEmailVisita, uContaEmailController, uFormProcesso,
+  uEmailModelo2, uEnviarEmail, uObsevacaoController, uObservacao, uDepartamentoController;
+
+procedure TfrmVisita.btnEditarClick(Sender: TObject);
+begin
+  FController.Editar(dbDados.Columns[0].Field.AsInteger, Self);
+  inherited;
+  if edtData.Enabled then
+    edtData.SetFocus;
+end;
+
+procedure TfrmVisita.btnExcluirClick(Sender: TObject);
+begin
+  if TFuncoes.Confirmar('Excluir Registro?') then
+  begin
+    FController.Excluir(dm.IdUsuario, dbDados.Columns[0].Field.AsInteger);
+    inherited;
+  end;
+end;
+
+procedure TfrmVisita.btnFecharEdicaoClick(Sender: TObject);
+begin
+  FController.Cancelar;
+  inherited;
+end;
+
+procedure TfrmVisita.btnFiltrarClick(Sender: TObject);
+begin
+  inherited;
+  try
+    edtDataInicial.SetFocus;
+  except
+    //
+  end;
+end;
+
+procedure TfrmVisita.btnFiltroClick(Sender: TObject);
+begin
+  inherited;
+  Localizar(edtDescricao.Text);
+end;
+
+procedure TfrmVisita.btnImprimirClick(Sender: TObject);
+var
+  iOpcao: integer;
+begin
+  FController.Imprimir(dm.IdUsuario);
+  iOpcao := StrToIntDef(Copy(cbbModelo.Text, 1, 2), 0);
+  case iOpcao of
+    1: RelatorioModelo_01;
+    2: RelatorioModelo_02;
+    3: RelatorioModelo_03;
+    4: RelatorioModelo_04;
+    5: RelatorioModelo_05;
+    6: RelatorioModelo_06;
+    7: RelatorioModelo_07;
+  end;
+
+//  case cbbModelo.ItemIndex of
+//    0: RelatorioModelo_01;
+//    1: RelatorioModelo_02;
+//    2: RelatorioModelo_03;
+//    3: RelatorioModelo_04;
+//  end;
+
+//  inherited;
+end;
+
+procedure TfrmVisita.btnNovoClick(Sender: TObject);
+begin
+  FController.Novo(dm.IdUsuario);
+  inherited;
+  StatusAgendamento();
+  BuscarClienteAgendamento();
+  BuscarTextoAgendamento();
+  edtData.SetFocus;
+end;
+
+procedure TfrmVisita.btnSalvarClick(Sender: TObject);
+var
+  bInclusao: Boolean;
+begin
+  bInclusao := (FController.Model.CDSCadastro.State = dsInsert);
+  FController.Salvar(dm.IdUsuario);
+  FController.FiltrarCodigo(FController.CodigoAtual());
+
+  if bInclusao then
+  begin
+    EnvioEmail(FController.Model.CDSCadastroVis_Id.AsInteger,
+               FController.Model.CDSCadastroVis_Status.AsInteger);
+  end;
+
+  if FEncerrarAgendamento then
+    dm.IdCadastro := FController.Model.CDSCadastroVis_Id.AsInteger;
+
+  if FQuadro then
+  begin
+    Close;
+    Exit;
+  end;
+  inherited;
+end;
+
+procedure TfrmVisita.BuscarCliente(AId, ACodigo: Integer);
+var
+  obj: TClienteController;
+begin
+  if edtCodUsuario.Text = '' then
+  begin
+    FController.Model.CDSCadastroVis_Cliente.Clear;
+    FController.Model.CDSCadastroCli_Codigo.Clear;
+    FController.Model.CDSCadastroCli_Nome.Clear;
+    FController.Model.CDSCadastroVis_Versao.Clear;
+
+    raise Exception.Create('Informe o Consultor.');
+  end;
+
+  obj := TClienteController.Create;
+  try
+    try
+      obj.APesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodCliente.SetFocus;
+      end;
+    end;
+  finally
+    FController.ModoEdicaoInsercao();
+    FController.Model.CDSCadastroVis_Cliente.AsString := obj.Model.CDSCadastroCli_Id.AsString;
+    FController.Model.CDSCadastroCli_Codigo.AsString := obj.Model.CDSCadastroCli_Codigo.AsString;
+    FController.Model.CDSCadastroCli_Nome.AsString := obj.Model.CDSCadastroCli_Nome.AsString;
+    FController.Model.CDSCadastroVis_Versao.AsString := obj.Model.CDSCadastroCli_Versao.AsString;
+    FreeAndNil(obj);
+  end;
+  edtCodCliente.Modified := False;
+end;
+
+procedure TfrmVisita.BuscarClienteAgendamento;
+begin
+  if FQuadro then
+  begin
+    if FIdClienteAgendamento > 0 then
+      BuscarCliente(FIdClienteAgendamento, 0);
+  end;
+end;
+
+procedure TfrmVisita.BuscarObservacao;
+var
+  obs: TObservacaoController;
+begin
+  if edtNome.Enabled = False then
+    Exit;
+
+  TFuncoes.CriarFormularioModal(TfrmObservacao.create(true, prVisita));
+  if dm.IdSelecionado > 0 then
+  begin
+    FController.ModoEdicaoInsercao;
+    obs := TObservacaoController.Create;
+    try
+      obs.LocalizarId(dm.IdSelecionado);
+      FController.Model.CDSCadastroVis_Descricao.AsString :=
+      FController.Model.CDSCadastroVis_Descricao.AsString + ' ' + obs.Model.CDSCadastroObs_Descricao.AsString;
+    finally
+      FreeAndNil(obs);
+    end;
+  end;
+end;
+
+procedure TfrmVisita.BuscarStatus(AId, ACodigo: Integer);
+var
+  obj: TStatusController;
+begin
+  obj := TStatusController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo, prVisita);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodStatus.SetFocus;
+      end;
+    end;
+  finally
+    FController.ModoEdicaoInsercao();
+    FController.Model.CDSCadastroVis_Status.AsString := obj.Model.CDSCadastroSta_Id.AsString;
+    FController.Model.CDSCadastroSta_Codigo.AsString := obj.Model.CDSCadastroSta_Codigo.AsString;
+    FController.Model.CDSCadastroSta_Nome.AsString := obj.Model.CDSCadastroSta_Nome.AsString;
+
+    FreeAndNil(obj);
+  end;
+  edtCodStatus.Modified := False;
+end;
+
+procedure TfrmVisita.BuscarTextoAgendamento;
+var
+  obj: TAgendamentoController;
+begin
+  if FIdAgendamento > 0 then
+  begin
+    obj := TAgendamentoController.Create;
+    try
+      obj.LocalizarId(FIdAgendamento);
+      FController.Model.CDSCadastroVis_Descricao.AsString := obj.Model.CDSCadastroAge_Descricao.AsString;
+      FController.Model.CDSCadastroVis_Data.AsDateTime := obj.Model.CDSCadastroAge_Data.AsDateTime;
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+procedure TfrmVisita.BuscarTipo(AId, ACodigo: Integer);
+var
+  obj: TTipoController;
+begin
+  obj := TTipoController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo, prVisita);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodTipo.SetFocus;
+      end;
+    end;
+  finally
+    FController.ModoEdicaoInsercao();
+    FController.Model.CDSCadastroVis_Tipo.AsString := obj.Model.CDSCadastroTip_Id.AsString;
+    FController.Model.CDSCadastroTip_Codigo.AsString := obj.Model.CDSCadastroTip_Codigo.AsString;
+    FController.Model.CDSCadastroTip_Nome.AsString := obj.Model.CDSCadastroTip_Nome.AsString;
+
+    FreeAndNil(obj);
+  end;
+  edtCodTipo.Modified := False;
+end;
+
+procedure TfrmVisita.BuscarUsuario(AId, ACodigo: Integer);
+var
+  obj: TUsuarioController;
+begin
+  obj := TUsuarioController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+      end;
+    end;
+  finally
+    FController.ModoEdicaoInsercao();
+    FController.Model.CDSCadastroVis_Usuario.AsString := obj.Model.CDSCadastroUsu_Id.AsString;
+    FController.Model.CDSCadastroUsu_Codigo.AsString := obj.Model.CDSCadastroUsu_Codigo.AsString;
+    FController.Model.CDSCadastroUsu_Nome.AsString := obj.Model.CDSCadastroUsu_Nome.AsString;
+
+    FController.Model.CDSCadastroVis_Cliente.Clear;
+    FController.Model.CDSCadastroCli_Codigo.Clear;
+    FController.Model.CDSCadastroCli_Nome.Clear;
+
+    FreeAndNil(obj);
+  end;
+  edtCodUsuario.Modified := False;
+  edtCodCliente.Modified := False;
+end;
+
+procedure TfrmVisita.CaminhoAnexo;
+var
+  parametros: TParametrosController;
+begin
+  parametros := TParametrosController.Create;
+  try
+    FCaminhoAnexo := parametros.CaminhoAnexos();
+  finally
+    FreeAndNil(parametros);
+  end;
+end;
+
+constructor TfrmVisita.create(APesquisar: Boolean; AQuadro: Boolean;
+  AEncerrarAgenda: Boolean; AIdCliente: Integer; AIdAgenda: Integer);
+begin
+  inherited create(nil);
+  Iniciar(APesquisar, AQuadro, AEncerrarAgenda, AIdCliente, AIdAgenda);
+end;
+
+procedure TfrmVisita.AbrirObservacao;
+var
+  obs: TObservacaoController;
+begin
+  if DBMemo1.ReadOnly = False then
+  begin
+    TFuncoes.CriarFormularioModal(TfrmObservacao.create(true, prVisita));
+    obs := TObservacaoController.Create;
+    try
+      FController.ModoEdicaoInsercao();
+      obs.LocalizarId(dm.IdSelecionado);
+      FController.Model.CDSCadastroVis_Descricao.AsString :=
+        FController.Model.CDSCadastroVis_Descricao.AsString
+        + ' '
+        + obs.Model.CDSCadastroObs_Descricao.AsString;
+    finally
+      FreeAndNil(obs);
+    end;
+  end;
+end;
+
+procedure TfrmVisita.btnAnexarClick(Sender: TObject);
+begin
+  inherited;
+
+  dlgAbrirArquivo.InitialDir := FCaminhoAnexo;
+
+  if dlgAbrirArquivo.Execute then
+  begin
+    if Trim(dlgAbrirArquivo.FileName) = '' then
+      raise Exception.Create('Informe o Nome do Arquivo.');
+
+    FController.ModoEdicaoInsercao;
+    FController.Model.CDSCadastroVis_Anexo.AsString := dlgAbrirArquivo.FileName;
+  end;
+end;
+
+procedure TfrmVisita.btnClienteClick(Sender: TObject);
+begin
+  inherited;
+  if edtCodUsuario.Text = '' then
+    raise Exception.Create('Informe o Consultor.');
+
+  TFuncoes.CriarFormularioModal(TfrmCliente.create(FController.Model.CDSCadastroVis_Usuario.AsInteger ,true));
+  if dm.IdSelecionado > 0 then
+    BuscarCliente(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmVisita.btnStatusClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmStatus.create(prVisita, True));
+  if dm.IdSelecionado > 0 then
+    BuscarStatus(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmVisita.btnTipoClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmTipo.create(prVisita, true));
+  if dm.IdSelecionado > 0 then
+    BuscarTipo(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmVisita.btnVisualizarClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.VisualizarArquivo(edtNomeArquivo.Text);
+end;
+
+procedure TfrmVisita.cbbCamposChange(Sender: TObject);
+begin
+  inherited;
+  lblMensagem.Visible := TFuncoes.MostrarDescricaoPesquisaData(cbbCampos.Text);
+end;
+
+procedure TfrmVisita.cbbModeloClick(Sender: TObject);
+begin
+  inherited;
+  MostrarFiltro();
+end;
+
+constructor TfrmVisita.create(AId: Integer; AEditar: Boolean);
+begin
+  inherited create(nil);
+  Iniciar(False, False, False, 0, 0);
+  FIdAgendamento := AId;
+  FEditar := AEditar;
+  FController.FiltrarCodigo(AId);
+end;
+
+procedure TfrmVisita.dbDadosKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    dbDadosDblClick(Self);
+    if edtCodigo.Enabled then
+      edtCodigo.SetFocus;
+  end;
+end;
+
+procedure TfrmVisita.dbDadosTitleClick(Column: TColumn);
+begin
+  inherited;
+  TFuncoes.OrdenarCamposGrid(FController.Model.cdsconsulta, Column.FieldName);
+end;
+
+procedure TfrmVisita.DBMemo1Enter(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := False;
+end;
+
+procedure TfrmVisita.DBMemo1Exit(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := True;
+end;
+
+procedure TfrmVisita.DBMemo1KeyDown(Sender: TObject; var Key: Word; Shift:
+    TShiftState);
+begin
+  inherited;
+  case key of
+    VK_F8:
+    begin
+      if btnSalvar.Enabled then
+      begin
+        btnSalvar.SetFocus;
+        btnSalvarClick(Self);
+      end;
+    end;
+    VK_F9: AbrirObservacao();
+    VK_ESCAPE: btnCancelarClick(Self);
+  end;
+end;
+
+procedure TfrmVisita.edtCodClienteExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodCliente.Modified then
+    BuscarCliente(0, StrToIntDef(edtCodCliente.Text, 0));
+end;
+
+procedure TfrmVisita.edtCodClienteKeyDown(Sender: TObject; var Key: Word;
+    Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_F9 then
+  begin
+    if Sender = edtCodCliente then
+      btnClienteClick(Self)
+    else if Sender = edtCodTipo then
+      btnTipoClick(Self)
+    else if Sender = edtCodStatus then
+      btnStatusClick(Self);
+  end;
+end;
+
+procedure TfrmVisita.edtCodStatusExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodStatus.Modified then
+    BuscarStatus(0, StrToIntDef(edtCodStatus.Text,0));
+end;
+
+procedure TfrmVisita.edtCodTipoExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodTipo.Modified then
+    BuscarTipo(0, StrToIntDef(edtCodTipo.Text, 0));
+end;
+
+procedure TfrmVisita.edtCodUsuarioExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodUsuario.Modified then
+    BuscarUsuario(0, StrToIntDef(edtCodUsuario.Text, 0));
+end;
+
+procedure TfrmVisita.edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+  begin
+    Localizar(edtDescricao.Text);
+  end;
+end;
+
+procedure TfrmVisita.edtIdFiltroExit(Sender: TObject);
+begin
+  inherited;
+  if edtIdFiltro.Modified then
+  begin
+    edtIdFiltro.Text := FormatFloat('000000', StrToFloatDef(edtIdFiltro.Text, 0));
+    edtIdFiltro.Modified := False;
+  end;
+end;
+
+procedure TfrmVisita.EnviodeEmail1Click(Sender: TObject);
+begin
+  inherited;
+  if TFuncoes.Confirmar('Confirmar o envio de email?') then
+  begin
+
+    EnvioEmail(FController.Model.CDSConsultaVis_Id.AsInteger,
+               FController.Model.CDSConsultaVis_Status.AsInteger);
+  end;
+end;
+
+procedure TfrmVisita.EnvioEmail(AIdVisita, AIdStatus: Integer);
+var
+  objEmailVisita: TEmailVisita;
+  sEmail: string;
+  sEmailCliente: string;
+  objContaEmail: TContaEmailController;
+begin
+  if TFuncoes.ModoDesenvolvimento() then
+    Exit;
+
+  sEmail := '';
+  objContaEmail     := TContaEmailController.Create;
+  objEmailVisita   := TEmailVisita.Create;
+  try
+    sEmail := objEmailVisita.RetornarListaEmail(AIdVisita,
+                                                 dm.IdUsuario,
+                                                 AIdStatus);
+
+    sEmailCliente := objEmailVisita.RetornarListaEmailCliente(AIdVisita);
+
+    if sEmailCliente = '' then
+      sEmailCliente := sEmail;
+
+    if (sEmailCliente <> '') then
+    begin
+      objContaEmail.EnviarEmail(dm.IdUsuario,
+                                sEmailCliente,
+                                sEmail,
+                                objEmailVisita.RetornarAssunto(AIdVisita),
+                                objEmailVisita.TextoEmail(AIdVisita),
+                                '');
+
+      end;
+  finally
+    FreeAndNil(objContaEmail);
+    FreeAndNil(objEmailVisita);
+  end;
+end;
+
+procedure TfrmVisita.FiltrarRelatorio(AFiltro: TFiltroVisita);
+begin
+  AFiltro.DataInicial := edtDataInicial.Text;
+  AFiltro.DataFinal := edtDataFinal.Text;
+  AFiltro.IdCliente := FraCliente.RetornoSelecao();
+
+  if tsFiltroTipo.TabVisible then
+    AFiltro.IdTipo := FraTipo.RetornoSelecao();
+
+  if tsFiltroStatus.TabVisible then
+    AFiltro.IdStatus := FraStatus.RetornoSelecao();
+
+  AFiltro.IdUsuario := FraUsuario.RetornoSelecao();
+  AFiltro.Revenda.IdStr := FraRevenda.RetornoSelecao();
+  AFiltro.IdCidade := FraCidade.RetornoSelecao();
+  AFiltro.Id := StrToIntDef(edtIdFiltro.Text, 0);
+  AFiltro.QtdeDias := StrToIntDef(edtDias.Text, 0);
+  AFiltro.Perfil := edtPerfil.Text;
+end;
+
+procedure TfrmVisita.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  FreeAndNil(FController);
+end;
+
+procedure TfrmVisita.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+
+  if Key = VK_ESCAPE then
+  begin
+    if FQuadro then
+      Close;
+  end;
+
+end;
+
+procedure TfrmVisita.FormShow(Sender: TObject);
+var
+  Img: TfrmImagens;
+  Botao: TPosicaoBotao;
+begin
+  inherited;
+  Img := TfrmImagens.Create(Self);
+  try
+    btnCliente.Glyph := Img.btnProcurar.Glyph;
+    btnTipo.Glyph := Img.btnProcurar.Glyph;
+    btnStatus.Glyph := Img.btnProcurar.Glyph;
+    btnAnexar.Glyph := Img.btnAnexar.Glyph;
+    btnVisualizar.Glyph := Img.btnExportar.Glyph;
+  finally
+    FreeAndNil(Img);
+  end;
+
+//------------------------------------------------------------------------------
+// edicao
+  Botao := TPosicaoBotao.Create(btnSalvar, 6, 6);
+  try
+    Botao.PosicaoBotao(btnCancelar);
+  finally
+    FreeAndNil(Botao);
+  end;
+
+//------------------------------------------------------------------------------
+// Pesquisa
+  Botao := TPosicaoBotao.Create(btnPrimeiro, 6, 6, True);
+  try
+    Botao.PosicaoBotaoNavegacao(btnAnterior);
+    Botao.PosicaoBotaoNavegacao(btnProximo);
+    Botao.PosicaoBotaoNavegacao(btnUltimo);
+    Botao.PosicaoBotao(btnNovo);
+    Botao.PosicaoBotao(btnEditar);
+    Botao.PosicaoBotao(btnExcluir);
+    Botao.PosicaoBotao(btnFiltrar);
+    Botao.PosicaoBotao(btnSair);
+  finally
+    FreeAndNil(Botao);
+  end;
+//------------------------------------------------------------------------------
+// filtro
+  Botao := TPosicaoBotao.Create(btnFiltro, 6, 6);
+  try
+    Botao.PosicaoBotao(btnImprimir);
+    Botao.PosicaoBotao(btnFecharFiltro);
+  finally
+    FreeAndNil(Botao);
+  end;
+
+
+  if FQuadro then
+    btnNovoClick(Self);
+
+  if FEditar then
+    btnEditarClick(Self);
+
+  CaminhoAnexo();
+  MostrarAnexo();
+  MostrarFiltro();
+end;
+
+procedure TfrmVisita.FraStatusbtnProcClick(Sender: TObject);
+begin
+  inherited;
+  FraStatus.TipoPrograma := prVisita;
+  FraStatus.btnProcClick(Sender);
+end;
+
+procedure TfrmVisita.FraStatusedtCodigoEnter(Sender: TObject);
+begin
+  inherited;
+  FraStatus.TipoPrograma := prVisita;
+end;
+
+procedure TfrmVisita.FraTipobtnProcClick(Sender: TObject);
+begin
+  inherited;
+  FraTipo.TipoPrograma := prVisita;
+  FraTipo.btnProcClick(Sender);
+end;
+
+procedure TfrmVisita.FraTipoedtCodigoEnter(Sender: TObject);
+begin
+  inherited;
+  FraTipo.TipoPrograma := prVisita;
+end;
+
+procedure TfrmVisita.Iniciar(APesquisar, AQuadro, AEncerrarAGenda: Boolean;
+  AIdCliente, AIdAgenda: Integer);
+begin
+  FController := TVisitaController.Create;
+  dsPesquisa.DataSet := FController.Model.CDSConsulta;
+  dsCad.DataSet := FController.Model.CDSCadastro;
+
+  TGrade.RetornaCamposGrid(dbDados, cbbCampos);
+  cbbCampos.ItemIndex := 3;
+  Localizar('ABCDE'); // para trazer vazio
+
+  if APesquisar then
+  begin
+    cbbSituacao.ItemIndex := 0;
+    Pesquisa := APesquisar;
+  end;
+  FraCliente.Inicializar();
+  FraUsuario.Inicializar();
+  FraTipo.Inicializar();
+  FraStatus.Inicializar();
+  FraRevenda.Inicializar();
+  FraCidade.Inicializar();
+
+  FQuadro := AQuadro;
+  FEncerrarAgendamento := AEncerrarAgenda;
+  FIdClienteAgendamento := AIdCliente;
+  FIdAgendamento := AIdAgenda;
+
+//  FIdAgendamento := 0;
+  FEditar := False;
+end;
+
+procedure TfrmVisita.Localizar(ATexto: string);
+var
+  sCampo: string;
+  sSituacao: string;
+  bContem: Boolean;
+  Filtro: TFiltroVisita;
+begin
+
+  Filtro := TFiltroVisita.Create;
+  try
+    Filtro.DataInicial := edtDataInicial.Text;
+    Filtro.DataFinal := edtDataFinal.Text;
+    Filtro.IdCliente := FraCliente.RetornoSelecao();
+    Filtro.IdTipo := FraTipo.RetornoSelecao();
+    Filtro.IdStatus := FraStatus.RetornoSelecao();
+    Filtro.IdUsuario := FraUsuario.RetornoSelecao();
+    Filtro.Revenda.IdStr := FraRevenda.RetornoSelecao();
+    Filtro.IdCidade := FraCidade.RetornoSelecao();
+    Filtro.Perfil := edtPerfil.Text;
+
+    sCampo := TGrade.FiltrarCampo(dbDados, cbbCampos);
+    sSituacao := Copy(cbbSituacao.Items.Strings[cbbSituacao.ItemIndex], 1, 1);
+    bContem := (cbbPesquisa.ItemIndex = 1);
+
+    FController.FiltrarVisita(Filtro, sCampo, ATexto, dm.IdUsuario, bContem);
+    FController.Model.CDSConsulta.IndexFieldNames := sCampo;
+  finally
+    FreeAndNil(Filtro);
+  end;
+
+end;
+
+procedure TfrmVisita.MostrarAnexo;
+var
+  Departamento: TDepartamentoController;
+  bResultado: Boolean;
+begin
+  Departamento := TDepartamentoController.Create;
+  try
+    bResultado := Departamento.MostrarAnexos();
+    Label15.Visible := bResultado;
+    edtNomeArquivo.Visible := bResultado;
+    btnAnexar.Visible := bResultado;
+    btnVisualizar.Visible := bResultado;
+  finally
+    FreeAndNil(Departamento);
+  end;
+end;
+
+procedure TfrmVisita.MostrarFiltro;
+var
+  iOpcao: integer;
+begin
+  iOpcao := StrToIntDef(Copy(cbbModelo.Text, 1, 2),0);
+
+  lblOrdemRelatorio.Visible := (cbbModelo.ItemIndex > 0);
+  cbbOrdemRelatorio.Visible := (cbbModelo.ItemIndex > 0);
+
+  if (iOpcao = 5) or (iOpcao = 6) then
+  begin
+    lblOrdemRelatorio.Visible := False;
+    cbbOrdemRelatorio.Visible := False;
+  end;
+
+  edtDataInicial.Visible  := not (cbbModelo.ItemIndex = 6);
+  edtDataFinal.Visible    := not (cbbModelo.ItemIndex = 6);
+  lblDataInicial.Visible  := not (cbbModelo.ItemIndex = 6);
+  lblDataFinal.Visible    := not (cbbModelo.ItemIndex = 6);
+  lbl1.Visible            := not (cbbModelo.ItemIndex = 6);
+  edtIdFiltro.Visible     := not (cbbModelo.ItemIndex = 6);
+  tsFiltroTipo.TabVisible := not (cbbModelo.ItemIndex = 6);
+  tsFiltroStatus.TabVisible := not (cbbModelo.ItemIndex = 6);
+
+  if cbbModelo.ItemIndex = 6 then
+  begin
+    lblOrdemRelatorio.Visible := not (cbbModelo.ItemIndex = 6);
+    cbbOrdemRelatorio.Visible := not (cbbModelo.ItemIndex = 6);
+  end;
+
+  lblAcimaDias.Visible    := (cbbModelo.ItemIndex = 6);
+  edtDias.Visible         := (cbbModelo.ItemIndex = 6);
+
+  if cbbModelo.ItemIndex = 6 then
+  begin
+    edtDataInicial.Clear;
+    edtDataFinal.Clear;
+    edtIdFiltro.Clear;
+  end
+  else
+    edtDias.Clear;
+
+  case cbbModelo.ItemIndex of
+    1: OrdemRelatorioModelo02;
+    2: OrdemRelatorioModelo03;
+    3: OrdemRelatorioModelo04;
+    7: OrdemRelatorioModelo08;
+  end;
+end;
+
+procedure TfrmVisita.OrdemRelatorioModelo02;
+begin
+// 02 - Resumo de Horas por Cliente
+  if cbbModelo.ItemIndex = 1 then
+  begin
+    cbbOrdemRelatorio.Clear;
+    cbbOrdemRelatorio.Items.Add('Por Cliente');
+    cbbOrdemRelatorio.Items.Add('Por Quantidade de Visitas');
+    cbbOrdemRelatorio.Items.Add('Por Horas Utilizadas');
+    cbbOrdemRelatorio.ItemIndex := 2;
+  end;
+
+end;
+
+procedure TfrmVisita.OrdemRelatorioModelo03;
+begin
+// 03 - Resumo de Visitas por Usuário
+  if cbbModelo.ItemIndex = 2 then
+  begin
+    cbbOrdemRelatorio.Clear;
+    cbbOrdemRelatorio.Items.Add('Por Consultor');
+    cbbOrdemRelatorio.Items.Add('Por Quantidade de Visitas');
+    cbbOrdemRelatorio.Items.Add('Por Horas Utilizadas');
+    cbbOrdemRelatorio.ItemIndex := 2;
+  end;
+end;
+
+procedure TfrmVisita.OrdemRelatorioModelo04;
+begin
+// 04 - Resumo de Horas por Tipo
+  if cbbModelo.ItemIndex = 3 then
+  begin
+    cbbOrdemRelatorio.Clear;
+    cbbOrdemRelatorio.Items.Add('Por Tipo');
+    cbbOrdemRelatorio.Items.Add('Por Quantidade de Visitas');
+    cbbOrdemRelatorio.Items.Add('Por Horas Utilizadas');
+    cbbOrdemRelatorio.ItemIndex := 2;
+  end;
+end;
+
+procedure TfrmVisita.OrdemRelatorioModelo08;
+begin
+// 08 - Resumo de Visitas por Perfil
+  if cbbModelo.ItemIndex = 7 then
+  begin
+    cbbOrdemRelatorio.Clear;
+    cbbOrdemRelatorio.Items.Add('Por Perfil');
+    cbbOrdemRelatorio.Items.Add('Por Quantidade de Visitas');
+    cbbOrdemRelatorio.Items.Add('Por Horas Utilizadas');
+    cbbOrdemRelatorio.ItemIndex := 0;
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_01;
+var
+  Filtro: TFiltroVisita;
+begin
+
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    FController.Relatorio(Filtro, 01, dm.IdUsuario, '');
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_02;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    case cbbOrdemRelatorio.ItemIndex of
+      0: sOrdem := 'Rev_Nome, Rev_Codigo, Cli_Nome';
+      1: sOrdem := 'Rev_Nome, Rev_Codigo, QtdeChamados Desc';
+      2: sOrdem := 'Rev_Nome, Rev_Codigo, TotalHoras Desc';
+    end;
+
+    FController.Relatorio(Filtro, 02, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_03;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    case cbbOrdemRelatorio.ItemIndex of
+      0: sOrdem := ' Usu_Nome';
+      1: sOrdem := ' QtdeChamados Desc';
+      2: sOrdem := ' TotalHoras Desc';
+    end;
+
+    FController.Relatorio(Filtro, 03, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_04;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+
+    case cbbOrdemRelatorio.ItemIndex of
+      0: sOrdem := 'Rev_Nome, Rev_Codigo, Tip_Nome';
+      1: sOrdem := 'Rev_Nome, Rev_Codigo, QtdeChamados Desc';
+      2: sOrdem := 'Rev_Nome, Rev_Codigo, TotalHoras Desc';
+    end;
+
+    FController.Relatorio(Filtro, 04, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_05;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    sOrdem := '';
+    FController.Relatorio(Filtro, 05, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_06;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    sOrdem := '';
+    FController.Relatorio(Filtro, 06, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_07;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    sOrdem := '';
+    FController.Relatorio(Filtro, 07, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.RelatorioModelo_08;
+var
+  Filtro: TFiltroVisita;
+  sOrdem: string;
+begin
+  Filtro := TFiltroVisita.Create;
+  try
+    FiltrarRelatorio(Filtro);
+    case cbbOrdemRelatorio.ItemIndex of
+      0: sOrdem := ' Cli_Perfil';
+      1: sOrdem := ' QtdeChamados Desc';
+      2: sOrdem := ' TotalHoras Desc';
+    end;
+
+    FController.Relatorio(Filtro, 08, dm.IdUsuario, sOrdem);
+
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmVisita.StatusAgendamento;
+var
+  Status: TStatusController;
+  listaStatus: TObjectList<TStatusVO>;
+  model: TStatusVO;
+begin
+  if FEncerrarAgendamento then
+  begin
+    Status := TStatusController.Create;
+    try
+      listaStatus := Status.LocalizarPorPrograma(2); // visita
+      if listaStatus.Count = 1 then
+      begin
+        for model in listaStatus do
+        begin
+          FController.Model.CDSCadastroVis_Status.AsInteger := model.Id;
+          FController.Model.CDSCadastroSta_Codigo.AsInteger := model.Codigo;
+          FController.Model.CDSCadastroSta_Nome.AsString := model.Nome;
+        end;
+      end;
+      edtCodStatus.Enabled := False;
+      btnStatus.Enabled := False;
+    finally
+      FreeAndNil(Status);
+      FreeAndNil(listaStatus);
+    end;
+  end
+  else begin
+    edtCodStatus.Enabled := True;
+    btnStatus.Enabled := True;
+  end;
+end;
+
+procedure TfrmVisita.tsFiltroShow(Sender: TObject);
+begin
+  inherited;
+  PageControl2.ActivePageIndex := 0;
+end;
+
+procedure TfrmVisita.tsGeralShow(Sender: TObject);
+begin
+  cbbPesquisa.SetFocus;
+  inherited;
+end;
+
+end.

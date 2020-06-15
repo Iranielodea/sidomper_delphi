@@ -1,0 +1,62 @@
+unit uExportarTipos;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uArquivoTexto, uDM, uFireDAC,
+  uTipoVO, System.Generics.Collections, uGenericDAO;
+
+type
+  TExportarTipo = class
+  private
+    FArquivo: string;
+
+  public
+    procedure Exportar();
+    function Importar(): TObjectList<TTipoVO>;
+
+    constructor Create(); overload;
+  end;
+
+
+implementation
+
+{ TExportarTipo }
+
+constructor TExportarTipo.Create;
+begin
+  inherited Create;
+  FArquivo := 'D:\DOMPER\SIDomper\Banco\Tipos.txt';
+end;
+
+procedure TExportarTipo.Exportar;
+var
+  obj: TFireDAC;
+  Arq: TArquivoTexto;
+begin
+  obj := TFireDAC.create;
+  Arq := TArquivoTexto.Create(FArquivo, tpExportar);
+  try
+    obj.OpenSQL('SELECT * FROM Tipo');
+    while not obj.Model.Eof do
+    begin
+      Arq.ExportarInt(obj.Model.FieldByName('Tip_Codigo').AsInteger,      001, 005);
+      Arq.ExportarString(obj.Model.FieldByName('Tip_Nome').AsString,      006, 050);
+      Arq.ExportarBool(obj.Model.FieldByName('Par_Ativo').AsBoolean,      056, 001);
+      Arq.ExportarInt(obj.Model.FieldByName('Par_Programa').AsInteger,    057, 005);
+      Arq.ExportarString(obj.Model.FieldByName('Par_Conceito').AsString,  062, 500);
+      Arq.NovaLinha();
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Arq);
+  end;
+end;
+
+function TExportarTipo.Importar: TObjectList<TTipoVO>;
+begin
+
+end;
+
+end.

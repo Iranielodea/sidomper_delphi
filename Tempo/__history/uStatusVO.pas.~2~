@@ -1,0 +1,18 @@
+unit uStatusVO;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TStatusVO = class
+  private
+
+  public
+
+  end;
+
+implementation
+
+end.

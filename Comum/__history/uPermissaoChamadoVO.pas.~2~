@@ -1,0 +1,21 @@
+unit uPermissaoChamadoVO;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TPermissaoChamadoVO = class
+  public
+    property Abertura: Boolean;
+    property Analise: Boolean;
+    property OcorrenciaGeral: Boolean;
+    property OcorrenciaTecnica: Boolean;
+    property OcorrenciaRegra: Boolean;
+    property StatusSolicitacao: Boolean;
+  end;
+
+implementation
+
+end.

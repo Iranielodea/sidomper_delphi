@@ -1,0 +1,254 @@
+unit uDMDepartamento;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient, uDM, uRegras, ppParameter, ppDesignLayer, ppCtrls,
+  ppBands, ppVar, ppPrnabl, ppClass, ppCache, ppProd, ppReport;
+
+type
+  TDMDepartamento = class(TDMBase)
+    CDSConsultaDep_Codigo: TIntegerField;
+    CDSConsultaDep_Id: TAutoIncField;
+    CDSConsultaDep_Nome: TWideStringField;
+    CDSCadastroDep_Id: TAutoIncField;
+    CDSCadastroDep_Ativo: TBooleanField;
+    CDSCadastroDep_Codigo: TIntegerField;
+    CDSCadastroDep_Nome: TWideStringField;
+    CDSItens: TClientDataSet;
+    CDSItensDepAc_Acesso: TBooleanField;
+    CDSItensDepAc_Departamento: TIntegerField;
+    CDSItensDepAc_Editar: TBooleanField;
+    CDSItensDepAc_Excluir: TBooleanField;
+    CDSItensDepAc_Incluir: TBooleanField;
+    CDSItensDepAc_Programa: TIntegerField;
+    CDSItensDepAc_Relatorio: TBooleanField;
+    Rel: TppReport;
+    ppHeaderBand1: TppHeaderBand;
+    ppLabel1: TppLabel;
+    ppLabel2: TppLabel;
+    ppLine1: TppLine;
+    ppLabel3: TppLabel;
+    ppSystemVariable1: TppSystemVariable;
+    ppSystemVariable2: TppSystemVariable;
+    ppSystemVariable3: TppSystemVariable;
+    ppDetailBand1: TppDetailBand;
+    ppDBText1: TppDBText;
+    ppDBText2: TppDBText;
+    ppSummaryBand1: TppSummaryBand;
+    ppLine2: TppLine;
+    ppLabel4: TppLabel;
+    ppDBCalc1: TppDBCalc;
+    ppDesignLayers1: TppDesignLayers;
+    ppDesignLayer1: TppDesignLayer;
+    ppParameterList1: TppParameterList;
+    CDSConsultaDep_Ativo: TBooleanField;
+    CDSConsultaCAtivo: TStringField;
+    ppLabel5: TppLabel;
+    ppDBText3: TppDBText;
+    CDSItensPrograma: TStringField;
+    CDSCadastroDep_SolicitaAbertura: TBooleanField;
+    CDSCadastroDep_SolicitaAnalise: TBooleanField;
+    CDSCadastroDep_SolicitaOcorGeral: TBooleanField;
+    CDSCadastroDep_SolicitaOcorTecnica: TBooleanField;
+    CDSCadastroDep_SolicitaQuadro: TBooleanField;
+    CDSCadastroDep_SolicitaStatus: TBooleanField;
+    CDSCadastroDep_ChamadoAbertura: TBooleanField;
+    CDSCadastroDep_ChamadoQuadro: TBooleanField;
+    CDSCadastroDep_ChamadoStatus: TBooleanField;
+    CDSCadastroDep_ChamadoOcor: TBooleanField;
+    CDSItensCAcesso: TBooleanField;
+    CDSItensCEditar: TBooleanField;
+    CDSItensCExcluir: TBooleanField;
+    CDSItensCIncluir: TBooleanField;
+    CDSItensCRelatorio: TBooleanField;
+    CDSDepartamentoEmail: TClientDataSet;
+    CDSDepartamentoEmailDepEm_Id: TAutoIncField;
+    CDSDepartamentoEmailDepEm_Departamento: TIntegerField;
+    CDSDepartamentoEmailDepEm_Email: TStringField;
+    CDSCadastroDep_AtividadeAbertura: TBooleanField;
+    CDSCadastroDep_AtividadeStatus: TBooleanField;
+    CDSCadastroDep_AtividadeQuadro: TBooleanField;
+    CDSCadastroDep_AtividadeOcor: TBooleanField;
+    CDSCadastroDep_AgendamentoQuadro: TBooleanField;
+    CDSItensDepAc_Id: TAutoIncField;
+    CDSCadastroDep_MostrarAnexos: TBooleanField;
+    procedure CDSCadastroReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure CDSCadastroNewRecord(DataSet: TDataSet);
+    procedure CDSItensDepAc_AcessoGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure CDSItensDepAc_EditarGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure CDSItensDepAc_ExcluirGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure CDSItensDepAc_IncluirGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure CDSItensDepAc_RelatorioGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
+    procedure DataModuleCreate(Sender: TObject);
+    procedure CDSConsultaCalcFields(DataSet: TDataSet);
+    procedure CDSDepartamentoEmailReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure CDSDepartamentoEmailBeforePost(DataSet: TDataSet);
+    procedure CDSItensBeforePost(DataSet: TDataSet);
+  private
+    { Private declarations }
+    FIdDepEmail: Integer;
+    FIdDepItem: Integer;
+  public
+    { Public declarations }
+  end;
+
+var
+  DMDepartamento: TDMDepartamento;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+uses uEnumerador;
+
+{$R *.dfm}
+
+procedure TDMDepartamento.CDSCadastroNewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  CDSCadastroDep_Ativo.AsBoolean := True;
+  CDSCadastroDep_SolicitaAbertura.AsBoolean := True;
+  CDSCadastroDep_SolicitaAnalise.AsBoolean := True;
+  CDSCadastroDep_SolicitaOcorGeral.AsBoolean := True;
+  CDSCadastroDep_SolicitaOcorTecnica.AsBoolean := True;
+  CDSCadastroDep_SolicitaQuadro.AsBoolean := True;
+  CDSCadastroDep_SolicitaStatus.AsBoolean := True;
+  CDSCadastroDep_ChamadoAbertura.AsBoolean := True;
+  CDSCadastroDep_ChamadoQuadro.AsBoolean := True;
+  CDSCadastroDep_ChamadoStatus.AsBoolean := True;
+  CDSCadastroDep_ChamadoOcor.AsBoolean := True;
+  CDSCadastroDep_AtividadeAbertura.AsBoolean := True;
+  CDSCadastroDep_AtividadeStatus.AsBoolean := True;
+  CDSCadastroDep_AtividadeQuadro.AsBoolean := True;
+  CDSCadastroDep_AtividadeOcor.AsBoolean := True;
+end;
+
+procedure TDMDepartamento.CDSCadastroReconcileError(DataSet: TCustomClientDataSet;
+  E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMDepartamento.CDSConsultaCalcFields(DataSet: TDataSet);
+begin
+  inherited;
+  if CDSConsulta.State = dsInternalCalc then
+  begin
+    if CDSConsultaDep_Ativo.AsBoolean then
+      CDSConsultaCAtivo.AsString := 'Sim'
+    else
+      CDSConsultaCAtivo.AsString := 'Não';
+  end;
+end;
+
+procedure TDMDepartamento.CDSDepartamentoEmailBeforePost(DataSet: TDataSet);
+begin
+  inherited;
+  if CDSDepartamentoEmail.State = dsInsert then
+  begin
+    CDSDepartamentoEmailDepEm_Departamento.AsInteger := -1;
+    CDSDepartamentoEmailDepEm_Id.AsInteger := FIdDepEmail;
+    Dec(FIdDepEmail);
+  end;
+end;
+
+procedure TDMDepartamento.CDSDepartamentoEmailReconcileError(
+  DataSet: TCustomClientDataSet; E: EReconcileError; UpdateKind: TUpdateKind;
+  var Action: TReconcileAction);
+begin
+  inherited;
+  raise Exception.Create(E.Message);
+end;
+
+procedure TDMDepartamento.CDSItensBeforePost(DataSet: TDataSet);
+begin
+  inherited;
+  if CDSItens.State = dsInsert then
+  begin
+    CDSItensDepAc_Departamento.AsInteger := -1;
+    CDSItensDepAc_Id.AsInteger := FIdDepItem;
+    FIdDepItem := FIdDepItem - 1;
+  end;
+end;
+
+procedure TDMDepartamento.CDSItensDepAc_AcessoGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  inherited;
+  if Sender.Value = True then
+    Text := 'S'
+  else
+    Text := 'N';
+end;
+
+procedure TDMDepartamento.CDSItensDepAc_EditarGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  inherited;
+  if Sender.Value = True then
+    Text := 'S'
+  else
+    Text := 'N';
+
+end;
+
+procedure TDMDepartamento.CDSItensDepAc_ExcluirGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  inherited;
+  if Sender.Value = True then
+    Text := 'S'
+  else
+    Text := 'N';
+
+end;
+
+procedure TDMDepartamento.CDSItensDepAc_IncluirGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  inherited;
+  if Sender.Value = True then
+    Text := 'S'
+  else
+    Text := 'N';
+
+end;
+
+procedure TDMDepartamento.CDSItensDepAc_RelatorioGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  inherited;
+  if Sender.Value = True then
+    Text := 'S'
+  else
+    Text := 'N';
+
+end;
+
+procedure TDMDepartamento.DataModuleCreate(Sender: TObject);
+var
+  i: Integer;
+begin
+  for I := 0 to Self.ComponentCount-1 do
+  begin
+    if Self.Components[i] is TClientDataSet then
+      TClientDataSet(Components[i]).RemoteServer := dm.DSPConexao;
+  end;
+  FIdDepEmail := -1;
+  FIdDepItem := -1;
+
+end;
+
+end.

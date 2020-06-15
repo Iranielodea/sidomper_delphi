@@ -1,0 +1,34 @@
+unit uDMCategoria;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uDMBase, ppComm, ppRelatv, ppDB, ppDBPipe,
+  Data.DB, Datasnap.DBClient, uDM;
+
+type
+  TDMCategoria = class(TDMBase)
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMCategoria: TDMCategoria;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+procedure TDMCategoria.DataModuleCreate(Sender: TObject);
+begin
+  inherited;
+  CDSCadastro.RemoteServer := DM.DSPConexao2;
+  CDSConsulta.RemoteServer := DM.DSPConexao2;
+end;
+
+end.

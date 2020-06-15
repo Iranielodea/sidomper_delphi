@@ -1,0 +1,43 @@
+unit uClienteVO;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TClienteVO = class
+  private
+    FCodigo: Integer;
+    FId: Integer;
+    FNome: string;
+    procedure SetCodigo(const Value: Integer);
+    procedure SetId(const Value: Integer);
+    procedure SetNome(const Value: string);
+
+  public
+    property Id: Integer read FId write SetId;
+    property Codigo: Integer read FCodigo write SetCodigo;
+    property Nome: string read FNome write SetNome;
+  end;
+
+implementation
+
+{ TClienteVO }
+
+procedure TClienteVO.SetCodigo(const Value: Integer);
+begin
+  FCodigo := Value;
+end;
+
+procedure TClienteVO.SetId(const Value: Integer);
+begin
+  FId := Value;
+end;
+
+procedure TClienteVO.SetNome(const Value: string);
+begin
+  FNome := Value;
+end;
+
+end.

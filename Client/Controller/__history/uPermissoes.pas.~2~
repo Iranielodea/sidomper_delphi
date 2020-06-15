@@ -1,0 +1,15 @@
+unit uPermissoes;
+
+interface
+
+uses System.SysUtils;
+
+type
+  TPermissoes = class
+  public
+
+  end;
+
+implementation
+
+end.

@@ -1,0 +1,64 @@
+unit uExportarDepartamentoAcesso;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, uArquivoTexto, uDM, uFireDAC,
+  uDepartamentoAcessoVO, System.Generics.Collections, uGenericDAO;
+
+type
+  TExportarDepartamentoAcesso = class
+  private
+    FArquivo: string;
+  public
+    procedure Exportar();
+    function Importar(): TObjectList<TDepartamentoAcessoVO>;
+
+    constructor Create(); overload;
+  end;
+
+
+implementation
+
+{ TExportarDepartamentoAcesso }
+
+constructor TExportarDepartamentoAcesso.Create;
+begin
+  inherited Create;
+
+  FArquivo := 'D:\DOMPER\SIDomper\Banco\Departamento.txt';
+end;
+
+procedure TExportarDepartamentoAcesso.Exportar;
+var
+  obj: TFireDAC;
+  Arq: TArquivoTexto;
+begin
+  obj := TFireDAC.create;
+  Arq := TArquivoTexto.Create(FArquivo, tpExportar);
+  try
+    obj.OpenSQL('SELECT * FROM Departamento_Acesso WHERE DepAc_Departamento = 7');
+    while not obj.Model.Eof do
+    begin
+      Arq.ExportarInt(obj.Model.FieldByName('DepAc_Departamento').AsInteger, 001, 005);
+      Arq.ExportarInt(obj.Model.FieldByName('DepAc_Programa').AsInteger,     006, 005);
+      Arq.ExportarBool(obj.Model.FieldByName('DepAc_Acesso').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('DepAc_Incluir').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('DepAc_Editar').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('DepAc_Excluir').AsBoolean);
+      Arq.ExportarBool(obj.Model.FieldByName('DepAc_Relatorio').AsBoolean);
+      Arq.NovaLinha();
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(Arq);
+  end;
+end;
+
+function TExportarDepartamentoAcesso.Importar: TObjectList<TDepartamentoAcessoVO>;
+begin
+
+end;
+
+end.

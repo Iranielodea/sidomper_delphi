@@ -1,0 +1,33 @@
+unit uBaseDadosNova;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons;
+
+type
+  TfrmBaseDadosNova = class(TForm)
+    btnExportar: TBitBtn;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmBaseDadosNova: TfrmBaseDadosNova;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmBaseDadosNova.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+    Close;
+end;
+
+end.

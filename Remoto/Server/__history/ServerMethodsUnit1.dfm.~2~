@@ -1,0 +1,5 @@
+object ServerMethods1: TServerMethods1
+  OldCreateOrder = False
+  Height = 223
+  Width = 435
+end

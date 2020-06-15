@@ -1,0 +1,15 @@
+unit uFeriado;
+
+interface
+
+uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface;
+
+  const CConsulta: string =
+    'SELECT Fer_Id, Fer_Data, Fer_Descricao FROM Feriado';
+
+implementation
+
+end.

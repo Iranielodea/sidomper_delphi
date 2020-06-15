@@ -1,0 +1,1345 @@
+unit uCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uBaseCadastro, Data.DB, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, uDMCliente,
+  uClienteController, Vcl.Mask, Vcl.DBCtrls, uFuncoesSIDomper, uDMClienteEmail, uDMClienteEspecificacao,
+  uGrade, uClienteEspecificacaoController, uClienteModuloController, uDMClienteModulo,
+  uFraUsuario, uFraRevenda, Vcl.Menus, uCidadeController, uCidade, uFraCidade,
+  uDMContato, uContatoVO, uContatoController, System.Generics.Collections,
+  uFraModulo, uFiltroCliente, uFraProduto;
+
+type
+  TfrmCliente = class(TfrmBaseCadastro)
+    PageControl1: TPageControl;
+    tsPrincipal: TTabSheet;
+    Panel7: TPanel;
+    Label4: TLabel;
+    Label5: TLabel;
+    edtCodigo: TDBEdit;
+    edtNome: TDBEdit;
+    DBEdit1: TDBEdit;
+    Label6: TLabel;
+    edtCNPJ: TDBEdit;
+    Label7: TLabel;
+    DBRadioGroup1: TDBRadioGroup;
+    Label8: TLabel;
+    Label9: TLabel;
+    edtUsuario: TDBEdit;
+    Label11: TLabel;
+    DBEdit6: TDBEdit;
+    edtRevenda: TDBEdit;
+    Label12: TLabel;
+    DBEdit8: TDBEdit;
+    btnUsuario: TSpeedButton;
+    btnRevenda: TSpeedButton;
+    tsEmail: TTabSheet;
+    Panel8: TPanel;
+    GroupBox2: TGroupBox;
+    dbEmail: TDBGrid;
+    dsEmail: TDataSource;
+    dsEspecificacao: TDataSource;
+    tsModulo: TTabSheet;
+    Panel10: TPanel;
+    GroupBox3: TGroupBox;
+    dbModulo: TDBGrid;
+    Label16: TLabel;
+    edtModulo: TDBEdit;
+    edtEmail: TDBEdit;
+    Label17: TLabel;
+    DBCheckBox2: TDBCheckBox;
+    dsModulo: TDataSource;
+    DBEdit9: TDBEdit;
+    btnModulo: TSpeedButton;
+    Label18: TLabel;
+    edtProduto: TDBEdit;
+    DBEdit11: TDBEdit;
+    btnProduto: TSpeedButton;
+    btnNovoModulo: TBitBtn;
+    btnExcluirModulo: TBitBtn;
+    btnCancelarModulo: TBitBtn;
+    btnNovoEmail: TBitBtn;
+    btnExcluirEmail: TBitBtn;
+    btnCancelarEmail: TBitBtn;
+    dlgAbrirArquivo: TOpenDialog;
+    dlgSalvarArquivo: TSaveDialog;
+    btnEspecificacao: TBitBtn;
+    GroupBox4: TGroupBox;
+    DBCheckBox1: TDBCheckBox;
+    tsFiltroUsuario: TTabSheet;
+    Panel9: TPanel;
+    tsFiltroRevenda: TTabSheet;
+    Panel11: TPanel;
+    FraRevenda: TFraRevenda;
+    FraUsuario: TFraUsuario;
+    cbbRestricao: TComboBox;
+    Label13: TLabel;
+    btnSalvarEmail: TBitBtn;
+    btnSalvarModulo: TBitBtn;
+    Ativo: TDBCheckBox;
+    btnEspecificacao1: TBitBtn;
+    btnEditarEmail: TBitBtn;
+    btnEditarModulo: TBitBtn;
+    Label14: TLabel;
+    DBEdit2: TDBEdit;
+    pm1: TPopupMenu;
+    ImpressodoHistrico1: TMenuItem;
+    DBEdit3: TDBEdit;
+    Label15: TLabel;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    DBEdit5: TDBEdit;
+    edtCodCidade: TDBEdit;
+    DBEdit10: TDBEdit;
+    DBEdit12: TDBEdit;
+    DBEdit13: TDBEdit;
+    DBEdit4: TDBEdit;
+    Label22: TLabel;
+    DBEdit14: TDBEdit;
+    Label23: TLabel;
+    DBEdit15: TDBEdit;
+    Label24: TLabel;
+    DBEdit16: TDBEdit;
+    DBEdit21: TDBEdit;
+    Label28: TLabel;
+    GroupBox5: TGroupBox;
+    DBEdit17: TDBEdit;
+    Label10: TLabel;
+    DBEdit18: TDBEdit;
+    Label25: TLabel;
+    GroupBox6: TGroupBox;
+    Label29: TLabel;
+    Label30: TLabel;
+    DBEdit22: TDBEdit;
+    DBEdit23: TDBEdit;
+    btnCidade: TSpeedButton;
+    GroupBox7: TGroupBox;
+    DBEdit7: TDBEdit;
+    Label26: TLabel;
+    Label27: TLabel;
+    DBEdit19: TDBEdit;
+    tsCidade: TTabSheet;
+    Panel12: TPanel;
+    FraCidade: TFraCidade;
+    dbContatos: TDBGrid;
+    dsContato: TDataSource;
+    lblRegistros: TLabel;
+    tsFiltroModulo: TTabSheet;
+    Panel13: TPanel;
+    FraModulo: TFraModulo;
+    GroupBox8: TGroupBox;
+    Label35: TLabel;
+    cbbModelo: TComboBox;
+    tsFiltroProduto: TTabSheet;
+    Panel14: TPanel;
+    FraProduto: TFraProduto;
+    edtVersao: TEdit;
+    Label31: TLabel;
+    Label32: TLabel;
+    DBEdit20: TDBEdit;
+    RGEmpVinculada: TRadioGroup;
+    procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnFiltroClick(Sender: TObject);
+    procedure dbDadosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure btnFecharEdicaoClick(Sender: TObject);
+    procedure btnImprimirClick(Sender: TObject);
+    procedure btnUsuarioClick(Sender: TObject);
+    procedure edtUsuarioExit(Sender: TObject);
+    procedure btnRevendaClick(Sender: TObject);
+    procedure edtRevendaExit(Sender: TObject);
+    procedure dbEmailDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure btnModuloClick(Sender: TObject);
+    procedure edtModuloExit(Sender: TObject);
+    procedure dbModuloDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure edtProdutoExit(Sender: TObject);
+    procedure btnProdutoClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure btnNovoModuloClick(Sender: TObject);
+    procedure btnExcluirModuloClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure btnCancelarModuloClick(Sender: TObject);
+    procedure btnNovoEmailClick(Sender: TObject);
+    procedure btnExcluirEmailClick(Sender: TObject);
+    procedure btnCancelarEmailClick(Sender: TObject);
+    procedure dbEmailKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dsEmailStateChange(Sender: TObject);
+    procedure dsModuloStateChange(Sender: TObject);
+    procedure edtUsuarioKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure DBCheckBox2KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnEspecificacaoClick(Sender: TObject);
+    procedure btnSalvarEmailClick(Sender: TObject);
+    procedure btnSalvarModuloClick(Sender: TObject);
+    procedure dbmEnderecoEnter(Sender: TObject);
+    procedure dbmEnderecoExit(Sender: TObject);
+    procedure edtCNPJExit(Sender: TObject);
+    procedure tsEmailShow(Sender: TObject);
+    procedure tsModuloShow(Sender: TObject);
+    procedure dbDadosTitleClick(Column: TColumn);
+    procedure dsCadStateChange(Sender: TObject);
+    procedure btnEspecificacao1Click(Sender: TObject);
+    procedure btnEditarEmailClick(Sender: TObject);
+    procedure btnEditarModuloClick(Sender: TObject);
+    procedure dbEmailCellClick(Column: TColumn);
+    procedure PageControl1Change(Sender: TObject);
+    procedure ImpressodoHistrico1Click(Sender: TObject);
+    procedure edtCodCidadeExit(Sender: TObject);
+    procedure btnCidadeClick(Sender: TObject);
+    procedure dbContatosDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure dbContatosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbContatosExit(Sender: TObject);
+    procedure dbContatosEnter(Sender: TObject);
+    procedure btnFiltrarClick(Sender: TObject);
+  private
+    { Private declarations }
+    FController: TClienteController;
+    procedure Localizar(ATexto: string; AIdUsuario: Integer);
+    procedure BuscarUsuario(AId, ACodigo: Integer);
+    procedure BuscarRevenda(AId, ACodigo: Integer);
+    procedure BuscarModulo(AId, ACodigo: Integer);
+    procedure BuscarProduto(AId, ACodigo: Integer);
+    procedure BuscarCidade(AId, ACodigo: Integer);
+    procedure NovoModulo;
+    procedure ExcluirModulo;
+    function CancelarModulo: Boolean;
+    function SalvarModulo: Boolean;
+
+    procedure NovoEmail;
+    procedure ExcluirEmail;
+    function CancelarEmail: Boolean;
+    function SalvarEmail: Boolean;
+
+    procedure EditarEmail;
+    procedure EditarModelo;
+
+    procedure ControleEmail;
+    procedure ControleModulo;
+    procedure Inicio(AIdUsuario: Integer; APesquisar: Boolean);
+
+    procedure MascaraCNPJCPF();
+    procedure EntrarEspecificacoes(AIdCliente: integer);
+    procedure ControleBotaoSalvar;
+    procedure CarregarContatos;
+
+    function RetornarFiltro(AFiltro: TfiltroCliente): TFiltroCliente;
+
+  public
+    { Public declarations }
+    constructor create(APesquisar: Boolean = False); overload;
+    constructor create(AIdUsuario: Integer; APesquisar: Boolean = False); overload;
+    constructor create(AIdUsuario, ACodigo: Integer; APesquisar: Boolean = False); overload;
+  end;
+
+var
+  frmCliente: TfrmCliente;
+
+implementation
+
+{$R *.dfm}
+
+uses uDM, uUsuarioController, uUsuario, uRevenda, uRevendaController,
+  uModuloController, uModulo, uProduto, uProdutoController, uImagens, uWeb,
+  uClienteEspecificacao, uPosicaoBotao, uClienteVO,
+  uClienteEmailVO, uClienteModuloVO;
+
+procedure TfrmCliente.btnCancelarEmailClick(Sender: TObject);
+begin
+  inherited;
+  FController.ClienteEmail.Cancelar;
+end;
+
+procedure TfrmCliente.btnCancelarModuloClick(Sender: TObject);
+begin
+  inherited;
+  FController.ClienteModulo.Cancelar;
+end;
+
+procedure TfrmCliente.btnCidadeClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmCidade.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarCidade(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmCliente.btnEditarClick(Sender: TObject);
+begin
+  FController.Editar(dbDados.Columns[0].Field.AsInteger, Self);
+  inherited;
+
+  PageControl1.ActivePageIndex := 0;
+  if edtNome.Enabled then
+    edtNome.SetFocus;
+
+  ControleEmail;
+  ControleModulo;
+  CarregarContatos;
+end;
+
+procedure TfrmCliente.btnEditarEmailClick(Sender: TObject);
+begin
+  inherited;
+  if dsEmail.DataSet.RecordCount = 0 then
+    raise Exception.Create('Não há Registro para Editar!');
+
+  dsEmail.DataSet.Edit;
+  edtEmail.SetFocus;
+end;
+
+procedure TfrmCliente.btnEditarModuloClick(Sender: TObject);
+begin
+  inherited;
+  if dsModulo.DataSet.RecordCount = 0 then
+    raise Exception.Create('Não há Registro para Editar!');
+
+  dsModulo.DataSet.Edit;
+  edtModulo.SetFocus;
+end;
+
+procedure TfrmCliente.btnEspecificacao1Click(Sender: TObject);
+begin
+  inherited;
+  EntrarEspecificacoes(FController.Model.CDSCadastroCli_Id.AsInteger);
+end;
+
+procedure TfrmCliente.btnEspecificacaoClick(Sender: TObject);
+begin
+  inherited;
+  EntrarEspecificacoes(FController.Model.CDSConsultaCli_Id.AsInteger);
+end;
+
+procedure TfrmCliente.btnExcluirClick(Sender: TObject);
+begin
+  if TFuncoes.Confirmar('Excluir Registro?') then
+  begin
+    FController.Excluir(dm.IdUsuario, dbDados.Columns[0].Field.AsInteger);
+    inherited;
+  end;
+end;
+
+procedure TfrmCliente.btnExcluirEmailClick(Sender: TObject);
+begin
+  inherited;
+  if FController.ClienteEmail.Model.CDSConsulta.RecordCount = 0 then
+    raise Exception.Create('Não há registro para Excluir!');
+
+  if TFuncoes.Confirmar('Confirmar Exclusão?') then
+  begin
+    FController.ClienteEmail.Excluir;
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+  end;
+end;
+
+procedure TfrmCliente.btnExcluirModuloClick(Sender: TObject);
+begin
+  if FController.ClienteModulo.Model.CDSConsulta.RecordCount = 0 then
+    raise Exception.Create('Não há registro para Excluir!');
+
+  inherited;
+  if TFuncoes.Confirmar('Confirmar Exclusão?') then
+  begin
+    FController.ClienteModulo.Excluir;
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+  end;
+end;
+
+procedure TfrmCliente.btnFecharEdicaoClick(Sender: TObject);
+begin
+  FController.Cancelar;
+//  tsPrincipal.Show;
+  PageControl1.TabIndex := 0;
+  inherited;
+end;
+
+procedure TfrmCliente.btnFiltrarClick(Sender: TObject);
+begin
+  inherited;
+  cbbSituacao.SetFocus;
+end;
+
+procedure TfrmCliente.btnFiltroClick(Sender: TObject);
+begin
+  inherited;
+  Localizar(edtDescricao.Text, dm.IdUsuario);
+end;
+
+procedure TfrmCliente.btnImprimirClick(Sender: TObject);
+var
+  sRelatorio: string;
+  oFiltro: TFiltroCliente;
+begin
+  sRelatorio := Copy(cbbModelo.Text, 1, 2);
+  if sRelatorio = '01' then
+  begin
+    Localizar(edtDescricao.Text, dm.IdUsuario);
+    FController.Imprimir(dm.IdUsuario);
+  end;
+
+  if sRelatorio = '02' then
+  begin
+    oFiltro := TFiltroCliente.Create;
+    try
+      oFiltro := RetornarFiltro(oFiltro);
+      FController.Relatorios(2, oFiltro);
+    finally
+      FreeAndNil(oFiltro);
+    end;
+
+  end;
+  inherited;
+end;
+
+procedure TfrmCliente.btnModuloClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmModulo.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarModulo(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmCliente.btnNovoClick(Sender: TObject);
+begin
+  FController.Novo(dm.IdUsuario);
+
+  inherited;
+  PageControl1.ActivePageIndex := 0;
+
+  ControleEmail;
+  ControleModulo;
+  CarregarContatos;
+
+  edtCodigo.SetFocus;
+end;
+
+procedure TfrmCliente.btnNovoEmailClick(Sender: TObject);
+begin
+  inherited;
+  FController.ClienteEmail.Model.CDSConsulta.Last;
+  edtEmail.SetFocus;
+  FController.ClienteEmail.Novo;
+end;
+
+procedure TfrmCliente.btnNovoModuloClick(Sender: TObject);
+begin
+  inherited;
+  edtModulo.SetFocus;
+  FController.ClienteModulo.Model.CDSConsulta.Last;
+  FController.ClienteModulo.Novo;
+end;
+
+procedure TfrmCliente.btnProdutoClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmProduto.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarProduto(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmCliente.btnRevendaClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmRevenda.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarRevenda(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmCliente.btnSalvarClick(Sender: TObject);
+begin
+  FController.Salvar(dm.IdUsuario);
+
+  FController.FiltrarCodigo(FController.Model.CDSCadastroCli_Codigo.AsInteger);
+  PageControl1.TabIndex := 0;
+  inherited;
+end;
+
+procedure TfrmCliente.btnUsuarioClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmUsuario.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarUsuario(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmCliente.BuscarCidade(AId, ACodigo: Integer);
+var
+  CidadeController: TCidadeController;
+begin
+  CidadeController := TCidadeController.Create;
+  try
+    try
+      CidadeController.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodCidade.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroCli_Cidade.AsString := CidadeController.Model.CDSCadastroCid_Id.AsString;
+    FController.Model.CDSCadastroCid_Codigo.AsString := CidadeController.Model.CDSCadastroCid_Codigo.AsString;
+    FController.Model.CDSCadastroCid_Nome.AsString := CidadeController.Model.CDSCadastroCid_Nome.AsString;
+    FController.Model.CDSCadastroCid_UF.AsString := CidadeController.Model.CDSCadastroCid_UF.AsString;
+    FreeAndNil(CidadeController);
+  end;
+  edtCodCidade.Modified := False;
+end;
+
+procedure TfrmCliente.BuscarModulo(AId, ACodigo: Integer);
+var
+  ModuloController: TModuloController;
+begin
+  if not (dsModulo.DataSet.State in [dsEdit, dsInsert]) then
+    Exit;
+
+  ModuloController := TModuloController.Create;
+  try
+    try
+      ModuloController.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtModulo.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.ClienteModulo.Model.CDSConsulta);
+    FController.ClienteModulo.Model.CDSConsultaCliMod_Modulo.AsString := ModuloController.Model.CDSCadastroMod_Id.AsString;
+    FController.ClienteModulo.Model.CDSConsultaMod_Codigo.AsString := ModuloController.Model.CDSCadastroMod_Codigo.AsString;
+    FController.ClienteModulo.Model.CDSConsultaMod_Nome.AsString := ModuloController.Model.CDSCadastroMod_Nome.AsString;
+
+    FreeAndNil(ModuloController);
+  end;
+  edtModulo.Modified := False;
+end;
+
+procedure TfrmCliente.BuscarProduto(AId, ACodigo: Integer);
+var
+  ProdutoController: TProdutoController;
+begin
+  if not (dsModulo.DataSet.State in [dsEdit, dsInsert]) then
+    Exit;
+
+  ProdutoController := TProdutoController.Create;
+  try
+    try
+      ProdutoController.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtProduto.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.ClienteModulo.Model.CDSConsulta);
+    FController.ClienteModulo.Model.CDSConsultaCliMod_Produto.AsString := ProdutoController.Model.CDSCadastroProd_Id.AsString;
+    FController.ClienteModulo.Model.CDSConsultaProd_Codigo.AsString := ProdutoController.Model.CDSCadastroProd_Codigo.AsString;
+    FController.ClienteModulo.Model.CDSConsultaProd_Nome.AsString := ProdutoController.Model.CDSCadastroProd_Nome.AsString;
+
+    FreeAndNil(ProdutoController);
+  end;
+
+  if edtModulo.Text <> '' then
+    FController.ClienteModulo.Post();
+
+  edtProduto.Modified := False;
+end;
+
+procedure TfrmCliente.BuscarRevenda(AId, ACodigo: Integer);
+var
+  RevendaController: TRevendaController;
+begin
+  RevendaController := TRevendaController.Create;
+  try
+    try
+      RevendaController.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtRevenda.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroCli_Revenda.AsString := RevendaController.Model.CDSCadastroRev_Id.AsString;
+    FController.Model.CDSCadastroRev_Codigo.AsString := RevendaController.Model.CDSCadastroRev_Codigo.AsString;
+    FController.Model.CDSCadastroRev_Nome.AsString := RevendaController.Model.CDSCadastroRev_Nome.AsString;
+
+    FreeAndNil(RevendaController);
+  end;
+  edtRevenda.Modified := False;
+end;
+
+procedure TfrmCliente.BuscarUsuario(AId, ACodigo: Integer);
+var
+  obj: TUsuarioController;
+begin
+  obj := TUsuarioController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtUsuario.SetFocus;
+      end;
+    end;
+  finally
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+    FController.Model.CDSCadastroCli_Usuario.AsString := obj.Model.CDSCadastroUsu_Id.AsString;
+    FController.Model.CDSCadastroUsu_Codigo.AsString := obj.Model.CDSCadastroUsu_Codigo.AsString;
+    FController.Model.CDSCadastroUsu_Nome.AsString := obj.Model.CDSCadastroUsu_Nome.AsString;
+
+    FreeAndNil(obj);
+  end;
+  edtUsuario.Modified := False;
+end;
+
+function TfrmCliente.CancelarEmail: Boolean;
+begin
+  Result := False;
+  if tsEmail.Showing then
+  begin
+    if (FController.ClienteEmail.Model.CDSConsulta.State in [dsEdit, dsInsert]) then
+    begin
+      btnCancelarEmailClick(Self);
+      Result := True;
+    end;
+  end;
+end;
+
+function TfrmCliente.CancelarModulo: Boolean;
+begin
+  Result := False;
+  if tsModulo.Showing then
+  begin
+    if (FController.ClienteModulo.Model.CDSConsulta.State in [dsEdit, dsInsert]) then
+    begin
+      if btnCancelarModulo.Enabled then
+      begin
+        btnCancelarModuloClick(Self);
+        Result := True;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmCliente.CarregarContatos;
+var
+  model: TContatoVO;
+  lista: TObjectList<TContatoVO>;
+  ContatoController: TContatoController;
+begin
+
+  FController.Model.CDSContato.First;
+  while not FController.Model.CDSContato.Eof do
+    FController.Model.CDSContato.Delete;
+  model := TContatoVO.Create;
+  Lista := ContatoController.LocalizarPorCliente(FController.Model.CDSCadastroCli_Id.AsInteger);
+  for model in lista do
+  begin
+    FController.Model.CDSContato.Append;
+    FController.Model.CDSContatoCont_Id.AsInteger := model.Id;
+    FController.Model.CDSContatoCont_Cliente.AsInteger := model.IdCliente;
+    FController.Model.CDSContatoCont_Orcamento.AsInteger := model.IdOrcamento;
+    FController.Model.CDSContatoCont_Nome.AsString := model.Nome;
+    FController.Model.CDSContatoCont_Fone1.AsString := model.Fone1;
+    FController.Model.CDSContatoCont_Fone2.AsString := model.Fone2;
+    FController.Model.CDSContatoCont_Depto.AsString := model.Departamento;
+    FController.Model.CDSContatoCont_Email.AsString := model.Email;
+    FController.Model.CDSContato.Post;
+  end;
+  FreeAndNil(lista);
+  FreeAndNil(model);
+  FController.Model.CDSContato.First;
+end;
+
+procedure TfrmCliente.ControleBotaoSalvar;
+begin
+  btnSalvar.Enabled := ((btnSalvarEmail.Enabled = False) and (btnSalvarModulo.Enabled = False) and (FController.Model.CDSCadastro.State in [dsEdit, dsInsert]));
+end;
+
+procedure TfrmCliente.ControleEmail;
+var
+  habilitar: Boolean;
+begin
+  habilitar := edtEmail.Enabled;
+
+  if habilitar = False then
+  begin
+    btnNovoEmail.Enabled := habilitar;
+    btnExcluirEmail.Enabled := habilitar;
+    btnCancelarEmail.Enabled := habilitar;
+    btnEditarEmail.Enabled := habilitar;
+    btnSalvarEmail.Enabled := habilitar;
+  end;
+
+  if FController.Model.CDSCadastro.State = dsInsert then
+  begin
+    btnNovoEmail.Enabled := True;
+    btnExcluirEmail.Enabled := True;
+    btnCancelarEmail.Enabled := False;
+    btnEditarEmail.Enabled := True;
+    btnSalvarEmail.Enabled := False;
+  end;
+
+  if habilitar then
+    dbEmail.Options := dbEmail.Options + [dgEditing]
+  else
+    dbEmail.Options := dbEmail.Options - [dgEditing];
+end;
+
+procedure TfrmCliente.ControleModulo;
+var
+  habilitar: Boolean;
+begin
+  habilitar := edtModulo.Enabled;
+  if habilitar = False then
+  begin
+    btnNovoModulo.Enabled := habilitar;
+    btnExcluirModulo.Enabled := habilitar;
+    btnCancelarModulo.Enabled := habilitar;
+    btnSalvarModulo.Enabled := habilitar;
+    btnEditarModulo.Enabled := habilitar;
+  end;
+
+  if FController.Model.CDSCadastro.State = dsInsert then
+  begin
+    btnNovoModulo.Enabled := True;
+    btnExcluirModulo.Enabled := True;
+    btnCancelarModulo.Enabled := False;
+    btnEditarModulo.Enabled := True;
+    btnSalvarModulo.Enabled := False;
+  end;
+
+  if habilitar then
+    dbModulo.Options := dbModulo.Options + [dgEditing]
+  else
+    dbModulo.Options := dbModulo.Options - [dgEditing];
+end;
+
+constructor TfrmCliente.create(AIdUsuario, ACodigo: Integer; APesquisar: Boolean);
+begin
+  inherited create(nil);
+  Inicio(AIdUsuario, APesquisar);
+  FController.FiltrarCodigo(ACodigo);
+end;
+
+constructor TfrmCliente.create(AIdUsuario: Integer; APesquisar: Boolean);
+begin
+  inherited create(nil);
+  Inicio(AIdUsuario, APesquisar);
+end;
+
+constructor TfrmCliente.create(APesquisar: Boolean);
+begin
+  inherited create(nil);
+  Inicio(dm.IdUsuario, APesquisar);
+end;
+
+procedure TfrmCliente.btnSalvarEmailClick(Sender: TObject);
+begin
+  inherited;
+  FController.ClienteEmail.Post();
+end;
+
+procedure TfrmCliente.btnSalvarModuloClick(Sender: TObject);
+begin
+  inherited;
+  FController.ClienteModulo.Post();
+  edtModulo.SetFocus;
+end;
+
+procedure TfrmCliente.DBCheckBox2KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+    FController.ClienteEmail.Post();
+end;
+
+procedure TfrmCliente.dbContatosDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.Zebrar(dsContato.DataSet, dbContatos, Sender, Rect, DataCol, Column, State);
+end;
+
+procedure TfrmCliente.dbContatosEnter(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := False;
+end;
+
+procedure TfrmCliente.dbContatosExit(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := True;
+end;
+
+procedure TfrmCliente.dbContatosKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if not (dsCad.State in [dsInsert, dsEdit]) then
+    dsCad.DataSet.Edit;
+
+  case key of
+    VK_ESCAPE: btnCancelar.Click;
+    VK_F8: btnSalvar.Click;
+    VK_RETURN:
+    begin
+      if dbContatos.SelectedIndex <= 3 then
+        dbContatos.SelectedIndex := dbContatos.SelectedIndex + 1
+      else begin
+        dbContatos.SelectedIndex := 0;
+        dsContato.DataSet.Append;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmCliente.dbDadosKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    dbDadosDblClick(Self);
+    if edtCodigo.Enabled then
+      edtCodigo.SetFocus;
+  end;
+end;
+
+procedure TfrmCliente.dbDadosTitleClick(Column: TColumn);
+begin
+  inherited;
+  TFuncoes.OrdenarCamposGrid(FController.Model.cdsconsulta, Column.FieldName);
+end;
+
+procedure TfrmCliente.dbEmailCellClick(Column: TColumn);
+begin
+  inherited;
+  TGrade.CheckBoxClicarCelula(Column, 'cNotificar', 'CliEm_Notificar', FController.ClienteEmail.Model.CDSConsulta);
+end;
+
+procedure TfrmCliente.dbEmailDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.Zebrar(dsEmail.DataSet, dbEmail, Sender, Rect, DataCol, Column, State);
+  TGrade.CheckBoxDesenharCelula(Column, 'CNotificar', dbEmail, Rect,  FController.ClienteEmail.Model.CDSConsultaCliEm_Notificar.AsBoolean);
+end;
+
+procedure TfrmCliente.dbEmailKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  TGrade.DesabilitarTelcasDeleteGrid(Key, Shift);
+end;
+
+procedure TfrmCliente.dbmEnderecoEnter(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := False;
+end;
+
+procedure TfrmCliente.dbmEnderecoExit(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := True;
+end;
+
+procedure TfrmCliente.dbModuloDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.Zebrar(dsModulo.DataSet, dbModulo, Sender, Rect, DataCol, Column, State);
+end;
+
+procedure TfrmCliente.dsCadStateChange(Sender: TObject);
+begin
+  inherited;
+  btnEspecificacao1.Enabled := (dsCad.DataSet.State in [dsEdit, dsBrowse]);
+end;
+
+procedure TfrmCliente.dsEmailStateChange(Sender: TObject);
+begin
+  inherited;
+  if dsEmail.State in [dsEdit, dsInsert] then
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+
+  btnSalvarEmail.Enabled := (dsEmail.DataSet.State in [dsEdit, dsInsert]);
+  btnCancelarEmail.Enabled := (dsEmail.DataSet.State in [dsEdit, dsInsert]);
+  btnEditarEmail.Enabled := (dsEmail.DataSet.State in [dsBrowse]);
+  btnExcluirEmail.Enabled := (dsEmail.DataSet.State in [dsBrowse]);
+  btnNovoEmail.Enabled := (dsEmail.DataSet.State in [dsBrowse]);
+
+  ControleBotaoSalvar();
+end;
+
+procedure TfrmCliente.dsModuloStateChange(Sender: TObject);
+begin
+  inherited;
+  if dsModulo.State in [dsEdit, dsInsert] then
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+
+  btnCancelarModulo.Enabled := dsModulo.DataSet.State in [dsEdit, dsInsert];
+  btnSalvarModulo.Enabled := dsModulo.DataSet.State in [dsEdit, dsInsert];
+  btnEditarModulo.Enabled := dsModulo.DataSet.State in [dsBrowse];
+  btnExcluirModulo.Enabled := dsModulo.DataSet.State in [dsBrowse];
+  btnNovoModulo.Enabled := dsModulo.DataSet.State in [dsBrowse];
+
+  ControleBotaoSalvar();
+end;
+
+procedure TfrmCliente.EditarEmail;
+begin
+  if (tsEdicao.Showing) and (tsEmail.Showing) and (btnEditarEmail.Enabled) then
+    btnEditarEmailClick(Self);
+
+end;
+
+procedure TfrmCliente.EditarModelo;
+begin
+  if (tsEdicao.Showing) and (tsModulo.Showing) and (btnEditarModulo.Enabled) then
+    btnEditarModuloClick(Self);
+end;
+
+procedure TfrmCliente.edtCNPJExit(Sender: TObject);
+begin
+  inherited;
+  if edtCNPJ.Modified then
+    MascaraCNPJCPF;
+end;
+
+procedure TfrmCliente.edtCodCidadeExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodCidade.Modified then
+    BuscarCidade(0, StrToIntDef(edtCodCidade.Text, 0));
+end;
+
+procedure TfrmCliente.edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+    Localizar(edtDescricao.Text, dm.IdUsuario);
+end;
+
+procedure TfrmCliente.edtModuloExit(Sender: TObject);
+begin
+  inherited;
+  if edtModulo.Modified then
+    BuscarModulo(0, StrToIntDef(edtModulo.Text, 0));
+end;
+
+procedure TfrmCliente.edtProdutoExit(Sender: TObject);
+begin
+  inherited;
+  if edtProduto.Modified then
+    BuscarProduto(0, StrToIntDef(edtProduto.Text, 0));
+end;
+
+procedure TfrmCliente.edtRevendaExit(Sender: TObject);
+begin
+  inherited;
+  if edtRevenda.Modified then
+    BuscarRevenda(0, StrToIntDef(edtRevenda.Text, 0));
+end;
+
+procedure TfrmCliente.edtUsuarioExit(Sender: TObject);
+begin
+  inherited;
+  if edtUsuario.Modified then
+    BuscarUsuario(0, StrToIntDef(edtUsuario.Text, 0));
+end;
+
+procedure TfrmCliente.edtUsuarioKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if key = VK_F9 then
+  begin
+    if Sender = edtUsuario then
+      btnUsuarioClick(Self)
+    else if Sender = edtRevenda then
+      btnRevendaClick(Self)
+    else if Sender = edtModulo then
+      btnModuloClick(Self)
+    else if Sender = edtProduto then
+      btnProdutoClick(Self)
+    else if Sender = edtCodCidade then
+      btnCidadeClick(Self);
+  end;
+end;
+
+procedure TfrmCliente.EntrarEspecificacoes(AIdCliente: integer);
+begin
+  if AIdCliente = 0 then
+    raise Exception.Create('Não há Cliente para informar as especifiações.');
+
+  TFuncoes.CriarFormularioModal(TfrmClienteEspecificacao.create(AIdCliente));
+end;
+
+procedure TfrmCliente.ExcluirEmail;
+begin
+  if tsEmail.Showing then
+  begin
+    if btnExcluirEmail.Enabled then
+      btnExcluirEmailClick(Self);
+  end;
+end;
+
+procedure TfrmCliente.ExcluirModulo;
+begin
+  if tsModulo.Showing then
+  begin
+    if btnExcluirModulo.Enabled then
+      btnExcluirModuloClick(Self);
+  end;
+end;
+
+procedure TfrmCliente.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  FreeAndNil(FController);
+end;
+
+procedure TfrmCliente.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+
+  if Key = VK_ESCAPE then
+  begin
+    if CancelarEmail then
+      Exit;
+
+    if CancelarModulo then
+      Exit;
+  end;
+
+  if Key = VK_F8 then
+  begin
+    if SalvarEmail() then
+      Exit;
+
+    if SalvarModulo() then
+      Exit;
+  end;
+
+  inherited;
+
+  case Key of
+    VK_INSERT:
+    begin
+      NovoEmail();
+      NovoModulo();
+    end;
+
+    VK_F2:
+    begin
+      EditarEmail();
+      EditarModelo();
+    end;
+
+    VK_ESCAPE:
+    begin
+      PageControl1.TabIndex := 0;
+    end;
+  end;
+
+  if (Shift = [ssCtrl]) and (Key = VK_DELETE) then
+  begin
+    ExcluirEmail;
+    ExcluirModulo;
+  end;
+end;
+
+procedure TfrmCliente.FormShow(Sender: TObject);
+var
+  Img: TfrmImagens;
+  Botao: TPosicaoBotao;
+  iPosicao: Integer;
+begin
+  inherited;
+
+  lblRegistros.Caption := '';
+  PageControl1.TabIndex := 0;
+
+  Img := TfrmImagens.Create(Self);
+  try
+    btnUsuario.Glyph := Img.btnProcurar.Glyph;
+    btnRevenda.Glyph := Img.btnProcurar.Glyph;
+    btnModulo.Glyph := Img.btnProcurar.Glyph;
+    btnProduto.Glyph := Img.btnProcurar.Glyph;
+    btnCidade.Glyph := Img.btnProcurar.Glyph;
+
+    btnNovoModulo.Glyph := Img.btnNovoItem.Glyph;
+    btnEditarModulo.Glyph := Img.btnEditar.Glyph;
+    btnExcluirModulo.Glyph := Img.btnExcluirItem.Glyph;
+    btnCancelarModulo.Glyph := Img.btnCancelarItem.Glyph;
+    btnSalvarModulo.Glyph := Img.btnSalvar.Glyph;
+
+    btnNovoEmail.Glyph := Img.btnNovoItem.Glyph;
+    btnEditarEmail.Glyph := Img.btnEditar.Glyph;
+    btnExcluirEmail.Glyph := Img.btnExcluirItem.Glyph;
+    btnCancelarEmail.Glyph := Img.btnCancelarItem.Glyph;
+    btnSalvarEmail.Glyph := Img.btnSalvar.Glyph;
+
+    btnEspecificacao.Glyph := Img.btnEspecificacao.Glyph;
+    btnEspecificacao1.Glyph := Img.btnEspecificacao.Glyph;
+  finally
+    FreeAndNil(Img);
+  end;
+
+  iPosicao := 528;
+  Botao := TPosicaoBotao.Create(btnNovoEmail, iPosicao, 500);
+  try
+    Botao.PosicaoBotao(btnEditarEmail);
+    Botao.PosicaoBotao(btnSalvarEmail);
+    Botao.PosicaoBotao(btnExcluirEmail);
+    Botao.PosicaoBotao(btnCancelarEmail);
+  finally
+    FreeAndNil(Botao);
+  end;
+
+  Botao := TPosicaoBotao.Create(btnNovoModulo, iPosicao, 500);
+  try
+    Botao.PosicaoBotao(btnEditarModulo);
+    Botao.PosicaoBotao(btnSalvarModulo);
+    Botao.PosicaoBotao(btnExcluirModulo);
+    Botao.PosicaoBotao(btnCancelarModulo);
+  finally
+    FreeAndNil(Botao);
+  end;
+//------------------------------------------------------------------------------
+// edicao
+  iPosicao := 6;
+  Botao := TPosicaoBotao.Create(btnSalvar, iPosicao, 6);
+  try
+    Botao.PosicaoBotao(btnCancelar);
+    Botao.PosicaoBotao(btnEspecificacao1);
+  finally
+    FreeAndNil(Botao);
+  end;
+
+//------------------------------------------------------------------------------
+// Pesquisa
+  iPosicao := 6;
+  Botao := TPosicaoBotao.Create(btnPrimeiro, iPosicao, 6, True);
+  try
+    Botao.PosicaoBotaoNavegacao(btnAnterior);
+    Botao.PosicaoBotaoNavegacao(btnProximo);
+    Botao.PosicaoBotaoNavegacao(btnUltimo);
+    Botao.PosicaoBotao(btnNovo);
+    Botao.PosicaoBotao(btnEditar);
+    Botao.PosicaoBotao(btnExcluir);
+    Botao.PosicaoBotao(btnFiltrar);
+    Botao.PosicaoBotao(btnEspecificacao);
+    Botao.PosicaoBotao(btnSair);
+  finally
+    FreeAndNil(Botao);
+  end;
+//------------------------------------------------------------------------------
+// filtro
+  iPosicao := 6;
+  Botao := TPosicaoBotao.Create(btnFiltro, iPosicao, 6);
+  try
+    Botao.PosicaoBotao(btnImprimir);
+    Botao.PosicaoBotao(btnFecharFiltro);
+  finally
+    FreeAndNil(Botao);
+  end;
+
+end;
+
+procedure TfrmCliente.ImpressodoHistrico1Click(Sender: TObject);
+begin
+  inherited;
+  if dsPesquisa.DataSet.FieldByName('Cli_Id').AsInteger = 0 then
+    raise Exception.Create('Não há Registros?');
+
+  FController.Historico(dsPesquisa.DataSet.FieldByName('Cli_Id').AsInteger);
+end;
+
+procedure TfrmCliente.Inicio(AIdUsuario: Integer; APesquisar: Boolean);
+begin
+  FController := TClienteController.Create;
+  dsPesquisa.DataSet := FController.Model.CDSConsulta;
+  dsCad.DataSet := FController.Model.CDSCadastro;
+
+  dsEmail.DataSet := FController.ClienteEmail.Model.CDSConsulta;
+  dsEspecificacao.DataSet := FController.ClienteEspecificacao.Model.CDSConsulta;
+  dsModulo.DataSet := FController.ClienteModulo.Model.CDSConsulta;
+
+  TGrade.RetornaCamposGrid(dbDados, cbbCampos);
+  Localizar('ABCDE', AIdUsuario);
+
+  if APesquisar then
+  begin
+    cbbSituacao.ItemIndex := 0;
+    Pesquisa := APesquisar;
+  end;
+  FraUsuario.Inicializar();
+  FraRevenda.Inicializar();
+  FraCidade.Inicializar();
+  FraModulo.Inicializar();
+  FraProduto.Inicializar();
+
+end;
+
+procedure TfrmCliente.Localizar(ATexto: string; AIdUsuario: Integer);
+var
+  sCampo: string;
+  sSituacao: string;
+  bContem: Boolean;
+  Filtro: TFiltroCliente;
+begin
+  sCampo := TGrade.FiltrarCampo(dbDados, cbbCampos);
+  sSituacao := Copy(cbbSituacao.Items.Strings[cbbSituacao.ItemIndex], 1, 1);
+  bContem := (cbbPesquisa.ItemIndex = 1);
+
+  Filtro := TFiltroCliente.Create;
+  try
+    Filtro := RetornarFiltro(Filtro);
+
+    FController.Filtrar(Filtro, sCampo, ATexto, sSituacao, AIdUsuario, bContem);
+    FController.Model.CDSConsulta.IndexFieldNames := sCampo;
+    lblRegistros.Caption := 'Registros: ' + IntToStr(FController.Model.CDSConsulta.RecordCount);
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmCliente.MascaraCNPJCPF;
+begin
+  if not (FController.Model.CDSCadastro.State in [dsEdit, dsInsert]) then
+    Exit;
+
+  FController.Model.CDSCadastroCli_Dcto.Text := TFuncoes.MascaraCnpjCpf(edtCNPJ.Text);
+end;
+
+procedure TfrmCliente.NovoEmail;
+begin
+  if tsEmail.Showing then
+  begin
+    if btnNovoEmail.Enabled then
+      btnNovoEmailClick(Self);
+  end;
+end;
+
+procedure TfrmCliente.NovoModulo;
+begin
+  if tsModulo.Showing then
+  begin
+    if btnNovoModulo.Enabled then
+      btnNovoModuloClick(Self);
+  end;
+end;
+
+procedure TfrmCliente.PageControl1Change(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.ControleGuias(PageControl1,
+                         tsEmail,
+                         btnSalvarEmail,
+                         'o Email!');
+
+  TFuncoes.ControleGuias(PageControl1,
+                         tsModulo,
+                         btnSalvarModulo,
+                         'o Módulo!');
+end;
+
+function TfrmCliente.RetornarFiltro(AFiltro: TfiltroCliente): TFiltroCliente;
+begin
+  AFiltro.IdUsuario := FraUsuario.RetornoSelecao();
+  AFiltro.IdRevenda := FraRevenda.RetornoSelecao();
+  AFiltro.IdCidade  := FraCidade.RetornoSelecao();
+  AFiltro.IdModulo  := FraModulo.RetornoSelecao();
+  AFiltro.IdProduto := FraProduto.RetornoSelecao();
+  AFiltro.Restricao := cbbRestricao.ItemIndex;
+  AFiltro.Ativo := Copy(cbbSituacao.Text,1,1);
+  AFiltro.Versao := edtVersao.Text;
+
+  case RGEmpVinculada.ItemIndex of
+    0: AFiltro.sEmpresaVinculada := 'S';
+    1: AFiltro.sEmpresaVinculada := 'N';
+    2: AFiltro.sEmpresaVinculada := 'T';
+  end;
+
+  Result := AFiltro;
+end;
+
+function TfrmCliente.SalvarEmail: Boolean;
+begin
+  Result := False;
+  if (tsEdicao.Showing) and (tsEmail.Showing)  then
+  begin
+    if btnSalvarEmail.Enabled then
+    begin
+      btnSalvarEmailClick(Self);
+      Result := True;
+    end;
+  end;
+
+end;
+
+function TfrmCliente.SalvarModulo: Boolean;
+begin
+  Result := False;
+  if (tsEdicao.Showing) and (tsModulo.Showing) then
+  begin
+    if btnSalvarModulo.Enabled then
+    begin
+      btnSalvarModuloClick(Self);
+      Result := True;
+    end;
+  end;
+end;
+
+procedure TfrmCliente.tsEmailShow(Sender: TObject);
+begin
+  inherited;
+  try
+    edtEmail.SetFocus;
+  except
+    // nada
+  end;
+end;
+
+procedure TfrmCliente.tsModuloShow(Sender: TObject);
+begin
+  inherited;
+  try
+    edtModulo.SetFocus;
+  except
+    // nada
+
+  end;
+end;
+
+end.

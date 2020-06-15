@@ -1,0 +1,25 @@
+unit uModuloVO;
+
+interface
+
+uses System.SysUtils;
+
+type
+  TModuloVO = class
+  private
+    FId: Integer;
+    FCodigo: Integer;
+    FNome: string;
+    FAtivo: Boolean;
+    FIdStr: string;
+  public
+    property Id: Integer read FId write FId;
+    property Codigo: Integer read FCodigo write FCodigo;
+    property IdStr: string read FIdStr write FIdStr;
+    property Nome: string read FNome write FNome;
+    property Ativo: Boolean read FAtivo write FAtivo;
+  end;
+
+implementation
+
+end.

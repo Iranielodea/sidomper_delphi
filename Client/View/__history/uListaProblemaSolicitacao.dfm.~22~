@@ -1,0 +1,270 @@
+object frmListaProblemaSolicitacao: TfrmListaProblemaSolicitacao
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'Pesquisa de Solicita'#231#245'es'
+  ClientHeight = 671
+  ClientWidth = 1018
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 1018
+    Height = 42
+    Align = alTop
+    BevelOuter = bvLowered
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 24
+      Top = 3
+      Width = 160
+      Height = 13
+      Caption = 'Digite o Texto e Pressione ENTER'
+    end
+    object edtTexto: TEdit
+      Left = 24
+      Top = 18
+      Width = 481
+      Height = 21
+      TabOrder = 0
+      OnKeyDown = edtTextoKeyDown
+    end
+  end
+  object DBCtrlGrid1: TDBCtrlGrid
+    Left = 0
+    Top = 42
+    Width = 1018
+    Height = 629
+    Align = alClient
+    DataSource = dsPesquisa
+    PanelHeight = 125
+    PanelWidth = 1001
+    TabOrder = 1
+    RowCount = 5
+    ExplicitTop = 45
+    object lblIdSolicitacao: TLabel
+      Left = 12
+      Top = 3
+      Width = 77
+      Height = 13
+      Caption = 'Id Solicita'#231#227'o'
+      DragCursor = crHandPoint
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Verdana'
+      Font.Style = [fsUnderline]
+      ParentFont = False
+      OnDblClick = lblIdSolicitacaoDblClick
+      OnMouseMove = lblIdSolicitacaoMouseMove
+      OnMouseLeave = lblIdSolicitacaoMouseLeave
+    end
+    object Label3: TLabel
+      Left = 190
+      Top = 4
+      Width = 92
+      Height = 13
+      Caption = 'Data Solicita'#231#227'o'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label4: TLabel
+      Left = 413
+      Top = 4
+      Width = 92
+      Height = 13
+      Caption = 'Hora Solicita'#231#227'o'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label6: TLabel
+      Left = 11
+      Top = 26
+      Width = 110
+      Height = 13
+      Caption = 'Descri'#231#227'o Abertura'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label2: TLabel
+      Left = 337
+      Top = 28
+      Width = 115
+      Height = 13
+      Caption = 'Descri'#231#227'o Libera'#231#227'o'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label5: TLabel
+      Left = 662
+      Top = 26
+      Width = 101
+      Height = 13
+      Caption = 'Descri'#231#227'o Ocorr'#234'ncia'
+    end
+    object Label7: TLabel
+      Left = 765
+      Top = 9
+      Width = 93
+      Height = 13
+      Caption = 'Data Ocorr'#234'ncia'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+    end
+    object DBEdit1: TDBEdit
+      Left = 95
+      Top = 0
+      Width = 89
+      Height = 21
+      TabStop = False
+      Color = clSilver
+      DataField = 'Sol_Id'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      TabOrder = 0
+    end
+    object DBEdit2: TDBEdit
+      Left = 288
+      Top = 0
+      Width = 118
+      Height = 21
+      TabStop = False
+      Color = clSilver
+      DataField = 'Sol_Data'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      TabOrder = 1
+    end
+    object DBEdit3: TDBEdit
+      Left = 511
+      Top = 0
+      Width = 118
+      Height = 21
+      TabStop = False
+      Color = clSilver
+      DataField = 'Sol_Hora'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      TabOrder = 2
+    end
+    object DBMemo1: TDBMemo
+      Left = 11
+      Top = 41
+      Width = 320
+      Height = 78
+      TabStop = False
+      Color = clSilver
+      DataField = 'Sol_Descricao'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      ScrollBars = ssVertical
+      TabOrder = 3
+    end
+    object DBMemo2: TDBMemo
+      Left = 337
+      Top = 41
+      Width = 320
+      Height = 78
+      TabStop = False
+      Color = clSilver
+      DataField = 'Sol_DescricaoLiberacao'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      ScrollBars = ssVertical
+      TabOrder = 4
+    end
+    object DBMemo3: TDBMemo
+      Left = 662
+      Top = 41
+      Width = 320
+      Height = 78
+      TabStop = False
+      Color = clSilver
+      DataField = 'DescricaoOco'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      ScrollBars = ssVertical
+      TabOrder = 5
+    end
+    object DBEdit4: TDBEdit
+      Left = 864
+      Top = 6
+      Width = 118
+      Height = 21
+      TabStop = False
+      Color = clSilver
+      DataField = 'DataOco'
+      DataSource = dsPesquisa
+      ReadOnly = True
+      TabOrder = 6
+    end
+  end
+  object dbredtRichLib: TDBRichEdit
+    Left = 337
+    Top = 167
+    Width = 319
+    Height = 89
+    DataField = 'Sol_DescricaoLiberacao'
+    DataSource = dsPesquisa
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ScrollBars = ssVertical
+    TabOrder = 2
+  end
+  object dbredtRichOco: TDBRichEdit
+    Left = 662
+    Top = 167
+    Width = 320
+    Height = 89
+    DataField = 'DescricaoOco'
+    DataSource = dsPesquisa
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ScrollBars = ssVertical
+    TabOrder = 3
+  end
+  object dsPesquisa: TDataSource
+    DataSet = DMSolicitacao.CDSListarProblemaSolucao
+    Left = 584
+    Top = 216
+  end
+end

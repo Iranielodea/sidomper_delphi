@@ -1,0 +1,28 @@
+program Client;
+
+uses
+  Vcl.Forms,
+  uTela in 'view\uTela.pas' {frmTela},
+  uDM in 'uDM.pas' {DM: TDataModule},
+  uRegras in 'uRegras.pas',
+  uLicencaController in 'Controller\uLicencaController.pas',
+  ULicencaVO in '..\Comum\ULicencaVO.pas',
+  uConverter in '..\Comum\uConverter.pas',
+  uKeyField in '..\..\Comum\DAO\uKeyField.pas',
+  uTableName in '..\..\Comum\DAO\uTableName.pas',
+  uConfig in '..\Comum\uConfig.pas',
+  uDMMSS in 'uDMMSS.pas' {DMMSS: TDataModule},
+  uGenericDAO in '..\Comum\uGenericDAO.pas',
+  uFireDAC in '..\Comum\uFireDAC.pas',
+  uLicencaItensVO in '..\Comum\uLicencaItensVO.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmTela, frmTela);
+  Application.CreateForm(TDM, DM);
+  Application.CreateForm(TDMMSS, DMMSS);
+  Application.Run;
+end.

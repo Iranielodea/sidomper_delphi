@@ -1,0 +1,32 @@
+unit uChamadoQuadroViewModel;
+
+interface
+
+uses System.Classes, uClienteVO, uStatusVO, uTipoVo, uUsuarioVO;
+
+type
+  TChamadoQuadroViewModel = class
+  public
+    property Quadro: string;
+    property IdChamado: Integer;
+    property DataAbertura: TDateTime;
+    property HoraAbertura: TTime;
+    property Nivel: Integer;
+    property Cha_Nivel: string;
+    property IdUsuarioAtendeAtual: Integer;
+    property UltimaData: TDate;
+    property HoraAtendeAtual: TTime;
+    property ParCodigo: Integer;
+
+    property Cliente: TClienteVO;
+    property Status: TStatusVO;
+    property Tipo: TTipoVO;
+    property Usuario: TUsuarioVO;
+
+
+//    property Cliente:
+  end;
+
+implementation
+
+end.

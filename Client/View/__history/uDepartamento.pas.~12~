@@ -1,0 +1,576 @@
+unit uDepartamento;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uBaseCadastro, Data.DB, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, uDMDepartamento,
+  uDepartamentoController, Vcl.Mask, Vcl.DBCtrls, uFuncoesSIDomper, Vcl.DBCGrids,
+  Vcl.Menus;
+
+type
+  TfrmDepartamento = class(TfrmBaseCadastro)
+    dsItens: TDataSource;
+    PageControl1: TPageControl;
+    tsPrincipal: TTabSheet;
+    Panel7: TPanel;
+    Label4: TLabel;
+    Label5: TLabel;
+    edtCodigo: TDBEdit;
+    edtNome: TDBEdit;
+    Ativo: TDBCheckBox;
+    GroupBox2: TGroupBox;
+    dbItens: TDBGrid;
+    PageControl3: TPageControl;
+    tsSolicitacao: TTabSheet;
+    grpSolicitacao: TGroupBox;
+    DBCheckBox1: TDBCheckBox;
+    DBCheckBox2: TDBCheckBox;
+    DBCheckBox3: TDBCheckBox;
+    DBCheckBox4: TDBCheckBox;
+    DBCheckBox5: TDBCheckBox;
+    DBCheckBox6: TDBCheckBox;
+    tsChamado: TTabSheet;
+    grpChamado: TGroupBox;
+    DBCheckBox7: TDBCheckBox;
+    DBCheckBox8: TDBCheckBox;
+    DBCheckBox9: TDBCheckBox;
+    DBCheckBox10: TDBCheckBox;
+    tsEmail: TTabSheet;
+    Panel8: TPanel;
+    dsEmail: TDataSource;
+    dbEmail: TDBGrid;
+    Label6: TLabel;
+    edtEmail: TDBEdit;
+    btnNovoEmail: TBitBtn;
+    btnExcluirEmail: TBitBtn;
+    btnCancelarEmail: TBitBtn;
+    btnSalvarEmail: TBitBtn;
+    btnEditarEmail: TBitBtn;
+    tsAtividade: TTabSheet;
+    grpAtividade: TGroupBox;
+    DBCheckBox11: TDBCheckBox;
+    DBCheckBox12: TDBCheckBox;
+    DBCheckBox13: TDBCheckBox;
+    DBCheckBox14: TDBCheckBox;
+    tsAgendamento: TTabSheet;
+    GroupBox3: TGroupBox;
+    DBCheckBox15: TDBCheckBox;
+    DBCheckBox16: TDBCheckBox;
+    pmPadrao: TPopupMenu;
+    DuplicarRegistro1: TMenuItem;
+    DBCheckBox17: TDBCheckBox;
+    procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnFiltroClick(Sender: TObject);
+    procedure dbDadosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure btnFecharEdicaoClick(Sender: TObject);
+    procedure btnImprimirClick(Sender: TObject);
+    procedure dbItensDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure dbItensCellClick(Column: TColumn);
+    procedure dbItensKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure dbItensKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure dbDadosTitleClick(Column: TColumn);
+    procedure FormShow(Sender: TObject);
+    procedure dbEmailDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure btnNovoEmailClick(Sender: TObject);
+    procedure btnEditarEmailClick(Sender: TObject);
+    procedure btnSalvarEmailClick(Sender: TObject);
+    procedure btnExcluirEmailClick(Sender: TObject);
+    procedure btnCancelarEmailClick(Sender: TObject);
+    procedure dsEmailStateChange(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtEmailKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure PageControl1Change(Sender: TObject);
+    procedure DuplicarRegistro1Click(Sender: TObject);
+
+  private
+    { Private declarations }
+    FController: TDepartamentoController;
+    procedure Localizar(ATexto: string);
+    procedure ControleAcessos;
+    procedure MostrarSolicitacao(ALerTodos: Boolean = False);
+    procedure MostrarChamado(ALerTodos: Boolean = False);
+    procedure MostrarProgramas(AEdicao: Boolean);
+    procedure MostrarAtividade(ALerTodos: Boolean = False);
+    procedure MostrarAgendamento(ALerTodos: Boolean = False);
+
+    procedure EntrarEdicao;
+    function NovoEmail: Boolean;
+    function EditarEmail: Boolean;
+    function SalvarEmail: Boolean;
+    function ExcluirEmail: Boolean;
+    function CancelarEmail: Boolean;
+    procedure ControleBotaoSalvar;
+  public
+    { Public declarations }
+    constructor create(APesquisar: Boolean = False);
+  end;
+
+var
+  frmDepartamento: TfrmDepartamento;
+
+implementation
+
+{$R *.dfm}
+
+uses uGrade, uDM, uImagens, uPosicaoBotao;
+
+procedure TfrmDepartamento.btnCancelarEmailClick(Sender: TObject);
+begin
+  inherited;
+  FController.Model.CDSDepartamentoEmail.Cancel;
+end;
+
+procedure TfrmDepartamento.btnEditarClick(Sender: TObject);
+begin
+  FController.Editar(dbDados.Columns[0].Field.AsInteger, Self);
+  inherited;
+  EntrarEdicao;
+  if edtNome.Enabled then
+    edtNome.SetFocus;
+  ControleAcessos;
+  MostrarProgramas(False);
+end;
+
+procedure TfrmDepartamento.btnEditarEmailClick(Sender: TObject);
+begin
+  inherited;
+  dsEmail.DataSet.Edit;
+  edtEmail.SetFocus;
+end;
+
+procedure TfrmDepartamento.btnExcluirClick(Sender: TObject);
+begin
+  if TFuncoes.Confirmar('Excluir Registro?') then
+  begin
+    FController.Excluir(dm.IdUsuario, dbDados.Columns[0].Field.AsInteger);
+    inherited;
+  end;
+end;
+
+procedure TfrmDepartamento.btnExcluirEmailClick(Sender: TObject);
+begin
+  inherited;
+  if FController.Model.CDSDepartamentoEmail.RecordCount = 0 then
+    raise Exception.Create('Não há registro para Excluir!');
+
+  if TFuncoes.Confirmar('Confirmar Exclusão?') then
+  begin
+    FController.Model.CDSDepartamentoEmail.Delete;
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+  end;
+end;
+
+procedure TfrmDepartamento.btnFecharEdicaoClick(Sender: TObject);
+begin
+  FController.Cancelar;
+  inherited;
+end;
+
+procedure TfrmDepartamento.btnFiltroClick(Sender: TObject);
+begin
+  inherited;
+  Localizar(edtDescricao.Text);
+end;
+
+procedure TfrmDepartamento.btnImprimirClick(Sender: TObject);
+begin
+  Localizar(edtDescricao.Text);
+  FController.Imprimir(dm.IdUsuario);
+  inherited;
+end;
+
+procedure TfrmDepartamento.btnNovoClick(Sender: TObject);
+begin
+  FController.Novo(dm.IdUsuario);
+  inherited;
+  EntrarEdicao;
+  MostrarProgramas(True);
+  edtCodigo.SetFocus;
+end;
+
+procedure TfrmDepartamento.btnNovoEmailClick(Sender: TObject);
+begin
+  inherited;
+  FController.Model.CDSDepartamentoEmail.Last;
+  edtEmail.SetFocus;
+  FController.Model.CDSDepartamentoEmail.Append;
+end;
+
+procedure TfrmDepartamento.btnSalvarClick(Sender: TObject);
+var
+  Id: Integer;
+begin
+  Id := FController.SalvarDepartamento(dm.IdUsuario);
+  FController.FiltrarId(Id);
+  inherited;
+end;
+
+procedure TfrmDepartamento.btnSalvarEmailClick(Sender: TObject);
+begin
+  inherited;
+  FController.Model.CDSDepartamentoEmail.Post;
+  TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+end;
+
+function TfrmDepartamento.CancelarEmail: Boolean;
+begin
+  Result := False;
+  if FController.Model.CDSDepartamentoEmail.State in [dsEdit, dsInsert] then
+  begin
+    if (tsEdicao.Showing) and (tsEmail.Showing) then
+    begin
+      btnCancelarEmailClick(Self);
+      Result := True;
+    end;
+  end;
+end;
+
+procedure TfrmDepartamento.ControleAcessos;
+var
+  habilitar: Boolean;
+begin
+  habilitar := edtNome.Enabled;
+  dbItens.Enabled := habilitar;
+end;
+
+procedure TfrmDepartamento.ControleBotaoSalvar;
+begin
+  btnSalvar.Enabled := ((btnSalvarEmail.Enabled = False) and (dsCad.State in [dsEdit, dsInsert]));
+end;
+
+constructor TfrmDepartamento.create(APesquisar: Boolean);
+begin
+  inherited create(nil);
+  FController := TDepartamentoController.Create;
+  dsPesquisa.DataSet := FController.Model.CDSConsulta;
+  dsCad.DataSet := FController.Model.CDSCadastro;
+  dsItens.DataSet := FController.Model.CDSItens;
+
+  TGrade.RetornaCamposGrid(dbDados, cbbCampos);
+  Localizar('ABCDE');
+
+  if APesquisar then
+  begin
+    cbbSituacao.ItemIndex := 0;
+    Pesquisa := APesquisar;
+  end;
+end;
+
+procedure TfrmDepartamento.MostrarProgramas(AEdicao: Boolean);
+begin
+  if FController.Model.CDSItensDepAc_Programa.AsInteger = 1 then
+    MostrarChamado()
+  else if FController.Model.CDSItensDepAc_Programa.AsInteger = 3 then
+    MostrarSolicitacao()
+  else if FController.Model.CDSItensDepAc_Programa.AsInteger = 111 then
+    MostrarAtividade()
+  else if FController.Model.CDSItensDepAc_Programa.AsInteger = 112 then
+    MostrarAgendamento()
+  else begin
+    tsSolicitacao.TabVisible  := False;
+    tsChamado.TabVisible      := False;
+    tsAtividade.TabVisible    := False;
+    tsAgendamento.TabVisible  := False;
+  end;
+
+  if AEdicao then
+    TFuncoes.ModoEdicaoInsercao(FController.Model.CDSCadastro);
+end;
+
+procedure TfrmDepartamento.dbDadosKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    dbDadosDblClick(Self);
+    if edtCodigo.Enabled then
+      edtCodigo.SetFocus;
+  end;
+end;
+
+procedure TfrmDepartamento.dbDadosTitleClick(Column: TColumn);
+begin
+  inherited;
+  TFuncoes.OrdenarCamposGrid(FController.Model.cdsconsulta, Column.FieldName);
+end;
+
+procedure TfrmDepartamento.dbEmailDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.Zebrar(dsEmail.DataSet, dbEmail, Sender, Rect, DataCol, Column, State);
+end;
+
+procedure TfrmDepartamento.dbItensCellClick(Column: TColumn);
+begin
+  inherited;
+  TGrade.CheckBoxClicarCelula(Column, 'CAcesso', 'DepAc_Acesso', FController.Model.CDSItens);
+  TGrade.CheckBoxClicarCelula(Column, 'CEditar', 'DepAc_Editar', FController.Model.CDSItens);
+  TGrade.CheckBoxClicarCelula(Column, 'CIncluir', 'DepAc_Incluir', FController.Model.CDSItens);
+  TGrade.CheckBoxClicarCelula(Column, 'CExcluir', 'DepAc_Excluir', FController.Model.CDSItens);
+  TGrade.CheckBoxClicarCelula(Column, 'CRelatorio', 'DepAc_Relatorio', FController.Model.CDSItens);
+  MostrarProgramas(True);
+end;
+
+procedure TfrmDepartamento.dbItensDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.Zebrar(dsItens.DataSet, dbItens, Sender, Rect, DataCol, Column, State);
+  TGrade.CheckBoxDesenharCelula(Column, 'CAcesso', dbItens, Rect,  FController.Model.CDSItensDepAc_Acesso.AsBoolean);
+  TGrade.CheckBoxDesenharCelula(Column, 'CEditar', dbItens, Rect,  FController.Model.CDSItensDepAc_Editar.AsBoolean);
+  TGrade.CheckBoxDesenharCelula(Column, 'CIncluir', dbItens, Rect,  FController.Model.CDSItensDepAc_Incluir.AsBoolean);
+  TGrade.CheckBoxDesenharCelula(Column, 'CExcluir', dbItens, Rect,  FController.Model.CDSItensDepAc_Excluir.AsBoolean);
+  TGrade.CheckBoxDesenharCelula(Column, 'CRelatorio', dbItens, Rect,  FController.Model.CDSItensDepAc_Relatorio.AsBoolean);
+end;
+
+procedure TfrmDepartamento.dbItensKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  TGrade.DesabilitarTelcasDeleteGrid(Key, Shift);
+end;
+
+procedure TfrmDepartamento.dbItensKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  MostrarProgramas(True);
+end;
+
+procedure TfrmDepartamento.dsEmailStateChange(Sender: TObject);
+begin
+  inherited;
+  btnNovoEmail.Enabled := (dsEmail.DataSet.State = dsBrowse);
+  btnEditarEmail.Enabled := (dsEmail.DataSet.State = dsBrowse);
+  btnSalvarEmail.Enabled := (dsEmail.DataSet.State in [dsEdit, dsInsert]);
+  btnExcluirEmail.Enabled := (dsEmail.DataSet.State = dsBrowse);
+  btnCancelarEmail.Enabled := (dsEmail.DataSet.State in [dsEdit, dsInsert]);
+
+  ControleBotaoSalvar();
+end;
+
+procedure TfrmDepartamento.DuplicarRegistro1Click(Sender: TObject);
+var
+  iId: Integer;
+begin
+  inherited;
+  if TFuncoes.Confirmar('Confirmar duplicação do registro?') then
+  begin
+    iId := FController.Duplicar(dsPesquisa.DataSet.FieldByName('Dep_Id').AsInteger);
+    FController.FiltrarId(iId);
+//    FController.Editar(iId, Self);
+    btnEditar.Click();
+  end;
+end;
+
+function TfrmDepartamento.EditarEmail: Boolean;
+begin
+  Result := False;
+  if (tsEdicao.Showing) and (tsEmail.Showing) then
+  begin
+    btnEditarEmailClick(Self);
+    Result := True;
+  end;
+end;
+
+procedure TfrmDepartamento.edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+    Localizar(edtDescricao.Text);
+end;
+
+procedure TfrmDepartamento.edtEmailKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+  begin
+    if FController.Model.CDSDepartamentoEmail.State in [dsEdit, dsInsert] then
+      btnSalvarEmailClick(Self);
+  end;
+end;
+
+procedure TfrmDepartamento.EntrarEdicao;
+begin
+  pgControl.ActivePageIndex := 1;
+  PageControl1.ActivePageIndex := 0;
+end;
+
+function TfrmDepartamento.ExcluirEmail: Boolean;
+begin
+  Result := False;
+  if (tsEdicao.Showing) and (tsEmail.Showing) then
+  begin
+    btnExcluirEmailClick(Self);
+    Result := True;
+  end;
+end;
+
+procedure TfrmDepartamento.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  FreeAndNil(FController);
+end;
+
+procedure TfrmDepartamento.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  case key of
+    VK_INSERT:
+    begin
+      if NovoEmail() then
+        Exit;
+    end;
+    VK_F2:
+    begin
+      if EditarEmail() then
+        Exit;
+    end;
+    VK_ESCAPE:
+    begin
+      if CancelarEmail() then
+        Exit;
+    end;
+    VK_F8:
+    begin
+      if SalvarEmail() then
+        Exit;
+    end;
+  end;
+
+  if (Shift = [ssCtrl]) and (Key = VK_DELETE) then
+  begin
+    if ExcluirEmail() then
+      Exit;
+  end;
+
+  inherited;
+end;
+
+procedure TfrmDepartamento.FormShow(Sender: TObject);
+var
+  Img: TfrmImagens;
+  iPosicao: Integer;
+  Botao: TPosicaoBotao;
+begin
+  inherited;
+  Img := TfrmImagens.Create(Self);
+  try
+    btnNovoEmail.Glyph := Img.btnNovoItem.Glyph;
+    btnEditarEmail.Glyph := Img.btnEditar.Glyph;
+    btnExcluirEmail.Glyph := Img.btnExcluirItem.Glyph;
+    btnCancelarEmail.Glyph := Img.btnCancelarItem.Glyph;
+    btnSalvarEmail.Glyph := Img.btnSalvar.Glyph;
+  finally
+    FreeAndNil(img);
+  end;
+
+  iPosicao := 230;
+  Botao := TPosicaoBotao.Create(btnNovoEmail, iPosicao, 428);
+  try
+    Botao.PosicaoBotao(btnEditarEmail);
+    Botao.PosicaoBotao(btnSalvarEmail);
+    Botao.PosicaoBotao(btnExcluirEmail);
+    Botao.PosicaoBotao(btnCancelarEmail);
+  finally
+    FreeAndNil(Botao);
+  end;
+end;
+
+procedure TfrmDepartamento.Localizar(ATexto: string);
+var
+  sCampo: string;
+  sSituacao: string;
+  bContem: Boolean;
+begin
+  sCampo := TGrade.FiltrarCampo(dbDados, cbbCampos);
+  sSituacao := Copy(cbbSituacao.Items.Strings[cbbSituacao.ItemIndex], 1, 1);
+  bContem := (cbbPesquisa.ItemIndex = 1);
+
+  FController.Filtrar(sCampo, ATexto, sSituacao, bContem);
+end;
+
+procedure TfrmDepartamento.MostrarAgendamento(ALerTodos: Boolean);
+begin
+  tsAgendamento.TabVisible := FController.MostrarAgendamento(ALerTodos);
+  tsAtividade.TabVisible := False;
+  tsChamado.TabVisible := False;
+  tsSolicitacao.TabVisible := False;
+end;
+
+procedure TfrmDepartamento.MostrarAtividade(ALerTodos: Boolean);
+begin
+  tsAtividade.TabVisible := FController.MostrarAtividades(ALerTodos);
+  tsChamado.TabVisible := False;
+  tsSolicitacao.TabVisible := False;
+  tsAgendamento.TabVisible := False;
+end;
+
+procedure TfrmDepartamento.MostrarChamado(ALerTodos: Boolean);
+begin
+  tsChamado.TabVisible := FController.MostrarChamados(ALerTodos);
+  tsSolicitacao.TabVisible := False;
+  tsAtividade.TabVisible := False;
+  tsAgendamento.TabVisible := False;
+end;
+
+procedure TfrmDepartamento.MostrarSolicitacao(ALerTodos: Boolean = False);
+begin
+  tsSolicitacao.TabVisible := FController.MostrarSolicitacao(ALerTodos);
+  tsChamado.TabVisible := False;
+  tsAtividade.TabVisible := False;
+  tsAgendamento.TabVisible := False;
+end;
+
+function TfrmDepartamento.NovoEmail: Boolean;
+begin
+  Result := False;
+  if (tsEdicao.Showing) and (tsEmail.Showing) then
+  begin
+    if btnNovoEmail.Enabled then
+    begin
+      btnNovoEmailClick(Self);
+      Result := True;
+    end;
+  end;
+end;
+
+procedure TfrmDepartamento.PageControl1Change(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.ControleGuias(PageControl1,
+                         tsEmail,
+                         btnSalvarEmail,
+                         'o Email!');
+end;
+
+function TfrmDepartamento.SalvarEmail: Boolean;
+begin
+  Result := False;
+  if (tsEdicao.Showing) and (tsEmail.Showing) then
+  begin
+    if btnSalvarEmail.Enabled then
+    begin
+      btnSalvarEmailClick(Self);
+      Result := True;
+    end;
+  end;
+end;
+
+end.

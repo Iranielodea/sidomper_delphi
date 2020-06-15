@@ -1,0 +1,50 @@
+object frmVersao: TfrmVersao
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'Vers'#227'o'
+  ClientHeight = 211
+  ClientWidth = 457
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnKeyDown = FormKeyDown
+  PixelsPerInch = 96
+  TextHeight = 13
+  object mmScript: TMemo
+    Left = 0
+    Top = 0
+    Width = 457
+    Height = 170
+    Align = alClient
+    TabOrder = 0
+    ExplicitTop = -6
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 170
+    Width = 457
+    Height = 41
+    Align = alBottom
+    BevelOuter = bvLowered
+    TabOrder = 1
+    ExplicitLeft = 72
+    ExplicitTop = 152
+    ExplicitWidth = 185
+    object btnCancelar: TBitBtn
+      Left = 360
+      Top = 6
+      Width = 90
+      Height = 25
+      Caption = '&Cancelar'
+      TabOrder = 0
+      OnClick = btnCancelarClick
+    end
+  end
+end

@@ -1,0 +1,188 @@
+inherited DMVisita: TDMVisita
+  OldCreateOrder = True
+  OnCreate = DataModuleCreate
+  inherited CDSConsulta: TClientDataSet
+    ProviderName = 'dspVisitaCons'
+    object CDSConsultaVis_Id: TAutoIncField
+      Alignment = taCenter
+      DisplayLabel = 'Id'
+      FieldName = 'Vis_Id'
+      ReadOnly = True
+      DisplayFormat = '000000'
+    end
+    object CDSConsultaVis_Dcto: TStringField
+      DisplayLabel = 'Documento'
+      FieldName = 'Vis_Dcto'
+      Size = 25
+    end
+    object CDSConsultaVis_Data: TDateField
+      DisplayLabel = 'Data'
+      FieldName = 'Vis_Data'
+      Required = True
+    end
+    object CDSConsultaCli_Codigo: TIntegerField
+      Alignment = taCenter
+      DisplayLabel = 'C'#243'd. Cliente'
+      FieldName = 'Cli_Codigo'
+      Required = True
+      DisplayFormat = '000000'
+    end
+    object CDSConsultaCli_Nome: TWideStringField
+      DisplayLabel = 'Cliente'
+      FieldName = 'Cli_Nome'
+      Required = True
+      Size = 100
+    end
+    object CDSConsultaUsu_Codigo: TIntegerField
+      Alignment = taCenter
+      DisplayLabel = 'C'#243'd. Consultor'
+      FieldName = 'Usu_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSConsultaUsu_Nome: TWideStringField
+      DisplayLabel = 'Consultor'
+      FieldName = 'Usu_Nome'
+      Required = True
+      Size = 100
+    end
+    object CDSConsultaCli_Fantasia: TWideStringField
+      DisplayLabel = 'Nome Fantasia'
+      FieldName = 'Cli_Fantasia'
+      Size = 100
+    end
+    object CDSConsultaVis_Status: TIntegerField
+      FieldName = 'Vis_Status'
+      Required = True
+    end
+  end
+  inherited CDSCadastro: TClientDataSet
+    ProviderName = 'dspVisitaCad'
+    RemoteServer = DM.DSPConexao
+    BeforePost = CDSCadastroBeforePost
+    OnNewRecord = CDSCadastroNewRecord
+    OnReconcileError = CDSCadastroReconcileError
+    object CDSCadastroVis_Id: TAutoIncField
+      Alignment = taCenter
+      FieldName = 'Vis_Id'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      DisplayFormat = '000000'
+    end
+    object CDSCadastroVis_Dcto: TStringField
+      FieldName = 'Vis_Dcto'
+      Size = 25
+    end
+    object CDSCadastroVis_Data: TDateField
+      FieldName = 'Vis_Data'
+      Required = True
+      OnSetText = CDSCadastroVis_DataSetText
+      EditMask = '##/##/####'
+    end
+    object CDSCadastroVis_HoraInicio: TTimeField
+      FieldName = 'Vis_HoraInicio'
+      Required = True
+      OnSetText = CDSCadastroVis_HoraInicioSetText
+      DisplayFormat = 'hh:mm'
+      EditMask = '##:##'
+    end
+    object CDSCadastroVis_HoraFim: TTimeField
+      FieldName = 'Vis_HoraFim'
+      Required = True
+      OnSetText = CDSCadastroVis_HoraFimSetText
+      DisplayFormat = 'hh:mm'
+      EditMask = '##:##'
+    end
+    object CDSCadastroVis_Cliente: TIntegerField
+      FieldName = 'Vis_Cliente'
+      Required = True
+    end
+    object CDSCadastroVis_Usuario: TIntegerField
+      FieldName = 'Vis_Usuario'
+      Required = True
+    end
+    object CDSCadastroVis_Contato: TStringField
+      FieldName = 'Vis_Contato'
+      Size = 100
+    end
+    object CDSCadastroVis_Tipo: TIntegerField
+      FieldName = 'Vis_Tipo'
+      Required = True
+    end
+    object CDSCadastroVis_Status: TIntegerField
+      FieldName = 'Vis_Status'
+      Required = True
+    end
+    object CDSCadastroVis_Descricao: TStringField
+      FieldName = 'Vis_Descricao'
+      Required = True
+      Size = 2000
+    end
+    object CDSCadastroVis_Anexo: TStringField
+      FieldName = 'Vis_Anexo'
+      Size = 200
+    end
+    object CDSCadastroCli_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Cli_Codigo'
+      DisplayFormat = '000000'
+    end
+    object CDSCadastroCli_Nome: TWideStringField
+      FieldName = 'Cli_Nome'
+      Size = 100
+    end
+    object CDSCadastroUsu_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Usu_Codigo'
+      DisplayFormat = '0000'
+    end
+    object CDSCadastroTip_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Tip_Codigo'
+      DisplayFormat = '0000'
+    end
+    object CDSCadastroTip_Nome: TWideStringField
+      FieldName = 'Tip_Nome'
+      Size = 50
+    end
+    object CDSCadastroSta_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Sta_Codigo'
+      DisplayFormat = '0000'
+    end
+    object CDSCadastroSta_Nome: TWideStringField
+      FieldName = 'Sta_Nome'
+      Size = 50
+    end
+    object CDSCadastroVis_TotalHoras: TFloatField
+      FieldName = 'Vis_TotalHoras'
+      Required = True
+    end
+    object CDSCadastroVis_FormaPagto: TStringField
+      FieldName = 'Vis_FormaPagto'
+      Size = 500
+    end
+    object CDSCadastroVis_Valor: TCurrencyField
+      FieldName = 'Vis_Valor'
+      Required = True
+      OnSetText = CDSCadastroVis_ValorSetText
+      DisplayFormat = ',##0.00'
+    end
+    object CDSCadastroUsu_Nome: TWideStringField
+      FieldName = 'Usu_Nome'
+      Required = True
+      Size = 100
+    end
+    object CDSCadastroVis_Versao: TStringField
+      FieldName = 'Vis_Versao'
+      Size = 25
+    end
+    object CDSCadastroVis_Latitude: TStringField
+      FieldName = 'Vis_Latitude'
+      Size = 100
+    end
+    object CDSCadastroVis_Longitude: TStringField
+      FieldName = 'Vis_Longitude'
+      Size = 100
+    end
+  end
+end

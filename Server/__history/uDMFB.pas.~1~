@@ -1,0 +1,25 @@
+unit uDMFB;
+
+interface
+
+uses
+  System.SysUtils, System.Classes;
+
+type
+  TDMFB = class(TDataModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DMFB: TDMFB;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

@@ -1,0 +1,103 @@
+inherited DMCategoria: TDMCategoria
+  OnCreate = DataModuleCreate
+  inherited CDSConsulta: TClientDataSet
+    ProviderName = 'dspCategoriaCons'
+    RemoteServer = DM.DSPConexao2
+    object CDSConsultaCat_Id: TAutoIncField
+      FieldName = 'Cat_Id'
+      ReadOnly = True
+      Visible = False
+    end
+    object CDSConsultaCat_Codigo: TIntegerField
+      Alignment = taCenter
+      DisplayLabel = 'C'#243'digo'
+      FieldName = 'Cat_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSConsultaCat_Nome: TStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'Cat_Nome'
+      Required = True
+      Size = 100
+    end
+  end
+  inherited CDSCadastro: TClientDataSet
+    ProviderName = 'dspCategoriaCad'
+    RemoteServer = DM.DSPConexao2
+    object CDSCadastroCat_Id: TAutoIncField
+      FieldName = 'Cat_Id'
+      ReadOnly = True
+    end
+    object CDSCadastroCat_Codigo: TIntegerField
+      Alignment = taCenter
+      FieldName = 'Cat_Codigo'
+      Required = True
+      DisplayFormat = '0000'
+    end
+    object CDSCadastroCat_Nome: TStringField
+      FieldName = 'Cat_Nome'
+      Required = True
+      Size = 100
+    end
+    object CDSCadastroCat_Ativo: TBooleanField
+      FieldName = 'Cat_Ativo'
+      Required = True
+    end
+  end
+  object Rel: TppReport
+    AutoStop = False
+    DataPipeline = DBConsulta
+    PrinterSetup.BinName = 'Default'
+    PrinterSetup.DocumentName = 'Report'
+    PrinterSetup.PaperName = 'A4'
+    PrinterSetup.PrinterName = 'Default'
+    PrinterSetup.SaveDeviceSettings = False
+    PrinterSetup.mmMarginBottom = 6350
+    PrinterSetup.mmMarginLeft = 6350
+    PrinterSetup.mmMarginRight = 6350
+    PrinterSetup.mmMarginTop = 6350
+    PrinterSetup.mmPaperHeight = 297000
+    PrinterSetup.mmPaperWidth = 210000
+    PrinterSetup.PaperSize = 9
+    ArchiveFileName = '($MyDocuments)\ReportArchive.raf'
+    DeviceType = 'Screen'
+    DefaultFileDeviceType = 'PDF'
+    EmailSettings.ReportFormat = 'PDF'
+    LanguageID = 'Default'
+    OpenFile = False
+    OutlineSettings.CreateNode = True
+    OutlineSettings.CreatePageNodes = True
+    OutlineSettings.Enabled = True
+    OutlineSettings.Visible = True
+    ThumbnailSettings.Enabled = True
+    ThumbnailSettings.Visible = True
+    ThumbnailSettings.DeadSpace = 30
+    PDFSettings.EmbedFontOptions = [efUseSubset]
+    PDFSettings.EncryptSettings.AllowCopy = True
+    PDFSettings.EncryptSettings.AllowInteract = True
+    PDFSettings.EncryptSettings.AllowModify = True
+    PDFSettings.EncryptSettings.AllowPrint = True
+    PDFSettings.EncryptSettings.Enabled = False
+    PDFSettings.EncryptSettings.KeyLength = kl40Bit
+    PDFSettings.FontEncoding = feAnsi
+    PDFSettings.ImageCompressionLevel = 25
+    RTFSettings.DefaultFont.Charset = DEFAULT_CHARSET
+    RTFSettings.DefaultFont.Color = clWindowText
+    RTFSettings.DefaultFont.Height = -13
+    RTFSettings.DefaultFont.Name = 'Arial'
+    RTFSettings.DefaultFont.Style = []
+    TextFileName = '($MyDocuments)\Report.pdf'
+    TextSearchSettings.DefaultString = '<Texto a localizar>'
+    TextSearchSettings.Enabled = True
+    XLSSettings.AppName = 'ReportBuilder'
+    XLSSettings.Author = 'ReportBuilder'
+    XLSSettings.Subject = 'Report'
+    XLSSettings.Title = 'Report'
+    Left = 80
+    Top = 144
+    Version = '15.03'
+    mmColumnWidth = 0
+    DataPipelineName = 'DBConsulta'
+  end
+end

@@ -1,0 +1,661 @@
+object DMRelCliente: TDMRelCliente
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 188
+  Width = 351
+  object CDSRelatorio2: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspClienteRelatorio2'
+    RemoteServer = DM.DSPConexao
+    Left = 40
+    Top = 24
+    object CDSRelatorio2Cli_Codigo: TIntegerField
+      FieldName = 'Cli_Codigo'
+      Origin = 'Cli_Codigo'
+      Required = True
+    end
+    object CDSRelatorio2Cli_Nome: TWideStringField
+      FieldName = 'Cli_Nome'
+      Origin = 'Cli_Nome'
+      Required = True
+      Size = 100
+    end
+    object CDSRelatorio2Cli_Fantasia: TWideStringField
+      FieldName = 'Cli_Fantasia'
+      Origin = 'Cli_Fantasia'
+      Size = 100
+    end
+    object CDSRelatorio2Cli_Fone1: TStringField
+      FieldName = 'Cli_Fone1'
+      Origin = 'Cli_Fone1'
+    end
+    object CDSRelatorio2Cli_Versao: TStringField
+      FieldName = 'Cli_Versao'
+      Origin = 'Cli_Versao'
+      Size = 25
+    end
+    object CDSRelatorio2CliMod_Produto: TIntegerField
+      FieldName = 'CliMod_Produto'
+      Origin = 'CliMod_Produto'
+    end
+    object CDSRelatorio2Prod_Codigo: TIntegerField
+      FieldName = 'Prod_Codigo'
+      Origin = 'Prod_Codigo'
+    end
+    object CDSRelatorio2Prod_Nome: TWideStringField
+      FieldName = 'Prod_Nome'
+      Origin = 'Prod_Nome'
+      Size = 100
+    end
+  end
+  object dsRelatorio2: TDataSource
+    DataSet = CDSRelatorio2
+    Left = 112
+    Top = 24
+  end
+  object dbVersao: TppDBPipeline
+    DataSource = dsRelatorio2
+    UserName = 'dbRelatorio2'
+    Left = 184
+    Top = 24
+    object dbVersaoppField1: TppField
+      FieldAlias = 'Cli_Codigo'
+      FieldName = 'Cli_Codigo'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 0
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField2: TppField
+      FieldAlias = 'Cli_Nome'
+      FieldName = 'Cli_Nome'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 1
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField3: TppField
+      FieldAlias = 'Cli_Fantasia'
+      FieldName = 'Cli_Fantasia'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 2
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField4: TppField
+      FieldAlias = 'Cli_Fone1'
+      FieldName = 'Cli_Fone1'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 3
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField5: TppField
+      FieldAlias = 'Cli_Versao'
+      FieldName = 'Cli_Versao'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 4
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField6: TppField
+      FieldAlias = 'CliMod_Produto'
+      FieldName = 'CliMod_Produto'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 5
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField7: TppField
+      FieldAlias = 'Prod_Codigo'
+      FieldName = 'Prod_Codigo'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 6
+      Searchable = False
+      Sortable = False
+    end
+    object dbVersaoppField8: TppField
+      FieldAlias = 'Prod_Nome'
+      FieldName = 'Prod_Nome'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 7
+      Searchable = False
+      Sortable = False
+    end
+  end
+  object Relatorio2: TppReport
+    AutoStop = False
+    DataPipeline = dbVersao
+    PrinterSetup.BinName = 'Default'
+    PrinterSetup.DocumentName = 'Report'
+    PrinterSetup.PaperName = 'A4'
+    PrinterSetup.PrinterName = 'Default'
+    PrinterSetup.SaveDeviceSettings = False
+    PrinterSetup.mmMarginBottom = 6350
+    PrinterSetup.mmMarginLeft = 6350
+    PrinterSetup.mmMarginRight = 6350
+    PrinterSetup.mmMarginTop = 6350
+    PrinterSetup.mmPaperHeight = 297000
+    PrinterSetup.mmPaperWidth = 210000
+    PrinterSetup.PaperSize = 9
+    AllowPrintToFile = True
+    ArchiveFileName = '($MyDocuments)\ReportArchive.raf'
+    DeviceType = 'Screen'
+    DefaultFileDeviceType = 'PDF'
+    EmailSettings.ReportFormat = 'PDF'
+    LanguageID = 'Default'
+    OpenFile = False
+    OutlineSettings.CreateNode = True
+    OutlineSettings.CreatePageNodes = True
+    OutlineSettings.Enabled = True
+    OutlineSettings.Visible = True
+    ThumbnailSettings.Enabled = True
+    ThumbnailSettings.Visible = True
+    ThumbnailSettings.DeadSpace = 30
+    PDFSettings.EmbedFontOptions = [efUseSubset]
+    PDFSettings.EncryptSettings.AllowCopy = True
+    PDFSettings.EncryptSettings.AllowInteract = True
+    PDFSettings.EncryptSettings.AllowModify = True
+    PDFSettings.EncryptSettings.AllowPrint = True
+    PDFSettings.EncryptSettings.Enabled = False
+    PDFSettings.EncryptSettings.KeyLength = kl40Bit
+    PDFSettings.FontEncoding = feAnsi
+    PDFSettings.ImageCompressionLevel = 25
+    PreviewFormSettings.WindowState = wsMaximized
+    PreviewFormSettings.ZoomSetting = zs100Percent
+    RTFSettings.DefaultFont.Charset = DEFAULT_CHARSET
+    RTFSettings.DefaultFont.Color = clWindowText
+    RTFSettings.DefaultFont.Height = -13
+    RTFSettings.DefaultFont.Name = 'Arial'
+    RTFSettings.DefaultFont.Style = []
+    TextFileName = '($MyDocuments)\Report.pdf'
+    TextSearchSettings.DefaultString = '<Texto a localizar>'
+    TextSearchSettings.Enabled = True
+    XLSSettings.AppName = 'ReportBuilder'
+    XLSSettings.Author = 'ReportBuilder'
+    XLSSettings.Subject = 'Report'
+    XLSSettings.Title = 'Report'
+    Left = 240
+    Top = 24
+    Version = '15.03'
+    mmColumnWidth = 0
+    DataPipelineName = 'dbVersao'
+    object ppHeaderBand1: TppHeaderBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 17198
+      mmPrintPosition = 0
+      object ppSystemVariable1: TppSystemVariable
+        UserName = 'SystemVariable1'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 18521
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable2: TppSystemVariable
+        UserName = 'SystemVariable2'
+        VarType = vtTime
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 0
+        mmTop = 4763
+        mmWidth = 14817
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel3: TppLabel
+        UserName = 'Label3'
+        AutoSize = False
+        Caption = 'Relat'#243'rio de Clientes por Produto'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 14
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 6085
+        mmLeft = 37571
+        mmTop = 0
+        mmWidth = 113242
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppSystemVariable3: TppSystemVariable
+        UserName = 'SystemVariable3'
+        VarType = vtPageSetDesc
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 169598
+        mmTop = 0
+        mmWidth = 24077
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel1: TppLabel
+        UserName = 'Label1'
+        Caption = 'C'#243'digo'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 0
+        mmTop = 12965
+        mmWidth = 11113
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel2: TppLabel
+        UserName = 'Label2'
+        Caption = 'Raz'#227'o'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 14817
+        mmTop = 12965
+        mmWidth = 9260
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel4: TppLabel
+        UserName = 'Label4'
+        Caption = 'Fantasia'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 82550
+        mmTop = 12965
+        mmWidth = 14817
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel5: TppLabel
+        UserName = 'Label5'
+        Caption = 'Telefone'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 149225
+        mmTop = 12965
+        mmWidth = 14817
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLabel6: TppLabel
+        UserName = 'Label6'
+        Caption = 'Vers'#227'o Atual'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 173832
+        mmTop = 12965
+        mmWidth = 22225
+        BandType = 0
+        LayerName = Foreground
+      end
+    end
+    object ppDetailBand1: TppDetailBand
+      Background1.Brush.Style = bsClear
+      Background2.Brush.Style = bsClear
+      PrintHeight = phDynamic
+      mmBottomOffset = 0
+      mmHeight = 4498
+      mmPrintPosition = 0
+      object ppDBText3: TppDBText
+        UserName = 'DBText3'
+        DataField = 'Cli_Codigo'
+        DataPipeline = dbVersao
+        DisplayFormat = '000000'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'dbVersao'
+        mmHeight = 4498
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 12965
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText6: TppDBText
+        UserName = 'DBText6'
+        DataField = 'Cli_Fone1'
+        DataPipeline = dbVersao
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'dbVersao'
+        mmHeight = 4498
+        mmLeft = 147373
+        mmTop = 0
+        mmWidth = 25665
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBText7: TppDBText
+        UserName = 'DBText7'
+        DataField = 'Cli_Versao'
+        DataPipeline = dbVersao
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'dbVersao'
+        mmHeight = 4498
+        mmLeft = 173832
+        mmTop = 0
+        mmWidth = 22225
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppDBMemo1: TppDBMemo
+        UserName = 'DBMemo1'
+        CharWrap = False
+        DataField = 'Cli_Nome'
+        DataPipeline = dbVersao
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        RemoveEmptyLines = False
+        Stretch = True
+        Transparent = True
+        DataPipelineName = 'dbVersao'
+        mmHeight = 4233
+        mmLeft = 14817
+        mmTop = 0
+        mmWidth = 65881
+        BandType = 4
+        LayerName = Foreground
+        mmBottomOffset = 0
+        mmOverFlowOffset = 0
+        mmStopPosition = 0
+        mmMinHeight = 0
+        mmLeading = 0
+      end
+      object ppDBMemo2: TppDBMemo
+        UserName = 'DBMemo2'
+        CharWrap = False
+        DataField = 'Cli_Fantasia'
+        DataPipeline = dbVersao
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        RemoveEmptyLines = False
+        Transparent = True
+        DataPipelineName = 'dbVersao'
+        mmHeight = 4498
+        mmLeft = 82550
+        mmTop = 0
+        mmWidth = 62971
+        BandType = 4
+        LayerName = Foreground
+        mmBottomOffset = 0
+        mmOverFlowOffset = 0
+        mmStopPosition = 0
+        mmMinHeight = 0
+        mmLeading = 0
+      end
+    end
+    object ppSummaryBand1: TppSummaryBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 10054
+      mmPrintPosition = 0
+      object ppLabel9: TppLabel
+        UserName = 'Label9'
+        Caption = 'Total Geral:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 0
+        mmTop = 2117
+        mmWidth = 22225
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppDBCalc3: TppDBCalc
+        UserName = 'DBCalc3'
+        DataField = 'Cli_Codigo'
+        DataPipeline = dbVersao
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DBCalcType = dcCount
+        DataPipelineName = 'dbVersao'
+        mmHeight = 4498
+        mmLeft = 34660
+        mmTop = 2117
+        mmWidth = 17198
+        BandType = 7
+        LayerName = Foreground
+      end
+    end
+    object ppGroup1: TppGroup
+      BreakName = 'CliMod_Produto'
+      DataPipeline = dbVersao
+      GroupFileSettings.NewFile = False
+      GroupFileSettings.EmailFile = False
+      OutlineSettings.CreateNode = True
+      StartOnOddPage = False
+      UserName = 'Group1'
+      mmNewColumnThreshold = 0
+      mmNewPageThreshold = 0
+      DataPipelineName = 'dbVersao'
+      NewFile = False
+      object ppGroupHeaderBand1: TppGroupHeaderBand
+        Background.Brush.Style = bsClear
+        mmBottomOffset = 0
+        mmHeight = 9790
+        mmPrintPosition = 0
+        object ppLine1: TppLine
+          UserName = 'Line1'
+          Weight = 0.750000000000000000
+          mmHeight = 2117
+          mmLeft = 0
+          mmTop = 0
+          mmWidth = 196057
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLabel7: TppLabel
+          UserName = 'Label7'
+          Caption = 'Produto:'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          mmHeight = 4234
+          mmLeft = 0
+          mmTop = 2910
+          mmWidth = 14817
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppDBText1: TppDBText
+          UserName = 'DBText1'
+          DataField = 'Prod_Codigo'
+          DataPipeline = dbVersao
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          DataPipelineName = 'dbVersao'
+          mmHeight = 4498
+          mmLeft = 16404
+          mmTop = 2910
+          mmWidth = 11377
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppDBText2: TppDBText
+          UserName = 'DBText2'
+          DataField = 'Prod_Nome'
+          DataPipeline = dbVersao
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          DataPipelineName = 'dbVersao'
+          mmHeight = 4498
+          mmLeft = 29898
+          mmTop = 2910
+          mmWidth = 79640
+          BandType = 3
+          GroupNo = 0
+          LayerName = Foreground
+        end
+      end
+      object ppGroupFooterBand1: TppGroupFooterBand
+        Background.Brush.Style = bsClear
+        HideWhenOneDetail = False
+        mmBottomOffset = 0
+        mmHeight = 8731
+        mmPrintPosition = 0
+        object ppLine2: TppLine
+          UserName = 'Line2'
+          Position = lpBottom
+          Weight = 0.750000000000000000
+          mmHeight = 1588
+          mmLeft = 0
+          mmTop = 7142
+          mmWidth = 196057
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppLabel8: TppLabel
+          UserName = 'Label8'
+          Caption = 'Total Produto:'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          Transparent = True
+          mmHeight = 4233
+          mmLeft = 0
+          mmTop = 794
+          mmWidth = 25929
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+        object ppDBCalc1: TppDBCalc
+          UserName = 'DBCalc1'
+          DataField = 'Cli_Codigo'
+          DataPipeline = dbVersao
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Courier New'
+          Font.Size = 9
+          Font.Style = [fsBold]
+          ResetGroup = ppGroup1
+          TextAlignment = taRightJustified
+          Transparent = True
+          DBCalcType = dcCount
+          DataPipelineName = 'dbVersao'
+          mmHeight = 4498
+          mmLeft = 34660
+          mmTop = 794
+          mmWidth = 17198
+          BandType = 5
+          GroupNo = 0
+          LayerName = Foreground
+        end
+      end
+    end
+    object ppDesignLayers1: TppDesignLayers
+      object ppDesignLayer1: TppDesignLayer
+        UserName = 'Foreground'
+        LayerType = ltBanded
+        Index = 0
+      end
+    end
+    object ppParameterList1: TppParameterList
+    end
+  end
+end

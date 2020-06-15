@@ -1,0 +1,30 @@
+object DMSolicitacao: TDMSolicitacao
+  OldCreateOrder = False
+  Height = 150
+  Width = 215
+  object QSolicitacaoStatus: TFDQuery
+    Connection = DM.Conexao
+    SQL.Strings = (
+      'SELECT'
+      '  '#9'Sol_Produto,'
+      '  '#9'Sol_Data,'
+      '  '#9'Sol_Titulo,'
+      '  '#9'Sol_Cliente,'
+      '  '#9'Sol_Status,'
+      '  '#9'Cli_Codigo,'
+      '  '#9'Cli_Nome,'
+      '  '#9'Sta_Codigo,'
+      '  '#9'Sta_Nome,'
+      #9'  Prod_Codigo,'
+      #9'  Prod_Nome,'
+      
+        '  '#9'ISNULL((SELECT SUM(STemp_TotalHoras) FROM Solicitacao_Tempo W' +
+        'HERE Sol_Id = STemp_Solicitacao),0) AS Tempo'
+      'FROM Solicitacao'
+      'INNER JOIN Cliente ON Sol_Cliente = Cli_Id'
+      'INNER JOIN Status ON Sol_Status = Sta_Id'
+      'LEFT JOIN Produto ON Sol_Produto = Prod_Id')
+    Left = 48
+    Top = 32
+  end
+end

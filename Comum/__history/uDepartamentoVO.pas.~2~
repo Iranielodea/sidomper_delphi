@@ -1,0 +1,230 @@
+unit uDepartamentoVO;
+
+interface
+
+uses
+  System.SysUtils, uDepartamentoAcessoVO, uDepartamentoEmailVO, System.Generics.Collections,
+  uKeyField, uTableName;
+
+type
+  [TableName('Departamento')]
+  TDepartamentoVO = class
+  private
+    FAgendamentoQuadro: Boolean;
+    FAtividadeQuadro: Boolean;
+    FChamadoStatus: Boolean;
+    FChamadoAbertura: Boolean;
+    FAtivo: Boolean;
+    FAtividadeStatus: Boolean;
+    FAtividadeAbertura: Boolean;
+    FCodigo: Integer;
+    FSolicitacaoOcorrenciaGeral: Boolean;
+    FSolicitacaoAnalise: Boolean;
+    FId: Integer;
+    FSolicitacaoQuadro: Boolean;
+    FChamadoOcorrencia: Boolean;
+    FSolicitacaoOcorrenciaTecnica: Boolean;
+    FAtividadeOcorrencia: Boolean;
+    FNome: string;
+    FSolicitacaoStatus: Boolean;
+    FSolicitacaoAbertura: Boolean;
+    FChamadoQuadro: Boolean;
+    FDepartamentoAcesso: TObjectList<TDepartamentoAcessoVO>;
+    FDepartamentoEmail: TObjectList<TDepartamentoEmailVO>;
+    FMostrarAnexos: Boolean;
+    procedure SetAgendamentoQuadro(const Value: Boolean);
+    procedure SetAtividadeAbertura(const Value: Boolean);
+    procedure SetAtividadeOcorrencia(const Value: Boolean);
+    procedure SetAtividadeQuadro(const Value: Boolean);
+    procedure SetAtividadeStatus(const Value: Boolean);
+    procedure SetAtivo(const Value: Boolean);
+    procedure SetChamadoAbertura(const Value: Boolean);
+    procedure SetChamadoOcorrencia(const Value: Boolean);
+    procedure SetChamadoQuadro(const Value: Boolean);
+    procedure SetChamadoStatus(const Value: Boolean);
+    procedure SetCodigo(const Value: Integer);
+    procedure SetId(const Value: Integer);
+    procedure SetNome(const Value: string);
+    procedure SetSolicitacaoAbertura(const Value: Boolean);
+    procedure SetSolicitacaoAnalise(const Value: Boolean);
+    procedure SetSolicitacaoOcorrenciaGeral(const Value: Boolean);
+    procedure SetSolicitacaoOcorrenciaTecnica(const Value: Boolean);
+    procedure SetSolicitacaoQuadro(const Value: Boolean);
+    procedure SetSolicitacaoStatus(const Value: Boolean);
+    procedure SetDepartamentoAcesso(
+      const Value: TObjectList<TDepartamentoAcessoVO>);
+    procedure SetDepartamentoEmail(
+      const Value: TObjectList<TDepartamentoEmailVO>);
+  public
+    [keyField('Dep_Id')]
+    property Id: Integer read FId write SetId;
+    [FieldName('Dep_Codigo')]
+    property Codigo: Integer read FCodigo write SetCodigo;
+    [FieldName('Dep_Nome')]
+    property Nome: string read FNome write SetNome;
+    [FieldName('Dep_Ativo')]
+    property Ativo: Boolean read FAtivo write SetAtivo;
+    [FieldName('Dep_SolicitaAbertura')]
+    property SolicitacaoAbertura: Boolean read FSolicitacaoAbertura write SetSolicitacaoAbertura;
+    [FieldName('Dep_SolicitaAnalise')]
+    property SolicitacaoAnalise: Boolean read FSolicitacaoAnalise write SetSolicitacaoAnalise;
+    [FieldName('Dep_SolicitaOcorGeral')]
+    property SolicitacaoOcorrenciaGeral: Boolean read FSolicitacaoOcorrenciaGeral write SetSolicitacaoOcorrenciaGeral;
+    [FieldName('Dep_SolicitaOcorTecnica')]
+    property SolicitacaoOcorrenciaTecnica: Boolean read FSolicitacaoOcorrenciaTecnica write SetSolicitacaoOcorrenciaTecnica;
+    [FieldName('Dep_SolicitaStatus')]
+    property SolicitacaoStatus: Boolean read FSolicitacaoStatus write SetSolicitacaoStatus;
+    [FieldName('Dep_SolicitaQuadro')]
+    property SolicitacaoQuadro: Boolean read FSolicitacaoQuadro write SetSolicitacaoQuadro;
+    [FieldName('Dep_ChamadoAbertura')]
+    property ChamadoAbertura: Boolean read FChamadoAbertura write SetChamadoAbertura;
+    [FieldName('Dep_ChamadoStatus')]
+    property ChamadoStatus: Boolean read FChamadoStatus write SetChamadoStatus;
+    [FieldName('Dep_ChamadoQuadro')]
+    property ChamadoQuadro: Boolean read FChamadoQuadro write SetChamadoQuadro;
+    [FieldName('Dep_ChamadoOcor')]
+    property ChamadoOcorrencia: Boolean read FChamadoOcorrencia write SetChamadoOcorrencia;
+    [FieldName('Dep_AtividadeAbertura')]
+    property AtividadeAbertura: Boolean read FAtividadeAbertura write SetAtividadeAbertura;
+    [FieldName('Dep_AtividadeStatus')]
+    property AtividadeStatus: Boolean read FAtividadeStatus write SetAtividadeStatus;
+    [FieldName('Dep_AtividadeQuadro')]
+    property AtividadeQuadro: Boolean read FAtividadeQuadro write SetAtividadeQuadro;
+    [FieldName('Dep_AtividadeOcor')]
+    property AtividadeOcorrencia: Boolean read FAtividadeOcorrencia write SetAtividadeOcorrencia;
+    [FieldName('Dep_MostrarAnexos')]
+    property MostrarAnexos: Boolean read FMostrarAnexos write FMostrarAnexos;
+    [FieldName('Dep_AgendamentoQuadro')]
+    property AgendamentoQuadro: Boolean read FAgendamentoQuadro write SetAgendamentoQuadro;
+    property DepartamentoAcesso: TObjectList<TDepartamentoAcessoVO> read FDepartamentoAcesso write SetDepartamentoAcesso;
+    property DepartamentoEmail: TObjectList<TDepartamentoEmailVO> read FDepartamentoEmail write SetDepartamentoEmail;
+
+    constructor Create;
+    destructor destroy; override;
+  end;
+
+implementation
+
+{ TDepartamentoVO }
+
+constructor TDepartamentoVO.Create;
+begin
+  FDepartamentoAcesso := TObjectList<TDepartamentoAcessoVO>.Create();
+  FDepartamentoEmail := TObjectList<TDepartamentoEmailVO>.Create();
+end;
+
+destructor TDepartamentoVO.destroy;
+begin
+  FreeAndNil(FDepartamentoAcesso);
+  FreeAndNil(FDepartamentoEmail);
+  inherited;
+end;
+
+procedure TDepartamentoVO.SetAgendamentoQuadro(const Value: Boolean);
+begin
+  FAgendamentoQuadro := Value;
+end;
+
+procedure TDepartamentoVO.SetAtividadeAbertura(const Value: Boolean);
+begin
+  FAtividadeAbertura := Value;
+end;
+
+procedure TDepartamentoVO.SetAtividadeOcorrencia(const Value: Boolean);
+begin
+  FAtividadeOcorrencia := Value;
+end;
+
+procedure TDepartamentoVO.SetAtividadeQuadro(const Value: Boolean);
+begin
+  FAtividadeQuadro := Value;
+end;
+
+procedure TDepartamentoVO.SetAtividadeStatus(const Value: Boolean);
+begin
+  FAtividadeStatus := Value;
+end;
+
+procedure TDepartamentoVO.SetAtivo(const Value: Boolean);
+begin
+  FAtivo := Value;
+end;
+
+procedure TDepartamentoVO.SetChamadoAbertura(const Value: Boolean);
+begin
+  FChamadoAbertura := Value;
+end;
+
+procedure TDepartamentoVO.SetChamadoOcorrencia(const Value: Boolean);
+begin
+  FChamadoOcorrencia := Value;
+end;
+
+procedure TDepartamentoVO.SetChamadoQuadro(const Value: Boolean);
+begin
+  FChamadoQuadro := Value;
+end;
+
+procedure TDepartamentoVO.SetChamadoStatus(const Value: Boolean);
+begin
+  FChamadoStatus := Value;
+end;
+
+procedure TDepartamentoVO.SetCodigo(const Value: Integer);
+begin
+  FCodigo := Value;
+end;
+
+procedure TDepartamentoVO.SetDepartamentoAcesso(
+  const Value: TObjectList<TDepartamentoAcessoVO>);
+begin
+  FDepartamentoAcesso := Value;
+end;
+
+procedure TDepartamentoVO.SetDepartamentoEmail(
+  const Value: TObjectList<TDepartamentoEmailVO>);
+begin
+  FDepartamentoEmail := Value;
+end;
+
+procedure TDepartamentoVO.SetId(const Value: Integer);
+begin
+  FId := Value;
+end;
+
+procedure TDepartamentoVO.SetNome(const Value: string);
+begin
+  FNome := Value;
+end;
+
+procedure TDepartamentoVO.SetSolicitacaoAbertura(const Value: Boolean);
+begin
+  FSolicitacaoAbertura := Value;
+end;
+
+procedure TDepartamentoVO.SetSolicitacaoAnalise(const Value: Boolean);
+begin
+  FSolicitacaoAnalise := Value;
+end;
+
+procedure TDepartamentoVO.SetSolicitacaoOcorrenciaGeral(const Value: Boolean);
+begin
+  FSolicitacaoOcorrenciaGeral := Value;
+end;
+
+procedure TDepartamentoVO.SetSolicitacaoOcorrenciaTecnica(const Value: Boolean);
+begin
+  FSolicitacaoOcorrenciaTecnica := Value;
+end;
+
+procedure TDepartamentoVO.SetSolicitacaoQuadro(const Value: Boolean);
+begin
+  FSolicitacaoQuadro := Value;
+end;
+
+procedure TDepartamentoVO.SetSolicitacaoStatus(const Value: Boolean);
+begin
+  FSolicitacaoStatus := Value;
+end;
+
+end.

@@ -1,0 +1,574 @@
+unit uEnvioEmailClientes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uBaseCadastro, Data.DB, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, uDMCliente,
+  uClienteController, uFraUsuario, uFraCliente, uFraRevenda, uFraModulo,
+  uFraProduto, Vcl.CheckLst, uUsuarioController, Vcl.Menus, System.Generics.Collections,
+  uClienteEmailVO, uFraCidade;
+
+type
+  TfrmEnviarEmailCliente = class(TfrmBaseCadastro)
+    tsCliente: TTabSheet;
+    Panel7: TPanel;
+    tsConsultor: TTabSheet;
+    Panel8: TPanel;
+    tsRevenda: TTabSheet;
+    tsModulo: TTabSheet;
+    tsProduto: TTabSheet;
+    Panel9: TPanel;
+    Panel10: TPanel;
+    Panel11: TPanel;
+    FraCliente1: TFraCliente;
+    FraUsuario1: TFraUsuario;
+    FraRevenda1: TFraRevenda;
+    FraModulo1: TFraModulo;
+    FraProduto1: TFraProduto;
+    chkListaEnquadramento: TCheckListBox;
+    Label4: TLabel;
+    tsEmail: TTabSheet;
+    Panel12: TPanel;
+    Label5: TLabel;
+    edtCodContaEmail: TEdit;
+    edtNomeContaEmail: TEdit;
+    Label6: TLabel;
+    edtAssunto: TEdit;
+    Label7: TLabel;
+    mmoTexto: TMemo;
+    Label8: TLabel;
+    lstAnexo: TListBox;
+    btnContaEmail: TSpeedButton;
+    btnAnexar: TBitBtn;
+    btnRemover: TBitBtn;
+    edtIdContaEmail: TEdit;
+    OpenDialog: TOpenDialog;
+    btnEnviar: TBitBtn;
+    btnEnviar2: TBitBtn;
+    pmFiltroEnquadramento: TPopupMenu;
+    MarcarTodos1: TMenuItem;
+    DesmarcarTodos1: TMenuItem;
+    pmMarcarEmail: TPopupMenu;
+    MarcarTodas1: TMenuItem;
+    DesmarcarTodos2: TMenuItem;
+    tsFiltroCidade: TTabSheet;
+    Panel13: TPanel;
+    FraCidade: TFraCidade;
+    RGEmpVinculada: TRadioGroup;
+    procedure btnFiltroClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure dbDadosTitleClick(Column: TColumn);
+    procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure dbDadosKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure tsEmailShow(Sender: TObject);
+    procedure edtCodContaEmailExit(Sender: TObject);
+    procedure btnContaEmailClick(Sender: TObject);
+    procedure btnRemoverClick(Sender: TObject);
+    procedure btnAnexarClick(Sender: TObject);
+    procedure btnEnviarClick(Sender: TObject);
+    procedure mmoTextoEnter(Sender: TObject);
+    procedure mmoTextoExit(Sender: TObject);
+    procedure mmoTextoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure MarcarTodos1Click(Sender: TObject);
+    procedure DesmarcarTodos1Click(Sender: TObject);
+    procedure dbDadosDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure dbDadosCellClick(Column: TColumn);
+    procedure MarcarTodas1Click(Sender: TObject);
+    procedure DesmarcarTodos2Click(Sender: TObject);
+  private
+    { Private declarations }
+    FController: TClienteController;
+    procedure Localizar(ATexto: string);
+    function RetornarEnquadramento: string;
+    procedure BuscarContaEmail;
+    procedure BuscarContaEmail2(AId, ACodigo: Integer);
+    procedure EnviarEmails;
+    function AnexarArquivos: string;
+    procedure TelaEmail;
+    procedure MarcarTodosEnquadramento(AMarcar: Boolean);
+    procedure MarcarEmail(AMarcar: Boolean);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmEnviarEmailCliente: TfrmEnviarEmailCliente;
+
+implementation
+
+{$R *.dfm}
+
+uses uGrade, uFuncoesSIDomper, uFiltroCliente, uDM, uContaEmailController,
+  uContaEmail, uEmailBase, uFormProcesso, uEmailModelo2, uEnviarEmail, uImagens;
+
+{ TfrmEnviarEmailCliente }
+
+function TfrmEnviarEmailCliente.AnexarArquivos: string;
+var
+  i: Integer;
+  sChar: string;
+begin
+  sChar := '';
+  for I := 0 to lstAnexo.Count -1 do
+  begin
+    if sChar = '' then
+      sChar := lstAnexo.Items[i]
+    else
+      sChar := sChar + ';' + lstAnexo.Items[i];
+  end;
+
+  Result := sChar;
+end;
+
+procedure TfrmEnviarEmailCliente.btnAnexarClick(Sender: TObject);
+begin
+  inherited;
+  if OpenDialog.Execute then
+    lstAnexo.Items.Add(OpenDialog.FileName);
+end;
+
+procedure TfrmEnviarEmailCliente.btnContaEmailClick(Sender: TObject);
+begin
+  inherited;
+  TFuncoes.CriarFormularioModal(TfrmContaEmail.create(true));
+  if dm.IdSelecionado > 0 then
+    BuscarContaEmail2(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmEnviarEmailCliente.btnEnviarClick(Sender: TObject);
+begin
+  inherited;
+
+  if Sender = btnEnviar2 then
+  begin
+    if trim(edtAssunto.Text) = '' then
+    begin
+      btnFiltrarClick(Self);
+      tsEmail.Show;
+      edtAssunto.SetFocus;
+      Exit;
+    end;
+  end;
+
+  if TFuncoes.Confirmar('Confirmar o Envio de Email?') then
+  begin
+    if Sender = btnEnviar then
+      Localizar(edtDescricao.Text);
+
+    if not FController.Model.CDSConsulta.IsEmpty then
+      EnviarEmails()
+    else
+      raise Exception.Create('Não há Clientes para Enviar!');
+  end;
+end;
+
+procedure TfrmEnviarEmailCliente.btnFiltroClick(Sender: TObject);
+begin
+  inherited;
+  Localizar(edtDescricao.Text);
+end;
+
+procedure TfrmEnviarEmailCliente.btnRemoverClick(Sender: TObject);
+begin
+  inherited;
+  lstAnexo.DeleteSelected;
+end;
+
+procedure TfrmEnviarEmailCliente.BuscarContaEmail;
+var
+  Usuario: TUsuarioController;
+begin
+  Usuario := TUsuarioController.Create;
+  try
+    Usuario.LocalizarId(dm.IdUsuario);
+    edtIdContaEmail.Text := Usuario.Model.CDSCadastroUsu_ContaEmail.AsString;
+    edtCodContaEmail.Text := '';
+    edtNomeContaEmail.Text := Usuario.Model.CDSCadastroCtaEm_Nome.AsString;
+    if Usuario.Model.CDSCadastroCtaEm_Codigo.AsInteger <> 0 then
+      edtCodContaEmail.Text := FormatFloat('0000', Usuario.Model.CDSCadastroCtaEm_Codigo.AsFloat);
+  finally
+    FreeAndNil(Usuario);
+  end;
+end;
+
+procedure TfrmEnviarEmailCliente.BuscarContaEmail2(AId, ACodigo: Integer);
+var
+  obj: TContaEmailController;
+begin
+  obj := TContaEmailController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodContaEmail.SetFocus;
+      end;
+    end;
+  finally
+    edtIdContaEmail.Text := obj.Model.CDSCadastroCtaEm_Id.AsString;
+    edtCodContaEmail.Text := '';
+    edtNomeContaEmail.Text := obj.Model.CDSCadastroCtaEm_Nome.AsString;
+    if obj.Model.CDSCadastroCtaEm_Codigo.AsInteger > 0 then
+      edtCodContaEmail.Text := FormatFloat('0000', obj.Model.CDSCadastroCtaEm_Codigo.AsFloat);
+
+    FreeAndNil(obj);
+  end;
+  edtCodContaEmail.Modified := False;
+end;
+
+procedure TfrmEnviarEmailCliente.dbDadosCellClick(Column: TColumn);
+begin
+  inherited;
+  TGrade.CheckBoxClicarCelula(Column, 'C_Marcar', 'C_Marcar', FController.Model.CDSConsulta);
+end;
+
+procedure TfrmEnviarEmailCliente.dbDadosDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  inherited;
+  TGrade.CheckBoxDesenharCelula(Column, 'C_Marcar', dbDados, Rect, FController.Model.CDSConsultaC_Marcar.AsBoolean);
+end;
+
+procedure TfrmEnviarEmailCliente.dbDadosKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  TGrade.DesabilitarTelcasDeleteGrid(Key, Shift);
+end;
+
+procedure TfrmEnviarEmailCliente.dbDadosTitleClick(Column: TColumn);
+begin
+  inherited;
+  TFuncoes.OrdenarCamposGrid(FController.Model.cdsconsulta, Column.FieldName);
+end;
+
+procedure TfrmEnviarEmailCliente.DesmarcarTodos1Click(Sender: TObject);
+begin
+  inherited;
+  MarcarTodosEnquadramento(False);
+end;
+
+procedure TfrmEnviarEmailCliente.DesmarcarTodos2Click(Sender: TObject);
+begin
+  inherited;
+  MarcarEmail(False);
+end;
+
+procedure TfrmEnviarEmailCliente.edtCodContaEmailExit(Sender: TObject);
+begin
+  inherited;
+  if edtCodContaEmail.Modified then
+    BuscarContaEmail2(0, StrToIntDef(edtCodContaEmail.Text, 0));
+end;
+
+procedure TfrmEnviarEmailCliente.edtDescricaoKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_RETURN then
+  begin
+    Localizar(edtDescricao.Text);
+    MarcarEmail(True);
+  end;
+end;
+
+procedure TfrmEnviarEmailCliente.EnviarEmails;
+var
+  objEmail: TEmailBase;
+  objContaEmail: TContaEmailController;
+  FormularioProcesso: TfrmProcesso;
+  iContador: Integer;
+  iTotalClientes: Integer;
+  sTexto: string;
+  i: Integer;
+  ListaEmail: TObjectList<TClienteEmailVO>;
+  Email: TClienteEmailVO;
+  sErroEmail: string;
+begin
+  if edtIdContaEmail.Text = '' then
+  begin
+    TelaEmail();
+    raise Exception.Create('Informe a Conta de Email!');
+  end;
+
+  if Trim(edtAssunto.Text) = '' then
+  begin
+    TelaEmail();
+    raise Exception.Create('Informe o Assunto!');
+  end;
+
+  if Trim(mmoTexto.Text) = '' then
+  begin
+    TelaEmail();
+    raise Exception.Create('Informe o Texto!');
+  end;
+
+  FormularioProcesso := TfrmProcesso.Create(Self);
+
+  objContaEmail := TContaEmailController.Create(dm.IdUsuario);
+  objEmail := TEmail.Create;
+  ListaEmail := TObjectList<TClienteEmailVO>.Create();
+  try
+    objContaEmail.LocalizarId(StrToIntDef(edtIdContaEmail.Text, 0));
+    if objContaEmail.Model.CDSCadastroCtaEm_Id.AsInteger > 0 then
+    begin
+      FController.Model.CDSConsulta.First;
+      while not FController.Model.CDSConsulta.Eof do
+      begin
+        if FController.Model.CDSConsultaC_Marcar.AsBoolean then
+        begin
+          FController.ClienteEmail.LocalizarCodigo(FController.Model.CDSConsultaCli_Id.AsInteger);
+          while not FController.ClienteEmail.Model.CDSConsulta.Eof do
+          begin
+            if FController.ClienteEmail.Model.CDSConsultaCliEm_Notificar.AsBoolean then
+            begin
+              Email := TClienteEmailVO.Create;
+              Email.Email := FController.ClienteEmail.Model.CDSConsultaCliEm_Email.AsString;
+
+              if not ListaEmail.Contains(Email) then
+                ListaEmail.Add(Email);
+
+            end;
+            FController.ClienteEmail.Model.CDSConsulta.Next;
+          end;
+        end;
+        FController.Model.CDSConsulta.Next;
+      end;
+    end;
+
+    iTotalClientes := ListaEmail.Count;
+    iContador := 1;
+    sErroEmail := '';
+
+    sTexto := '';
+    for I := 0 to mmoTexto.Lines.Count -1 do
+    begin
+      if lstAnexo.Count > 0 then
+        sTexto := sTexto + mmoTexto.Lines[i] + #13 // com anexo tem que ser a tecla enter
+      else
+        sTexto := sTexto + mmoTexto.Lines[i] + '<br>'; // sem anexo tem que ser com html
+    end;
+
+    for Email in ListaEmail do
+    begin
+      try
+        objContaEmail.EnviarEmail(0, Email.Email, '', edtAssunto.Text, sTexto, AnexarArquivos, False);
+      except
+        on E: Exception do
+        begin
+          sErroEmail := sErroEmail + E.Message + ' - ' + Email.Email + sLineBreak;
+        end;
+      end;
+
+      FormularioProcesso.Mensagem('Aguarde, enviando o email: ' + Email.Email + ': Qtde: ' + IntToStr(iContador) + ' de ' + IntToStr(iTotalClientes));
+      Application.ProcessMessages;
+
+      Inc(iContador);
+    end;
+  finally
+    FreeAndNil(objContaEmail);
+    FreeAndNil(FormularioProcesso);
+    FreeAndNil(objEmail);
+    FreeAndNil(ListaEmail);
+  end;
+
+  if sErroEmail <> '' then
+    ShowMessage('Emails com Erro: ' + sLineBreak + sErroEmail)
+  else
+    ShowMessage('Emails enviado com sucesso!');
+end;
+
+procedure TfrmEnviarEmailCliente.FormCreate(Sender: TObject);
+var
+  img: TfrmImagens;
+begin
+  inherited;
+
+  img := TfrmImagens.Create(Self);
+  try
+    btnEnviar.Glyph := img.btnEmail.Glyph;
+    btnEnviar2.Glyph := img.btnEmail.Glyph;
+    btnAnexar.Glyph := img.btnAnexar.Glyph;
+    btnRemover.Glyph := img.btnExcluir.Glyph;
+  finally
+    FreeAndNil(img);
+  end;
+
+  FController := TClienteController.Create;
+  dsPesquisa.DataSet := FController.Model.CDSConsulta;
+  dsCad.DataSet := FController.Model.CDSCadastro;
+
+  TGrade.RetornaCamposGrid(dbDados, cbbCampos);
+  Localizar('ABCDE');
+  cbbCampos.ItemIndex := 2;
+
+  cbbSituacao.ItemIndex := 0;
+
+  FraCliente1.Inicializar();
+  FraUsuario1.Inicializar();
+  FraRevenda1.Inicializar();
+  FraModulo1.Inicializar();
+  FraProduto1.Inicializar();
+  FraCidade.Inicializar();
+end;
+
+procedure TfrmEnviarEmailCliente.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  FreeAndNil(FController);
+end;
+
+procedure TfrmEnviarEmailCliente.Localizar(ATexto: string);
+var
+  sCampo: string;
+  sSituacao: string;
+  bContem: Boolean;
+  Filtro: TFiltroCliente;
+begin
+  sCampo := TGrade.FiltrarCampo(dbDados, cbbCampos);
+  sSituacao := Copy(cbbSituacao.Items.Strings[cbbSituacao.ItemIndex], 1, 1);
+  bContem := (cbbPesquisa.ItemIndex = 1);
+
+  Filtro := TFiltroCliente.Create;
+  try
+    Filtro.IdUsuario  := FraUsuario1.RetornoSelecao();
+    Filtro.IdRevenda  := FraRevenda1.RetornoSelecao();
+    Filtro.Id         := FraCliente1.RetornoSelecao();
+    Filtro.IdModulo   := FraModulo1.RetornoSelecao();
+    Filtro.IdProduto  := FraProduto1.RetornoSelecao();
+    Filtro.IdCidade   := FraCidade.RetornoSelecao();
+    Filtro.Restricao  := -1; //cbbRestricao.ItemIndex;
+    Filtro.Enquadramento := RetornarEnquadramento();
+
+    case RGEmpVinculada.ItemIndex of
+      0: Filtro.sEmpresaVinculada := 'S';
+      1: Filtro.sEmpresaVinculada := 'N';
+      2: Filtro.sEmpresaVinculada := 'T';
+    end;
+
+    FController.Filtrar(Filtro, sCampo, ATexto, sSituacao, dm.IdUsuario, bContem);
+    FController.Model.CDSConsulta.IndexFieldNames := sCampo;
+  finally
+    FreeAndNil(Filtro);
+  end;
+end;
+
+procedure TfrmEnviarEmailCliente.MarcarEmail(AMarcar: Boolean);
+begin
+  try
+    FController.Model.CDSConsulta.DisableControls;
+    FController.Model.CDSConsulta.First;
+    while not FController.Model.CDSConsulta.Eof do
+    begin
+      FController.Model.CDSConsulta.Edit;
+      FController.Model.CDSConsultaC_Marcar.AsBoolean := AMarcar;
+      FController.Model.CDSConsulta.Post;
+      FController.Model.CDSConsulta.Next;
+    end;
+    FController.Model.CDSConsulta.First;
+  finally
+    FController.Model.CDSConsulta.EnableControls;
+  end;
+end;
+
+procedure TfrmEnviarEmailCliente.MarcarTodas1Click(Sender: TObject);
+begin
+  inherited;
+  MarcarEmail(True);
+end;
+
+procedure TfrmEnviarEmailCliente.MarcarTodos1Click(Sender: TObject);
+begin
+  inherited;
+  MarcarTodosEnquadramento(True);
+end;
+
+procedure TfrmEnviarEmailCliente.MarcarTodosEnquadramento(AMarcar: Boolean);
+var
+  i: Integer;
+  QtdeItens: Integer;
+begin
+  QtdeItens := chkListaEnquadramento.Count-1;
+  for I := 0 to QtdeItens do
+    chkListaEnquadramento.Checked[i] := AMarcar;
+end;
+
+procedure TfrmEnviarEmailCliente.mmoTextoEnter(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := False;
+end;
+
+procedure TfrmEnviarEmailCliente.mmoTextoExit(Sender: TObject);
+begin
+  inherited;
+  Self.KeyPreview := True;
+end;
+
+procedure TfrmEnviarEmailCliente.mmoTextoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  case key of
+    VK_ESCAPE: btnFecharFiltroClick(Self);
+    VK_F4: btnFiltroClick(Self);
+  end;
+end;
+
+function TfrmEnviarEmailCliente.RetornarEnquadramento: string;
+var
+  i: Integer;
+  sRetorno: string;
+  sChar: string;
+begin
+  sRetorno := '';
+  for I := 0 to chkListaEnquadramento.Count -1 do
+  begin
+    if chkListaEnquadramento.Checked[i] then
+    begin
+      sChar := Copy(chkListaEnquadramento.Items[i], 1, 2);
+      if sRetorno = '' then
+        sRetorno := '(''' + sChar + ''''
+      else
+        sRetorno := sRetorno + ',''' + sChar + '''';
+    end;
+  end;
+
+  if sRetorno <> '' then
+    sRetorno := sRetorno + ')';
+
+  Result := sRetorno;
+end;
+
+procedure TfrmEnviarEmailCliente.TelaEmail;
+begin
+  if (tsFiltro.Showing) then
+  begin
+    tsEmail.Show;
+    edtAssunto.SetFocus;
+    Exit;
+  end
+  else begin
+    btnFiltroClick(Self);
+    tsEmail.Show;
+    edtAssunto.SetFocus;
+  end;
+end;
+
+procedure TfrmEnviarEmailCliente.tsEmailShow(Sender: TObject);
+begin
+  inherited;
+  if edtCodContaEmail.Text = '' then
+    BuscarContaEmail();
+end;
+
+end.

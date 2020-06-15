@@ -1,0 +1,11 @@
+inherited DMCategoria: TDMCategoria
+  OnCreate = DataModuleCreate
+  inherited CDSConsulta: TClientDataSet
+    ProviderName = 'dspCategoriaCons'
+    RemoteServer = DM.DSPConexao2
+  end
+  inherited CDSCadastro: TClientDataSet
+    ProviderName = 'dspCategoriaCad'
+    RemoteServer = DM.DSPConexao2
+  end
+end

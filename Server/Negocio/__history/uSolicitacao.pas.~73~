@@ -1,0 +1,845 @@
+unit uSolicitacao;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, uSolicitacaoStatusVO, uUsuario, uFiltroSolicitacao,
+  uFireDAC, uSolicitacaoVO, uSolicitacaoViewModel, uSolicitacaoTempo, System.Generics.Collections;
+
+  const CConsulta: string =
+    ' SELECT'
+    +'  Sol_Id,'
+    +'  Sol_Data,'
+    +'  Sol_Hora,'
+    +'  Sol_Cliente,'
+    +'  Sol_Status,'
+    +'  Sol_Titulo,'
+    +'  CASE Sol_Nivel'
+    +'    WHEN 1 THEN ''1-Baixo'''
+    +'    WHEN 2 THEN ''2-Normal'''
+    +'    WHEN 3 THEN ''3-Alto'''
+    +'    WHEN 4 THEN ''4-Crítico'''
+    +'  END AS Sol_Nivel,'
+    +'  Cli_Codigo,'
+    +'  Cli_Nome,'
+    +'  Cli_Fantasia,'
+	  +'  Sta_Nome,'
+	  +'  Tip_Nome,'
+    +'  Ver_Versao'
+    +' FROM Solicitacao'
+    +'  INNER JOIN Cliente ON Sol_Cliente = Cli_Id'
+    +'  INNER JOIN Status ON Sol_Status = Sta_Id'
+	  +'  LEFT JOIN Tipo ON Sol_Tipo = Tip_Id'
+    +'  LEFT JOIN Versao On Sol_VersaoId = Ver_Id';
+
+type
+  TSolicitacao = class(TInterfacedObject, ICadastroInterface)
+  private
+    function DataIngles(Data: string): string;
+    function UsuarioIgualCadastro(AId, AIdUsuario, ATipoOperacao: Integer): Boolean;
+    function RelatorioAnalitico(AModelo, AIdUsuario: Integer; AFiltro: TFiltroSolicitacao;
+      var AQtdeSolicitacao: Integer): string;
+    function FiltrarDados(AIdUsuario: Integer; AFiltro: TFiltroSolicitacao): string;
+    function Join(AFiltro: TFiltroSolicitacao): string;
+    function RetornoQuantidadeSolicitacao(AIdUsuario: Integer; AFiltro: TFiltroSolicitacao): Integer;
+    function RelatorioPorTipo(AIdUsuario: Integer; AFiltro: TFiltroSolicitacao): string;
+    function RelatorioPorStatus(AIdUsuario: Integer; AFiltro: TFiltroSolicitacao): string;
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string;
+    function FiltrarCodigo(Codigo: integer): string;
+    function FiltrarUsuario(Filtro: TFiltroSolicitacao; Campo, Texto: string; IdUsuario: Integer; Contem: Boolean = True): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    procedure Salvar(Programa, IdUsuario: Integer); overload;
+    function ProximoCodigo: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function ProximoId: Integer;
+    function RetornaNumeroSolicitacao(IdSolicitacao: integer): Integer;
+    procedure Salvar(IdUsuario: Integer; SolicitacaoStatus: TSolicitacaoStatusVO); overload;
+    function FiltrarId(IdSolicitacao: Integer): string;
+    function RetornarSQLQuadro(IdUsuario, Parametro: Integer): string;
+    function ObterPorId(Id: Integer): TSolicitacaoViewModel;
+
+    function OcorrenciaUsuarioIgualCadastro(AIdOcorrencia, AIdUsuario, ATipoOperacao: Integer): Boolean;
+    function SolicitacaoUsuarioIgualCadastro(AId, AIdUsuario, ATipoOperacao: Integer): Boolean;
+
+    function Relatorios(AModelo, AIdUsuario: Integer; AFiltro: TFiltroSolicitacao; var AQtdeSolicitacao: Integer): string;
+    function ListarQuadro(AQuery: TFDQuery; AIdUsuario: Integer): TObjectList<TSolicitacaoViewModel>;
+    function ListarProblemaSolucao(AFiltro: TFiltroSolicitacao; ATexto: string; AIdUsuario: Integer): string;
+
+  end;
+
+implementation
+
+{ TSolicitacao }
+
+uses uFuncoesServidor, uParametros, uStatus;
+
+
+function TSolicitacao.DataIngles(Data: string): string;
+begin
+  Result := TFuncoes.DataIngles(Data);
+end;
+
+function TSolicitacao.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+//    Result := usuario.PermissaoEditarADM(Programa, IdUsuario);
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TSolicitacao.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+begin
+  if not UsuarioIgualCadastro(Id, IdUsuario, 3) then
+  begin
+    usuario := TUsuario.Create;
+    try
+//      usuario.PermissaoExcluirADM(Programa, IdUsuario);
+      usuario.PermissaoExcluir(Programa, IdUsuario);
+    finally
+      FreeAndNil(usuario);
+    end;
+  end;
+
+  DM.ExecutarSQL('DELETE FROM Solicitacao WHERE Sol_Id = ' + IntToStr(Id));
+end;
+
+function TSolicitacao.Filtrar(Campo, Texto, Ativo: string; Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+
+  Result := sConsulta;
+end;
+
+function TSolicitacao.FiltrarCodigo(Codigo: integer): string;
+begin
+  Result := CConsulta + ' WHERE Sol_Id = ' + Codigo.ToString();
+end;
+
+function TSolicitacao.FiltrarDados(AIdUsuario: Integer;
+  AFiltro: TFiltroSolicitacao): string;
+var
+  sConsulta: string;
+  Usuario: TUsuario;
+begin
+  sConsulta := '';
+  Usuario := TUsuario.Create;
+  try
+    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario);
+  finally
+    FreeAndNil(Usuario);
+  end;
+
+  if Trim(AFiltro.DataInicial) <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Sol_Data >= ' + DataIngles(AFiltro.DataInicial);
+
+  if Trim(AFiltro.DataFinal) <> DataEmBranco then
+    sConsulta := sConsulta + ' AND Sol_Data <= ' + DataIngles(AFiltro.DataFinal);
+
+  if AFiltro.IdUsuarioAbertura <> '' then
+    sConsulta := sConsulta + ' AND Sol_UsuarioAbertura IN' + AFiltro.IdUsuarioAbertura;
+
+  if AFiltro.IdCliente <> '' then
+    sConsulta := sConsulta + ' AND Sol_Cliente IN' + AFiltro.IdCliente;
+
+  if AFiltro.IdModulo <> '' then
+    sConsulta := sConsulta + ' AND Sol_Modulo IN' + AFiltro.IdModulo;
+
+  if AFiltro.IdProduto <> '' then
+    sConsulta := sConsulta + ' AND Sol_Produto IN' + AFiltro.IdProduto;
+
+  if AFiltro.IdAnalista <> '' then
+    sConsulta := sConsulta + ' AND Sol_Analista IN' + AFiltro.IdAnalista;
+
+  if AFiltro.IdTipo <> '' then
+    sConsulta := sConsulta + ' AND Sol_Tipo IN' + AFiltro.IdTipo;
+
+  if AFiltro.IdDesenvolvedor <> '' then
+    sConsulta := sConsulta + ' AND Sol_Desenvolvedor IN' + AFiltro.IdDesenvolvedor;
+
+  if AFiltro.IdDesenvolvedor <> '' then
+    sConsulta := sConsulta + ' AND Sol_Desenvolvedor IN' + AFiltro.IdDesenvolvedor;
+
+  if AFiltro.IdOperador <> '' then
+    sConsulta := sConsulta + ' AND SCro_UsuarioOperacional IN' + AFiltro.IdOperador;
+
+  if AFiltro.IdStatus <> '' then
+    sConsulta := sConsulta + ' AND Sol_Status IN' + AFiltro.IdStatus;
+
+  if AFiltro.Nivel < 5 then
+    sConsulta := sConsulta + ' AND Sol_Nivel = ' + IntToStr(AFiltro.Nivel);
+
+  if AFiltro.Cliente.IdUsuario <> '' then
+    sConsulta := sConsulta + ' AND Cli_Usuario IN' + AFiltro.Cliente.IdUsuario;
+
+  if AFiltro.Cliente.Perfil.Trim() <> '' then
+    sConsulta := sConsulta + ' AND Cli_Perfil = ' + QuotedStr(AFiltro.Cliente.Perfil);
+
+  if AFiltro.idVersao <> '' then
+    sConsulta := sConsulta + ' AND Sol_VersaoId IN' + AFiltro.idVersao;
+
+  if AFiltro.Id > 0 then
+    sConsulta := sConsulta + ' AND Sol_Id = ' + AFiltro.Id.ToString();
+
+  if AFiltro.IdCategoria <> '' then
+    sConsulta := sConsulta + ' AND Sol_Categoria IN ' + AFiltro.IdCategoria;
+
+
+  Result := sConsulta;
+end;
+
+function TSolicitacao.FiltrarId(IdSolicitacao: Integer): string;
+begin
+  Result := CConsulta + ' WHERE Sol_Id = ' + IdSolicitacao.ToString();
+end;
+
+function TSolicitacao.FiltrarUsuario(Filtro: TFiltroSolicitacao; Campo,
+Texto: string; IdUsuario: Integer; Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+  Usuario: TUsuario;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+  sConsulta := sConsulta + FiltrarDados(IdUsuario, Filtro);
+
+  Result := sConsulta;
+
+//  Usuario := TUsuario.Create;
+//  try
+//    sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+//    sConsulta := sConsulta +  Usuario.RetornaPermissaoUsuarioDepartamento(IdUsuario);
+//  finally
+//    FreeAndNil(Usuario);
+//  end;
+//
+//  sConsulta := sConsulta + FiltrarDados(IdUsuario, Filtro);
+//
+//  if Trim(Filtro.DataInicial) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Sol_Data >= ' + DataIngles(Filtro.DataInicial);
+//
+//  if Trim(Filtro.DataFinal) <> DataEmBranco then
+//    sConsulta := sConsulta + ' AND Sol_Data <= ' + DataIngles(Filtro.DataFinal);
+//
+//  if Filtro.IdUsuarioAbertura <> '' then
+//    sConsulta := sConsulta + ' AND Sol_UsuarioAbertura IN' + Filtro.IdUsuarioAbertura;
+//
+//  if Filtro.IdCliente <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Cliente IN' + Filtro.IdCliente;
+//
+//  if Filtro.IdModulo <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Modulo IN' + Filtro.IdModulo;
+//
+//  if Filtro.IdProduto <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Produto IN' + Filtro.IdProduto;
+//
+//  if Filtro.IdAnalista <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Analista IN' + Filtro.IdAnalista;
+//
+//  if Filtro.IdTipo <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Tipo IN' + Filtro.IdTipo;
+//
+//  if Filtro.IdDesenvolvedor <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Desenvolvedor IN' + Filtro.IdDesenvolvedor;
+//
+//  if Filtro.IdDesenvolvedor <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Desenvolvedor IN' + Filtro.IdDesenvolvedor;
+//
+//  if Filtro.IdOperador <> '' then
+//    sConsulta := sConsulta + ' AND SCro_UsuarioOperacional IN' + Filtro.IdOperador;
+//
+//  if Filtro.IdStatus <> '' then
+//    sConsulta := sConsulta + ' AND Sol_Status IN' + Filtro.IdStatus;
+//
+//  if Filtro.Nivel < 5 then
+//    sConsulta := sConsulta + ' AND Sol_Nivel = ' + IntToStr(Filtro.Nivel);
+//
+//  if Filtro.Cliente.IdUsuario <> '' then
+//    sConsulta := sConsulta + ' AND Cli_Usuario IN' + Filtro.Cliente.IdUsuario;
+//
+//  Result := sConsulta;
+end;
+
+function TSolicitacao.Join(AFiltro: TFiltroSolicitacao): string;
+var
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    sb.Append(' 	INNER JOIN Cliente ON Sol_Cliente = Cli_Id');
+    sb.Append(' 	INNER JOIN Status ON Sol_Status = Sta_Id');
+    sb.Append(' 	LEFT JOIN Versao On Sol_VersaoId = Ver_Id');
+    sb.Append(' 	LEFT JOIN Tipo ON Sol_Tipo = Tip_Id');
+    sb.Append(' 	LEFT JOIN Modulo ON Sol_Modulo = Mod_Id');
+    sb.Append(' 	LEFT JOIN Produto ON Sol_Produto = Prod_Id');
+    sb.Append(' 	LEFT JOIN Usuario AS Anal ON Sol_Analista = Anal.Usu_Id');
+    sb.Append(' 	LEFT JOIN Usuario AS Desenv ON Sol_Desenvolvedor = Desenv.Usu_Id');
+    Result := sb.ToString();
+  finally
+    FreeAndNil(sb);
+  end;
+end;
+
+function TSolicitacao.ListarProblemaSolucao(AFiltro: TFiltroSolicitacao;
+  ATexto: string; AIdUsuario: Integer): string;
+var
+  sb: TStringBuilder;
+  sTexto: string;
+  Usuario: TUsuario;
+begin
+  sTexto := '''%' + ATexto + '%''';
+  sb := TStringBuilder.Create;
+  try
+    sb.AppendLine(' SELECT');
+    sb.AppendLine(' 	Sol_Id,');
+    sb.AppendLine(' 	Sol_Data,');
+    sb.AppendLine(' 	Sol_Hora,');
+    sb.AppendLine(' 	Sol_Descricao,');
+    sb.AppendLine(' 	Sol_DescricaoLiberacao,');
+    sb.AppendLine(' 	SOcor_Descricao as DescricaoOco,');
+    sb.AppendLine(' 	SOcor_Classificacao,');
+    sb.AppendLine(' 	SOcor_Data as DataOco,');
+    sb.AppendLine(' 	SOcor_Hora as ');
+    sb.AppendLine('  Solicitacao ');
+    sb.AppendLine(' 	INNER JOIN Solicitacao_Ocorrencia ON Sol_Id = SOcor_Solicitacao ');
+    sb.AppendLine('   LEFT JOIN Cliente ON Sol_Cliente = Cli_Id');
+    sb.AppendLine(' 	WHERE ((Sol_Descricao LIKE ' + sTexto +') OR (Sol_DescricaoLiberacao LIKE ' + sTexto + ') OR (SOcor_Descricao LIKE ' + sTexto + '))');
+
+    Usuario := TUsuario.Create;
+    try
+      sb.AppendLine(Usuario.RetornaPermissaoUsuarioDepartamento(AIdUsuario));
+    finally
+      FreeAndNil(Usuario);
+    end;
+
+    sb.AppendLine(' 	ORDER BY Sol_Data ');
+    ShowMessage(sb.ToString);
+
+  finally
+    FreeAndNil(sb);
+  end;
+end;
+
+function TSolicitacao.ListarQuadro(AQuery: TFDQuery;
+  AIdUsuario: Integer): TObjectList<TSolicitacaoViewModel>;
+var
+  lista: TObjectList<TSolicitacaoViewModel>;
+  model: TSolicitacaoViewModel;
+begin
+  lista := TObjectList<TSolicitacaoViewModel>.Create();
+  AQuery.First;
+  while not AQuery.Eof do
+  begin
+
+    model := TSolicitacaoViewModel.Create;
+    model.Quadro := AQuery.FieldByName('Quadro').AsString;
+    model.Aberta := AQuery.FieldByName('Aberta').AsInteger;
+    model.Id := AQuery.FieldByName('Sol_Id').AsInteger;
+    model.Titulo := AQuery.FieldByName('Sol_Titulo').AsString;
+    model.IdUsuarioAtendeAtual := AQuery.FieldByName('Sol_UsuarioAtendeAtual').AsInteger;
+    model.Nivel := AQuery.FieldByName('Nivel').AsString;
+    model.NomeCliente := AQuery.FieldByName('Cli_Nome').AsString;
+    model.UsuarioNome := AQuery.FieldByName('Usu_Nome').AsString;
+    model.IdStatus := AQuery.FieldByName('Sol_Status').AsInteger;
+    model.Perfil := AQuery.FieldByName('Cli_Perfil').AsString;
+
+    lista.Add(model);
+    AQuery.Next;
+  end;
+
+  Result := lista;
+end;
+
+procedure TSolicitacao.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+begin
+//
+end;
+
+function TSolicitacao.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+procedure TSolicitacao.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TSolicitacao.ObterPorId(Id: Integer): TSolicitacaoViewModel;
+var
+  obj: TFireDAC;
+  Solicitacao: TSolicitacaoViewModel;
+  cTotalHoras: Currency;
+  hHorasEmAberto: TTime;
+  SolicitacaoTempo: TSolicitacaoTempo;
+  cHoras: Currency;
+  cHoraAtual: Currency;
+begin
+  Solicitacao := TSolicitacaoViewModel.Create;
+  SolicitacaoTempo := TSolicitacaoTempo.Create;
+  obj := TFireDAC.create;
+  try
+    obj.Lista.Clear();
+    obj.Lista.Add(' SELECT Sol_Id, Sol_Nivel, Sol_Titulo, Sol_UsuarioAtendeAtual, Cli_Nome, Usu_Nome, Sta_Nome, Sol_TempoPrevisto FROM Solicitacao');
+	  obj.Lista.Add('  INNER JOIN Cliente ON Sol_Cliente = Cli_Id ');
+	  obj.Lista.Add('  INNER JOIN Status ON Sol_Status = Sta_Id ');
+    obj.Lista.Add('  LEFT JOIN Usuario ON Sol_UsuarioAtendeAtual = Usu_Id ');
+    obj.Lista.Add(' WHERE Sol_Id = ' + IntToStr(Id));
+    obj.OpenSQL();
+
+    Solicitacao.Id := Id;
+    Solicitacao.IdUsuarioAtendeAtual := obj.Model.FieldByName('Sol_UsuarioAtendeAtual').AsInteger;
+    Solicitacao.Titulo := obj.Model.FieldByName('Sol_Titulo').AsString;
+    Solicitacao.NomeStatus := obj.Model.FieldByName('Sta_Nome').AsString;
+    Solicitacao.NomeCliente := obj.Model.FieldByName('Cli_Nome').AsString;
+    Solicitacao.Nivel := obj.Model.FieldByName('Sol_Nivel').AsString;
+    Solicitacao.TempoPrevisto := obj.Model.FieldByName('Sol_TempoPrevisto').AsCurrency;
+    obj.Model.Close;
+
+    hHorasEmAberto := SolicitacaoTempo.BuscarHorasEmAberto(id, Solicitacao.IdUsuarioAtendeAtual);
+    cHoras := TFuncoes.HoraToDecimal(TimeToStr(hHorasEmAberto));
+    cTotalHoras := SolicitacaoTempo.BuscarTotalHorasSolicitacao(Id);
+    cHoraAtual := TFuncoes.HoraToDecimal(TimeToStr(Time));
+
+    if hHorasEmAberto > 0 then
+      cHoras := cHoraAtual - cHoras;
+
+    cTotalHoras := cTotalHoras + cHoras;
+
+    Solicitacao.TempoDecorrido := TFuncoes.DecimalToHora(cTotalHoras);
+
+    Result := Solicitacao;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(SolicitacaoTempo);
+  end;
+end;
+
+function TSolicitacao.OcorrenciaUsuarioIgualCadastro(AIdOcorrencia,
+  AIdUsuario, ATipoOperacao: Integer): Boolean;
+var
+  obj: TFireDAC;
+begin
+{
+   ATipoOperacao = 2-Edicao 3-Exclusao
+}
+
+  Result := True;
+  if (ATipoOperacao = 2) or (ATipoOperacao = 3) then
+  begin
+    obj := TFireDAC.create;
+    try
+      obj.Lista.Clear();
+      obj.Lista.Add(' SELECT SOcor_UsuarioOperacional FROM Solicitacao_Ocorrencia');
+      obj.Lista.Add(' WHERE SOcor_Id = ' + IntToStr(AIdOcorrencia));
+      obj.OpenSQL();
+
+      Result := (obj.Model.FieldByName('SOcor_UsuarioOperacional').AsInteger = AIdUsuario);
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+function TSolicitacao.ProximoCodigo: Integer;
+begin
+  Result := 0;
+end;
+
+function TSolicitacao.ProximoId: Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT IDENT_CURRENT(''Solicitacao'')';
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+procedure TSolicitacao.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TSolicitacao.RelatorioAnalitico(AModelo, AIdUsuario: Integer;
+  AFiltro: TFiltroSolicitacao; var AQtdeSolicitacao: Integer): string;
+var
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    sb.Append(' SELECT');
+    sb.Append(' 	Sol_Id,');
+    sb.Append(' 	Ver_Id,');
+    sb.Append(' 	Ver_Versao,');
+    sb.Append(' 	Sol_Data,');
+    sb.Append(' 	Sol_Hora,');
+    sb.Append(' 	Sol_Tipo,');
+    sb.Append(' 	Sol_Nivel,');
+    sb.Append(' 	Cli_Nome,');
+    sb.Append(' 	Cli_Fantasia,');
+    sb.Append(' 	Tip_Nome,');
+    sb.Append(' 	Sta_Nome,');
+    sb.Append(' 	Mod_Nome,');
+    sb.Append(' 	Sol_Titulo,');
+    sb.Append(' 	Prod_Nome,');
+    sb.Append(' 	Anal.Usu_Nome AS Analista,');
+    sb.Append(' 	Desenv.Usu_Nome As Desenvolvedor,');
+    sb.Append(' 	Sol_TempoPrevisto,');
+    sb.Append(' 	Sol_PrevisaoEntrega,');
+    sb.Append(' 	(');
+    sb.Append(' 	          SELECT Usu_Nome FROM Usuario');
+    sb.Append(' 	            WHERE Sol_Desenvolvedor = Usu_Id');
+    sb.Append(' 	        ) AS Desenvolvedor,');
+    sb.Append(' 	(');
+    sb.Append(' 		SELECT SUM(STemp_TotalHoras) FROM Solicitacao_Tempo');
+    sb.Append(' 			WHERE Sol_Id = STemp_Solicitacao');
+    sb.Append(' 	) AS TotalTempo');
+    sb.Append(' FROM Solicitacao');
+    sb.Append(Join(AFiltro));
+//    sb.Append(' 	INNER JOIN Cliente ON Sol_Cliente = Cli_Id');
+//    sb.Append(' 	INNER JOIN Status ON Sol_Status = Sta_Id');
+//    sb.Append(' 	LEFT JOIN Versao On Sol_VersaoId = Ver_Id');
+//    sb.Append(' 	LEFT JOIN Tipo ON Sol_Tipo = Tip_Id');
+//    sb.Append(' 	LEFT JOIN Modulo ON Sol_Modulo = Mod_Id');
+//    sb.Append(' 	LEFT JOIN Produto ON Sol_Produto = Prod_Id');
+//    sb.Append(' 	LEFT JOIN Usuario AS Anal ON Sol_Analista = Anal.Usu_Id');
+//    sb.Append(' 	LEFT JOIN Usuario AS Desenv ON Sol_Desenvolvedor = Desenv.Usu_Id');
+
+    sb.Append(' WHERE Sol_Id > 0');
+
+    AFiltro.IdOperador := '';
+
+    sb.Append(FiltrarDados(AIdUsuario, AFiltro));
+
+    AQtdeSolicitacao := RetornoQuantidadeSolicitacao(AIdUsuario, AFiltro);
+
+    Result := sb.ToString();
+  finally
+    FreeAndNil(sb);
+  end;
+end;
+
+function TSolicitacao.RelatorioPorStatus(AIdUsuario: Integer;
+  AFiltro: TFiltroSolicitacao): string;
+var
+  sql: string;
+begin
+  sql := '';
+  sql := sql + ' SELECT';
+  sql := sql + ' 	Sol_Produto,';
+  sql := sql + ' 	Sol_Data,';
+  sql := sql + ' 	Sol_Titulo,';
+  sql := sql + ' 	Sol_Cliente,';
+  sql := sql + ' 	Sol_Status,';
+  sql := sql + ' 	Cli_Codigo,';
+  sql := sql + ' 	Cli_Nome,';
+  sql := sql + ' 	Sta_Codigo,';
+  sql := sql + ' 	Sta_Nome,';
+  sql := sql + ' 	Prod_Codigo,';
+  sql := sql + ' 	Prod_Nome,';
+	sql := sql + ' 	Sol_tipo,';
+	sql := sql + ' 	Tip_Codigo,';
+  sql := sql + ' 	Tip_Nome,';
+  sql := sql + ' 	ISNULL((SELECT SUM(STemp_TotalHoras) FROM Solicitacao_Tempo WHERE Sol_Id = STemp_Solicitacao),0) AS Tempo';
+  sql := sql + ' FROM Solicitacao';
+  sql := sql + Join(AFiltro);
+  sql := sql + ' 	WHERE Sol_Id > 0';
+  sql := sql + FiltrarDados(AIdUsuario, AFiltro);
+
+  Result := sql;
+end;
+
+function TSolicitacao.RelatorioPorTipo(AIdUsuario: Integer;
+  AFiltro: TFiltroSolicitacao): string;
+var
+  sql: string;
+begin
+  sql := '';
+  sql := sql + ' SELECT';
+  sql := sql + ' 	Tip_Codigo,';
+  sql := sql + ' 	Tip_Nome,';
+  sql := sql + ' 	Sol_Tipo,';
+  sql := sql + ' 	Sol_Data,';
+  sql := sql + ' 	Sol_Titulo,';
+  sql := sql + ' 	Sol_Cliente,';
+  sql := sql + ' 	Sol_Status,';
+  sql := sql + ' 	Cli_Codigo,';
+  sql := sql + ' 	Cli_Nome,';
+  sql := sql + ' 	Sta_Codigo,';
+  sql := sql + ' 	Sta_Nome,';
+  sql := sql + ' 	ISNULL((SELECT SUM(STemp_TotalHoras) FROM Solicitacao_Tempo WHERE Sol_Id = STemp_Solicitacao),0) AS Tempo';
+  sql := sql + ' FROM Solicitacao';
+  sql := sql + Join(AFiltro);
+  sql := sql + ' 	WHERE Sol_Id > 0';
+  sql := sql + FiltrarDados(AIdUsuario, AFiltro);
+
+//  ShowMessage(sql);
+
+  Result := sql;
+end;
+
+function TSolicitacao.Relatorios(AModelo, AIdUsuario: Integer;
+  AFiltro: TFiltroSolicitacao; var AQtdeSolicitacao: Integer): string;
+begin
+  case AModelo of
+    1: Result := RelatorioAnalitico(AModelo, AIdUsuario, AFiltro, AQtdeSolicitacao);
+    2: Result := RelatorioPorTipo(AIdUsuario, AFiltro);
+    3: Result := RelatorioPorStatus(AIdUsuario, AFiltro);
+  end;
+end;
+
+function TSolicitacao.RetornaNumeroSolicitacao(IdSolicitacao: integer): Integer;
+var
+  lQry: TFDQuery;
+begin
+  lQry := TFDQuery.Create(Nil);
+  try
+    lQry.Connection := DM.Conexao;
+    lQry.SQL.Text := 'SELECT Sol_Id FROM Solicitacao WHERE Sol_Id = :Id';
+
+    lQry.Params[0].AsInteger := IdSolicitacao;
+    lQry.Open();
+
+    Result := lQry.Fields[0].AsInteger;
+  finally
+    FreeAndNil(lQry);
+  end;
+end;
+
+function TSolicitacao.RetornarSQLQuadro(IdUsuario, Parametro: Integer): string;
+var
+  sb: TStringBuilder;
+  Usuario: TUsuario;
+  sConsulta: string;
+begin
+  Usuario := TUsuario.Create;
+  try
+    sConsulta := Usuario.RetornaPermissaoUsuarioDepartamento(IdUsuario);
+  finally
+    FreeAndNil(Usuario);
+  end;
+
+  sb := TStringBuilder.Create;
+  try
+    sb.AppendLine(' SELECT');
+    sb.AppendLine(' 	Sol_Id,');
+    sb.AppendLine(' 	Sol_Titulo,');
+    sb.AppendLine(' 	Sol_UsuarioAtendeAtual,');
+    sb.AppendLine(' 	Cli_Nome,');
+    sb.AppendLine(' 	Usu_Nome,');
+    sb.AppendLine(' 	Sol_Status');
+    sb.AppendLine(' FROM Solicitacao');
+    sb.AppendLine(' 	INNER JOIN Cliente ON Sol_Cliente = Cli_Id');
+    sb.AppendLine(' 	INNER JOIN Status ON Sol_Status = Sta_Id');
+    sb.AppendLine(' 	INNER JOIN Parametros ON Sta_Codigo = COALESCE(Par_Valor, 0)');
+    sb.AppendLine('   LEFT JOIN Usuario ON Sol_UsuarioAtendeAtual = Usu_Id');
+
+    sb.AppendLine(' WHERE Par_Codigo = ' + IntToStr(Parametro));
+    sb.AppendLine(' AND Par_Programa = 3');
+    sb.AppendLine(sConsulta);
+    sb.AppendLine(' ORDER BY Sol_Data');
+
+    Result := sb.ToString();
+  finally
+    FreeAndNil(sb);
+  end;
+end;
+
+function TSolicitacao.RetornoQuantidadeSolicitacao(AIdUsuario: Integer;
+  AFiltro: TFiltroSolicitacao): Integer;
+var
+  sb: TStringBuilder;
+  obj: TFireDAC;
+begin
+  sb := TStringBuilder.Create;
+  obj := TFireDAC.create;
+  try
+    sb.Append(' SELECT');
+    sb.Append(' 	COUNT(Sol_Id) AS Qtde');
+    sb.Append(' FROM Solicitacao');
+    sb.Append(Join(AFiltro));
+
+    sb.Append(' WHERE Sol_Id > 0');
+
+    AFiltro.IdOperador := '';
+
+    sb.Append(FiltrarDados(AIdUsuario, AFiltro));
+
+    obj.OpenSQL(sb.ToString());
+
+    Result := obj.Model.Fields[0].AsInteger;
+  finally
+    FreeAndNil(sb);
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TSolicitacao.Salvar(IdUsuario: Integer;
+  SolicitacaoStatus: TSolicitacaoStatusVO);
+var
+  lQry: TFDQuery;
+  objParametros: TParametros;
+  objStatus: TStatus;
+  iCodigoStatus: Integer;
+  IdStatusEncerramento: Integer;
+begin
+  objStatus := TStatus.Create;
+  objParametros := TParametros.Create;
+  try
+    iCodigoStatus := objParametros.SolicitacaoStatusEncerramento();
+    IdStatusEncerramento := objStatus.LocalizarCodigo(iCodigoStatus);
+  finally
+    FreeAndNil(objStatus);
+    FreeAndNil(objParametros);
+  end;
+
+  if IdStatusEncerramento > 0 then
+  begin
+    if IdStatusEncerramento = SolicitacaoStatus.IdStatusNovo then
+    begin
+      if SolicitacaoStatus.DescricaoLiberacao.Trim() = '' then
+        raise Exception.Create('Informe a Descrição da Análise antes de Encerrar!');
+    end;
+  end;
+
+
+  if SolicitacaoStatus.IdStatus > 0 then
+  begin
+    lQry := TFDQuery.Create(Nil);
+    try
+      lQry.Connection := DM.Conexao;
+
+      lQry.SQL.Text := 'SELECT Sol_Status FROM Solicitacao WHERE Sol_Id = ' + IntToStr(SolicitacaoStatus.IdSolicitacao);
+      lQry.Open();
+
+      if SolicitacaoStatus.IdStatus <> lQry.Fields[0].AsInteger then
+      begin
+        lQry.SQL.Clear;
+        lQry.SQL.Add('INSERT INTO Solicitacao_Status(');
+        lQry.SQL.Add(' SSta_Solicitacao,');
+        lQry.SQL.Add(' SSta_Data,');
+        lQry.SQL.Add(' SSta_UsuarioOperacional,');
+        lQry.SQL.Add(' SSta_Status)');
+        lQry.SQL.Add(' VALUES(');
+        lQry.SQL.Add(' :Solicitacao,');
+        lQry.SQL.Add(' :Data,');
+        lQry.SQL.Add(' :Usuario,');
+        lQry.SQL.Add(' :Status)');
+
+
+        lQry.Params.ParamByName('Solicitacao').AsInteger := SolicitacaoStatus.IdSolicitacao;
+        lQry.Params.ParamByName('Data').AsDateTime := SolicitacaoStatus.Data;
+        lQry.Params.ParamByName('Usuario').AsInteger := IdUsuario;
+        lQry.Params.ParamByName('Status').AsInteger := SolicitacaoStatus.IdStatus;
+
+        lQry.ExecSQL();
+      end;
+    finally
+      FreeAndNil(lQry);
+    end;
+  end;
+end;
+
+function TSolicitacao.SolicitacaoUsuarioIgualCadastro(AId, AIdUsuario,
+  ATipoOperacao: Integer): Boolean;
+var
+  obj: TFireDAC;
+begin
+{
+   ATipoOperacao = 2-Edicao 3-Exclusao
+}
+  Result := True;
+  if (ATipoOperacao = 2) or (ATipoOperacao = 3) then
+  begin
+    obj := TFireDAC.create;
+    try
+      obj.OpenSQL('SELECT Sol_UsuarioAbertura FROM Solicitacao WHERE Sol_Id = ' + IntToStr(AId));
+      Result  := (obj.Model.FieldByName('Sol_UsuarioAbertura').AsInteger = AIdUsuario);
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+function TSolicitacao.UsuarioIgualCadastro(AId, AIdUsuario,
+  ATipoOperacao: Integer): Boolean;
+var
+  obj: TFireDAC;
+begin
+{
+   ATipoOperacao = 2-Edicao 3-Exclusao
+}
+  Result := True;
+  if (ATipoOperacao = 2) or (ATipoOperacao = 3) then
+  begin
+    obj := TFireDAC.create;
+    try
+      obj.OpenSQL('SELECT Sol_UsuarioAbertura FROM Solicitacao WHERE Sol_Id = ' + IntToStr(AId));
+      Result  := (obj.Model.FieldByName('Sol_UsuarioAbertura').AsInteger = AIdUsuario);
+    finally
+      FreeAndNil(obj);
+    end;
+  end;
+end;
+
+procedure TSolicitacao.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+end.

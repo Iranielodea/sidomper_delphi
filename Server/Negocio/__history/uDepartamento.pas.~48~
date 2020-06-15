@@ -1,0 +1,593 @@
+unit uDepartamento;
+
+interface
+  uses uDM, System.SysUtils, FireDAC.Stan.Param,
+
+  Data.DB,
+  FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface,
+  System.Generics.Collections, uDepartamentoVO, uDepartamentoAcessoVO, uDepartamentoEmailVO,
+  uFireDAC, uGenericDAO, uExportarDepartamento;
+
+  const CConsulta: string =
+    'SELECT Dep_Codigo, Dep_Id, Dep_Nome, Dep_Ativo FROM Departamento ';
+
+type
+  TDepartamento = class(TInterfacedObject, ICadastroInterface)
+  private
+    function BolToString(AValor: Boolean): string;
+    procedure SalvarAcesso(AIdDepartamento: Integer; ADepartamento: TDepartamentoVO);
+    procedure SalvarEmail(ADepartamento: TDepartamentoVO);
+    procedure ExcluirAcesso(ADepartamento: TDepartamentoVO);
+    procedure ExcluirEmail(ADepartamento: TDepartamentoVO);
+    function SalvarDepartamento(ADepartamento: TDepartamentoVO): Integer;
+  public
+    procedure Novo(Programa, IdUsuario: Integer);
+    function Editar(Programa, IdUsuario: Integer): Boolean;
+    procedure Excluir(Programa, IdUsuario, Id: Integer);
+    function Filtrar(Campo, Texto, Ativo: string; Contem: Boolean = True): string;
+    function FiltrarCodigo(Codigo: Integer): string;
+    function FiltarId(AId: Integer): string;
+    function LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+    procedure LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+    function LocalizarUmRegistro(): Integer;
+    procedure Salvar(Programa, IdUsuario: Integer); overload;
+    function Salvar(ADepartamento: TDepartamentoVO): Integer; overload;
+    function ProximoCodigo: Integer;
+    function ProximoId: Integer;
+    procedure Relatorio(Programa, IdUsuario: Integer);
+    function RetornarEmail(IdUsuario: Integer): TList<string>;
+    function MostrarAnexos(AIdUsuario: Integer): Boolean;
+    procedure Exportar();
+    procedure Importar();
+    function Duplicar(AId: Integer): Integer;
+    function ObterPorId(AId: Integer): TDepartamentoVO;
+
+  end;
+
+implementation
+
+{ TDepartamento }
+
+uses uUsuario, uFuncoesServidor, uCRUD;
+
+function TDepartamento.BolToString(AValor: Boolean): string;
+begin
+  Result := TFuncoes.BolToString(AValor);
+end;
+
+function TDepartamento.Duplicar(AId: Integer): Integer;
+var
+  iCodigo: Integer;
+  model: TDepartamentoVO;
+  obj: TFireDAC;
+  Acesso: TDepartamentoAcessoVO;
+  Email: TDepartamentoEmailVO;
+begin
+  iCodigo := ProximoCodigo() + 1;
+  obj := TFireDAC.create;
+  try
+    model := ObterPorId(AId);
+    model.Id := 0;
+    model.Codigo := iCodigo;
+    model.Nome := 'DEPARTAMENTO XXXX';
+
+    try
+      obj.StartTransacao();
+      model.Id := SalvarDepartamento(model);
+//==============================================================================
+// Departamento Acesso
+//==============================================================================
+      for Acesso in model.DepartamentoAcesso do
+      begin
+        Acesso.IdDepartamento := model.Id;
+        Acesso.Id := 0;
+        TGenericDAO.Save<TDepartamentoAcessoVO>(Acesso);
+      end;
+//==============================================================================
+// Departamento Email
+//==============================================================================
+      for Email in model.DepartamentoEmail do
+      begin
+        Email.IdDepartamento := model.Id;
+        Email.Id := 0;
+        TGenericDAO.Save<TDepartamentoEmailVO>(Email);
+      end;
+      obj.Commit;
+
+      Result := model.Id;
+    except
+      On E: Exception do
+      begin
+        obj.Roolback;
+      end;
+    end;
+  finally
+    FreeAndNil(model);
+    FreeAndNil(obj);
+  end;
+
+end;
+
+function TDepartamento.Editar(Programa, IdUsuario: Integer): Boolean;
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    Result := usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+procedure TDepartamento.Excluir(Programa, IdUsuario, Id: Integer);
+var
+  usuario: TUsuario;
+  obj: TFireDAC;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoExcluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+
+  obj := TFireDAC.create;
+  try
+    obj.ExecutarSQL('DELETE FROM Departamento WHERE Dep_Id = ' + IntToStr(Id));
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TDepartamento.ExcluirAcesso(ADepartamento: TDepartamentoVO);
+var
+  Id: Integer;
+  Item: TDepartamentoAcessoVO;
+  achou: Boolean;
+  obj: TFireDAC;
+begin
+// se na lista de objetos não tiver registro e no banco de dados sim
+// então excluir do banco de dados o registro da lista de objectos
+
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT DepAc_Id FROM Departamento_Acesso WHERE DepAc_Departamento = ' + ADepartamento.Id.ToString);
+    while not obj.Model.Eof do
+    begin
+      id := obj.Model.Fields[0].AsInteger;
+      achou := False;
+
+      for Item in ADepartamento.DepartamentoAcesso do
+      begin
+        if Item.Id = id then
+          achou := True;
+      end;
+
+      if achou = False then
+        obj.ExecutarSQL('DELETE FROM Departamento_Acesso WHERE DepAc_Id = ' + Id.ToString());
+
+      obj.Model.Next;
+    end;
+
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TDepartamento.ExcluirEmail(ADepartamento: TDepartamentoVO);
+var
+  Id: Integer;
+  Item: TDepartamentoEmailVO;
+  achou: Boolean;
+  obj: TFireDAC;
+begin
+// se na lista de objetos não tiver registro e no banco de dados sim
+// então excluir do banco de dados o registro da lista de objectos
+
+
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT DepEm_Id FROM Departamento_Email WHERE DepEm_Departamento = ' + ADepartamento.Id.ToString);
+    while not obj.Model.Eof do
+    begin
+      id := obj.Model.Fields[0].AsInteger;
+      achou := False;
+
+      for Item in ADepartamento.DepartamentoEmail do
+      begin
+        if Item.Id = id then
+          achou := True;
+      end;
+
+      if achou = False then
+        obj.ExecutarSQL('DELETE FROM Departamento_Email WHERE DepEm_Id = ' + Id.ToString());
+
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TDepartamento.Exportar;
+var
+  obj: TExportarDepartamento;
+begin
+  obj := TExportarDepartamento.Create;
+  try
+    obj.Exportar();
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TDepartamento.FiltarId(AId: Integer): string;
+begin
+  Result := CConsulta + ' WHERE Dep_Id = ' + IntToStr(AId);
+end;
+
+function TDepartamento.Filtrar(Campo, Texto, Ativo: string;
+  Contem: Boolean): string;
+var
+  sConsulta: string;
+  sTexto: string;
+begin
+  sTexto := '''' + Texto + '%''';
+  if Contem then
+    sTexto := '''%' + Texto + '%''';
+
+  sConsulta := CConsulta + ' WHERE ' + Campo + ' LIKE ' + sTexto;
+  if Ativo <> 'T' then
+  begin
+    if Ativo = 'A' then
+      sConsulta := sConsulta + ' AND Dep_Ativo = 1'
+    else
+      sConsulta := sConsulta + ' AND Dep_Ativo = 0';
+  end;
+  sConsulta := sConsulta + ' ORDER BY ' + Campo;
+
+  Result := sConsulta;
+end;
+
+function TDepartamento.FiltrarCodigo(Codigo: Integer): string;
+begin
+  Result := CConsulta + ' WHERE Dep_Codigo = ' + Codigo.ToString();
+end;
+
+procedure TDepartamento.Importar;
+var
+  Arq: TExportarDepartamento;
+  lista: TObjectList<TDepartamentoVO>;
+  Item: TDepartamentoVO;
+begin
+  Arq := TExportarDepartamento.Create();
+  try
+    lista := Arq.Importar();
+
+    for Item in lista do
+      Salvar(Item);
+
+  finally
+    FreeAndNil(Arq);
+    FreeAndNil(lista);
+  end;
+end;
+
+procedure TDepartamento.LocalizarCodigo(var Qry: TFDQuery; Codigo: integer);
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT Dep_Id, Dep_Ativo FROM Departamento WHERE Dep_Codigo = ' + IntToStr(Codigo));
+    if Codigo > 0 then
+    begin
+      if (obj.Model.IsEmpty) then
+        raise Exception.Create(CRegistroNaoEncontrado);
+
+      LocalizarId(Qry, obj.Model.Fields[0].AsInteger);
+      if obj.Model.FieldByName('Dep_Ativo').AsBoolean = False then
+      begin
+        LocalizarId(Qry, 0);
+        raise Exception.Create(CRegistroInativo);
+      end;
+    end
+    else
+      LocalizarId(Qry, 0);
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TDepartamento.LocalizarId(var Qry: TFDQuery; Id: integer): Boolean;
+begin
+  Qry.Close;
+  Qry.Params[0].AsInteger := Id;
+  Qry.Open();
+
+  Result := (not Qry.IsEmpty);
+end;
+
+function TDepartamento.LocalizarUmRegistro: Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT TOP(1) * FROM Departamento');
+    Result := obj.Model.FieldByName('Dep_Id').AsInteger;
+    obj.Model.Close();
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TDepartamento.MostrarAnexos(AIdUsuario: Integer): Boolean;
+var
+  obj: TFireDAC;
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  obj := TFireDAC.create;
+  try
+    sb.AppendLine(' SELECT Dep_MostrarAnexos FROM Usuario');
+	  sb.AppendLine(' INNER JOIN Departamento ON Usu_Departamento = Dep_Id');
+    sb.AppendLine(' WHERE Usu_Id = ' + IntToStr(AIdUsuario));
+    obj.OpenSQL(sb.ToString);
+    Result := obj.Model.Fields[0].AsBoolean;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(sb);
+  end;
+end;
+
+procedure TDepartamento.Novo(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoIncluir(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TDepartamento.ObterPorId(AId: Integer): TDepartamentoVO;
+var
+  sCamposDepartamento: string;
+  sCamposDepartamentoAcesso: string;
+  sCamposDepartamentoEmail: string;
+
+  model: TDepartamentoVO;
+  modelAcesso: TDepartamentoAcessoVO;
+  modelEmail: TDepartamentoEmailVO;
+  obj: TFireDAC;
+begin
+  model := TDepartamentoVO.Create;
+  modelAcesso := TDepartamentoAcessoVO.Create;
+  modelEmail := TDepartamentoEmailVO.Create;
+
+  sCamposDepartamento := TGenericDAO.SelectFrom<TDepartamentoVO>(model, AId);
+
+  sCamposDepartamentoAcesso := TGenericDAO.Select<TDepartamentoAcessoVO>(modelAcesso, False);
+  sCamposDepartamentoAcesso := sCamposDepartamentoAcesso + ' FROM Departamento_Acesso WHERE DepAc_Departamento = ' + IntToStr(AId);
+
+  sCamposDepartamentoEmail := TGenericDAO.Select<TDepartamentoEmailVO>(modelEmail, False);
+  sCamposDepartamentoEmail := sCamposDepartamentoEmail + ' FROM Departamento_Email WHERE DepEm_Departamento = ' + IntToStr(AId);
+
+  FreeAndNil(modelAcesso);
+  FreeAndNil(modelEmail);
+
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL(sCamposDepartamento);
+
+    model.Id := obj.Model.FieldByName('Dep_Id').AsInteger;
+    model.Codigo := obj.Model.FieldByName('Dep_Codigo').AsInteger;
+    model.Nome := obj.Model.FieldByName('Dep_Nome').AsString;
+    model.Ativo := obj.Model.FieldByName('Dep_Ativo').AsBoolean;
+    model.SolicitacaoAbertura := obj.Model.FieldByName('Dep_SolicitaAbertura').AsBoolean;
+    model.SolicitacaoAnalise := obj.Model.FieldByName('Dep_SolicitaAnalise').AsBoolean;
+    model.SolicitacaoOcorrenciaGeral := obj.Model.FieldByName('Dep_SolicitaOcorGeral').AsBoolean;
+    model.SolicitacaoOcorrenciaTecnica := obj.Model.FieldByName('Dep_SolicitaOcorTecnica').AsBoolean;
+    model.ChamadoAbertura := obj.Model.FieldByName('Dep_ChamadoAbertura').AsBoolean;
+    model.ChamadoStatus := obj.Model.FieldByName('Dep_ChamadoStatus').AsBoolean;
+    model.ChamadoQuadro := obj.Model.FieldByName('Dep_ChamadoQuadro').AsBoolean;
+    model.ChamadoOcorrencia := obj.Model.FieldByName('Dep_ChamadoOcor').AsBoolean;
+    model.AtividadeAbertura := obj.Model.FieldByName('Dep_AtividadeAbertura').AsBoolean;
+    model.AtividadeStatus := obj.Model.FieldByName('Dep_AtividadeStatus').AsBoolean;
+    model.AtividadeQuadro := obj.Model.FieldByName('Dep_AtividadeQuadro').AsBoolean;
+    model.AtividadeOcorrencia := obj.Model.FieldByName('Dep_AtividadeOcor').AsBoolean;
+    model.AgendamentoQuadro := obj.Model.FieldByName('Dep_AgendamentoQuadro').AsBoolean;
+    model.MostrarAnexos := obj.Model.FieldByName('Dep_MostrarAnexos').AsBoolean;
+
+    obj.OpenSQL(sCamposDepartamentoAcesso);
+    while not obj.Model.Eof do
+    begin
+      modelAcesso := TDepartamentoAcessoVO.Create;
+      modelAcesso.Id := obj.Model.FieldByName('DepAc_Id').AsInteger;
+      modelAcesso.IdDepartamento := obj.Model.FieldByName('DepAc_Departamento').AsInteger;
+      modelAcesso.Programa := obj.Model.FieldByName('DepAc_Programa').AsInteger;
+      modelAcesso.Acesso := obj.Model.FieldByName('DepAc_Acesso').AsBoolean;
+      modelAcesso.Incluir := obj.Model.FieldByName('DepAc_Incluir').AsBoolean;
+      modelAcesso.Editar := obj.Model.FieldByName('DepAc_Editar').AsBoolean;
+      modelAcesso.Excluir := obj.Model.FieldByName('DepAc_Excluir').AsBoolean;
+      modelAcesso.Relatorio := obj.Model.FieldByName('DepAc_Relatorio').AsBoolean;
+      model.DepartamentoAcesso.Add(modelAcesso);
+      obj.Model.Next;
+    end;
+
+    obj.OpenSQL(sCamposDepartamentoEmail);
+    while not obj.Model.Eof do
+    begin
+      modelEmail := TDepartamentoEmailVO.Create;
+      modelEmail.Id := obj.Model.FieldByName('DepEm_Id').AsInteger;
+      modelEmail.IdDepartamento := obj.Model.FieldByName('DepEm_Departamento').AsInteger;
+      modelEmail.Email := obj.Model.FieldByName('DepEm_Email').AsString;
+      model.DepartamentoEmail.Add(modelEmail);
+      obj.Model.Next;
+    end;
+    Result := model;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TDepartamento.ProximoCodigo: Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT MAX(Dep_Codigo) FROM Departamento');
+    Result := obj.Model.Fields[0].AsInteger;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+function TDepartamento.ProximoId: Integer;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.OpenSQL('SELECT IDENT_CURRENT(''Departamento'')');
+    Result := obj.Model.Fields[0].AsInteger + 1;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TDepartamento.Relatorio(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoRelatorio(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+function TDepartamento.RetornarEmail(IdUsuario: Integer): TList<string>;
+var
+  Qry: TFDQuery;
+  ListaEmail: TList<string>;
+  obj: TFireDAC;
+begin
+  ListaEmail := TList<string>.Create;
+
+  obj := TFireDAC.create;
+  try
+    obj.Lista.Add(' SELECT');
+    obj.Lista.Add('   DepEm_Email');
+    obj.Lista.Add(' FROM Usuario');
+    obj.Lista.Add('   INNER JOIN Departamento_Email On Usu_Departamento = DepEm_Departamento');
+    obj.Lista.Add(' WHERE Usu_Id = ' + IntToStr(IdUsuario));
+    obj.OpenSQL();
+
+    while not obj.Model.Eof do
+    begin
+      ListaEmail.Add(obj.Model.FieldByName('DepEm_Email').AsString.Trim());
+      obj.Model.Next;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+
+  Result := ListaEmail;
+end;
+
+function TDepartamento.Salvar(ADepartamento: TDepartamentoVO): Integer;
+var
+  IdDepartamento: Integer;
+  obj: TFireDAC;
+begin
+//  if ADepartamento.Codigo <= 0 then
+//    raise Exception.Create('Informe o Código do Departamento!');
+//
+//  if ADepartamento.Nome.Trim = '' then
+//    raise Exception.Create('Informe o Nome do Departamento!');
+
+  IdDepartamento := ADepartamento.Id;
+
+  obj := TFireDAC.create;
+  try
+    try
+      obj.StartTransacao();
+      ADepartamento.Id := SalvarDepartamento(ADepartamento);
+
+//      ADepartamento.Id := TGenericDAO.Save<TDepartamentoVO>(ADepartamento);
+      SalvarAcesso(IdDepartamento, ADepartamento);
+      SalvarEmail(ADepartamento);
+
+      obj.Commit();
+      Result := ADepartamento.Id;
+    except
+      on E: Exception do
+      begin
+        obj.Roolback();
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
+end;
+
+procedure TDepartamento.SalvarAcesso(AIdDepartamento: Integer; ADepartamento: TDepartamentoVO);
+var
+  Item: TDepartamentoAcessoVO;
+begin
+
+  ExcluirAcesso(ADepartamento);
+  for item in ADepartamento.DepartamentoAcesso do
+  begin
+    Item.IdDepartamento := ADepartamento.Id;
+    TGenericDAO.Save<TDepartamentoAcessoVO>(Item);
+  end;
+end;
+
+function TDepartamento.SalvarDepartamento(
+  ADepartamento: TDepartamentoVO): Integer;
+begin
+  if ADepartamento.Codigo <= 0 then
+    raise Exception.Create('Informe o Código do Departamento!');
+
+  if ADepartamento.Nome.Trim = '' then
+    raise Exception.Create('Informe o Nome do Departamento!');
+
+  ADepartamento.Id := TGenericDAO.Save<TDepartamentoVO>(ADepartamento);
+  Result := ADepartamento.Id;
+end;
+
+procedure TDepartamento.SalvarEmail(ADepartamento: TDepartamentoVO);
+var
+  Item: TDepartamentoEmailVO;
+begin
+  ExcluirEmail(ADepartamento);
+
+  for item in ADepartamento.DepartamentoEmail do
+  begin
+    Item.IdDepartamento := ADepartamento.Id;
+    TGenericDAO.Save<TDepartamentoEmailVO>(Item);
+  end;
+end;
+
+procedure TDepartamento.Salvar(Programa, IdUsuario: Integer);
+var
+  usuario: TUsuario;
+begin
+  usuario := TUsuario.Create;
+  try
+    usuario.PermissaoEditar(Programa, IdUsuario);
+  finally
+    FreeAndNil(usuario);
+  end;
+end;
+
+end.
