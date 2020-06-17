@@ -107,7 +107,7 @@ object frmOrcamentoImpressao: TfrmOrcamentoImpressao
           Width = 185
           Height = 105
           Caption = 'Modelos de Relat'#243'rios'
-          ItemIndex = 0
+          ItemIndex = 1
           Items.Strings = (
             'Detalhado'
             'Simplificado')
