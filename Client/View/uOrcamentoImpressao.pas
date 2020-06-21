@@ -198,7 +198,7 @@ begin
                                        FController.Model.CDSCadastroOrc_Numero.AsString,
                                        FController.Model.CDSCadastroOrc_RazaoSocial.AsString);
     sEmail := RetornoEmail();
-    sEmail := 'iranielodea@hotmail.com';
+    //teste
     FController.EnviarEmail(FController.Model.CDSCadastroOrc_Cliente.AsInteger,
                             FController.Model.CDSCadastroOrc_Numero.AsInteger,
                             dm.IdUsuario,
