@@ -1,3 +1,7 @@
 /Client/exe/*.exe
 /Server/Exe/*.exe
 /Client/dcu/*.dcu
+/Client/dcu
+/Server/dcu
+/Tempo/dcu
+/Remoto/Server/dcu
