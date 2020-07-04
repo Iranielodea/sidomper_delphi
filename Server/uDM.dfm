@@ -12,6 +12,7 @@ object DM: TDM
       'Server=DESKTOP-IRANI\SQLEXPRESS'
       'DriverID=MSSQL')
     LoginPrompt = False
+    BeforeConnect = ConexaoBeforeConnect
     Left = 80
     Top = 24
   end

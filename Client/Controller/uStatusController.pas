@@ -73,6 +73,7 @@ begin
   if Id = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -84,6 +85,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -94,12 +96,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CStatusPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -108,6 +112,7 @@ procedure TStatusController.Filtrar(ACampo, ATexto, AAtivo: string;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -122,6 +127,7 @@ procedure TStatusController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -129,6 +135,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -138,6 +145,7 @@ var
   Negocio: TServerMethods1Client;
   iEnum: Integer;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     iEnum := Integer(AStatusPrograma);
@@ -154,12 +162,14 @@ procedure TStatusController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CStatusPrograma, AIdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -167,6 +177,7 @@ procedure TStatusController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -174,6 +185,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -183,6 +195,7 @@ var
   Negocio: TServerMethods1Client;
   iEnum: Integer;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     iEnum := integer(AStatusPrograma);
@@ -191,6 +204,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -198,6 +212,7 @@ procedure TStatusController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -205,6 +220,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -213,11 +229,13 @@ function TStatusController.LocalizarPorPrograma(
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaStatus>(Negocio.Status_LocalizarPorPrograma(ATipo));
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -225,6 +243,7 @@ procedure TStatusController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -237,6 +256,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -267,11 +287,13 @@ function TStatusController.ProximoCodigo: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CStatusPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -279,11 +301,13 @@ function TStatusController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CStatusPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -297,6 +321,7 @@ begin
   if Trim(FModel.CDSCadastroSta_Nome.AsString) = '' then
     raise Exception.Create('Informe o Nome!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -315,6 +340,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 

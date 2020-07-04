@@ -812,6 +812,9 @@ type
     function EchoString(Value: string): string;
     function ReverseString(Value: string): string;
 
+    procedure AbrirConexao;
+    procedure FecharConexao;
+
     procedure DuplicacaoRegistro(CampoWhere, CampoValor, Tabela: string);
 //------------------------------------------------------------------------------
 // Cadastro Padrao
@@ -1136,6 +1139,11 @@ uses System.StrUtils, uUsuario, uCliente, uSolicitacao,
   uSolicitacaoEmail, uRevenda, uModulo, uVisitaEmail, uDepartamentoVO,
   uClienteVO, uClienteEmailVO, uClienteEmail, uAgendamento, uParametroVO;
 
+procedure TServerMethods1.AbrirConexao;
+begin
+  dm.AbrirConexao;
+end;
+
 function TServerMethods1.AgendamentoUsuarioMesmoCadastro(AId, AIdUsuario,
   ATipoOperacao: Integer): Boolean;
 var
@@ -1234,6 +1242,7 @@ var
   Lista: TObjectList<TChamadoQuadroViewModel>;
 begin
   obj := TChamado.Create;
+  AbrirConexao;
   try
     try
       QAtividadeQuadro.Close;
@@ -1250,6 +1259,7 @@ begin
     QChamadoQuadro.Close;
     Result := TConverte.ObjectToJSON<TListaChamadoQuadroViewModel>(Lista);
   finally
+    FecharConexao;
     FreeAndNil(obj);
     FreeAndNil(Lista);
   end;
@@ -1380,6 +1390,8 @@ var
   obj: TChamado;
   Lista: TObjectList<TChamadoQuadroViewModel>;
 begin
+  FecharConexao;
+  AbrirConexao;
   obj := TChamado.Create;
   try
     try
@@ -1398,6 +1410,7 @@ begin
     QChamadoQuadro.Close;
     Result := TConverte.ObjectToJSON<TListaChamadoQuadroViewModel>(Lista);
   finally
+    FecharConexao;
     FreeAndNil(obj);
     FreeAndNil(Lista);
   end;
@@ -1949,6 +1962,11 @@ begin
   finally
     FreeAndNil(obj);
   end;
+end;
+
+procedure TServerMethods1.FecharConexao;
+begin
+  dm.FecharConexao;
 end;
 
 procedure TServerMethods1.Filtrar(Programa: Integer; Campo, Texto, Ativo: string; Contem: Boolean = True);
@@ -4595,6 +4613,7 @@ var
   Lista: TObjectList<TSolicitacaoViewModel>;
 begin
   obj := TSolicitacao.Create;
+  AbrirConexao;
   try
     try
       QSolicitacaoQuadro.Close;
@@ -4612,6 +4631,7 @@ begin
 
     Result := TConverte.ObjectToJSON<TListaSolicitacaoViewModel>(Lista);
   finally
+    FecharConexao;
     FreeAndNil(obj);
     FreeAndNil(Lista);
   end;

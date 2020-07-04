@@ -33,6 +33,7 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure ConexaoBeforeConnect(Sender: TObject);
+    procedure ConexaoAfterDisconnect(Sender: TObject);
   private
     { Private declarations }
     FIdSelecionado: integer;
@@ -45,6 +46,8 @@ type
 
   public
     { Public declarations }
+    procedure Conectar;
+    procedure Desconectar;
     procedure StartTransacao;
     procedure Commit;
     procedure Roolback;
@@ -91,6 +94,26 @@ begin
   end;
 end;
 
+procedure TDM.Conectar;
+begin
+  try
+    if Conexao.Connected then
+      Conexao.Connected := False;
+    Conexao.Connected := True;
+  except
+    On E: Exception do
+    begin
+      raise Exception.Create(E.Message);
+      Application.Terminate;
+    end;
+  end;
+end;
+
+procedure TDM.ConexaoAfterDisconnect(Sender: TObject);
+begin
+  Desconectar;
+end;
+
 procedure TDM.ConexaoBeforeConnect(Sender: TObject);
 begin
   CarregarIni();
@@ -115,7 +138,13 @@ end;
 
 procedure TDM.DataModuleDestroy(Sender: TObject);
 begin
-  Conexao.Connected := False;
+  Desconectar;
+end;
+
+procedure TDM.Desconectar;
+begin
+  if dm.Conexao.Connected then
+    dm.Conexao.Connected := False;
 end;
 
 function TDM.GetTema: string;

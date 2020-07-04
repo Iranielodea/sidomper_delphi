@@ -292,7 +292,6 @@ begin
   if edtNome.Enabled then
     edtNome.SetFocus;
 
-
   ControleEmail;
   ControleModulo;
   CarregarContatos;

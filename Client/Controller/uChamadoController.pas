@@ -52,6 +52,7 @@ type
     procedure PreencheQuadrosAtividades(ADataSet: TDataSet);
     procedure ObservacaoPadrao(ATipo: TEnumChamadoAtividade);
     procedure TipoUmRegistro(ATipo: TEnumChamadoAtividade);
+    procedure AbrirChamadoOcorrencia;
   public
     function CodigoAtual: Integer;
     procedure FiltrarCodigo(ACodigo: Integer);
@@ -164,6 +165,7 @@ procedure TChamadoController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -185,6 +187,7 @@ function TChamadoController.CodigoAtual: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -197,6 +200,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -204,6 +208,7 @@ procedure TChamadoController.AbrirAtividade(AIdUsuario, AIdRevenda: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -218,6 +223,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -226,6 +232,7 @@ function TChamadoController.AbrirAtividadeJSON(AIdUsuario,
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -245,6 +252,7 @@ procedure TChamadoController.AbrirAtividadeQuadro1(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -266,6 +274,7 @@ procedure TChamadoController.AbrirAtividadeQuadro2(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -287,6 +296,7 @@ procedure TChamadoController.AbrirAtividadeQuadro3(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -308,6 +318,7 @@ procedure TChamadoController.AbrirAtividadeQuadro4(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -329,6 +340,7 @@ procedure TChamadoController.AbrirAtividadeQuadro5(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -350,6 +362,7 @@ procedure TChamadoController.AbrirAtividadeQuadro6(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -367,10 +380,26 @@ begin
   end;
 end;
 
+procedure TChamadoController.AbrirChamadoOcorrencia;
+var
+  Negocio: TServerMethods1Client;
+begin
+  dm.Conectar;
+  Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
+  try
+      FModel.CDSChamadoOcorrenciaCons.Close;
+      Negocio.LocalizarChamadoOcorrencia(0);
+      FModel.CDSChamadoOcorrenciaCons.Open;
+  finally
+    FreeAndNil(Negocio);
+  end;
+end;
+
 procedure TChamadoController.AbrirQuadro(AIdUsuario, AIdRevenda: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -385,6 +414,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -392,6 +422,7 @@ procedure TChamadoController.AbrirQuadro1(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -406,6 +437,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -413,6 +445,7 @@ procedure TChamadoController.AbrirQuadro2(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -427,6 +460,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -434,6 +468,7 @@ procedure TChamadoController.AbrirQuadro3(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -448,6 +483,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -455,6 +491,7 @@ procedure TChamadoController.AbrirQuadro4(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -469,6 +506,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -476,6 +514,7 @@ procedure TChamadoController.AbrirQuadro5(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -490,6 +529,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -497,6 +537,7 @@ procedure TChamadoController.AbrirQuadro6(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -511,6 +552,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -519,6 +561,7 @@ function TChamadoController.AbrirQuadroJSON(AIdUsuario,
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -531,6 +574,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+//    dm.Desconectar;
   end;
 end;
 
@@ -548,6 +592,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -569,6 +614,7 @@ function TChamadoController.BuscarIdOcorrencia: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -581,6 +627,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -590,6 +637,7 @@ var
   Negocio: TServerMethods1Client;
   cHoras: Double;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -625,6 +673,7 @@ procedure TChamadoController.ChamadoAnexos(AIdChamado: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -678,6 +727,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -707,6 +757,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -717,6 +768,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -734,6 +786,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -747,6 +800,7 @@ procedure TChamadoController.Filtrar(APrograma:Integer; ACampo, ATexto, AAtivo: 
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -781,6 +835,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -815,6 +870,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -836,6 +892,7 @@ procedure TChamadoController.FiltrarIdChamado(AIdChamado: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -918,6 +975,7 @@ procedure TChamadoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -932,6 +990,7 @@ begin
 
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -956,6 +1015,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -984,6 +1044,7 @@ procedure TChamadoController.LocalizarChamadoOcorrencia(AIdChamado: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -998,6 +1059,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1005,6 +1067,7 @@ procedure TChamadoController.LocalizarChamadoStatus(AIdChamado: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1019,6 +1082,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1026,6 +1090,7 @@ procedure TChamadoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1040,6 +1105,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1060,6 +1126,7 @@ var
   Usuario: TUsuarioController;
   IdCliente: Integer;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1072,9 +1139,7 @@ begin
 
       FModel.CDSCadastro.Append;
 
-      FModel.CDSChamadoOcorrenciaCons.Close;
-      Negocio.LocalizarChamadoOcorrencia(0);
-      FModel.CDSChamadoOcorrenciaCons.Open;
+      AbrirChamadoOcorrencia();
 
   //------------------------------------------------------------------------------
   // usuario logado
@@ -1120,6 +1185,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    //dm.Desconectar;
   end;
 end;
 
@@ -1172,6 +1238,7 @@ function TChamadoController.PermissaoAtividadeAbertura(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1184,6 +1251,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1192,6 +1260,7 @@ function TChamadoController.PermissaoAtividadeOcorrencia(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1204,6 +1273,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1212,6 +1282,7 @@ function TChamadoController.PermissaoAtividadeQuadro(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1224,6 +1295,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1232,6 +1304,7 @@ function TChamadoController.PermissaoAtividadeStatus(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1244,6 +1317,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1252,6 +1326,7 @@ function TChamadoController.PermissaoChamadoAbertura(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1264,6 +1339,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1272,6 +1348,7 @@ function TChamadoController.PermissaoChamadoOcorrencia(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1284,6 +1361,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1291,6 +1369,7 @@ function TChamadoController.PermissaoChamadoQuadro(AIdUsuario: Integer): Boolean
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1303,6 +1382,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1310,6 +1390,7 @@ function TChamadoController.PermissaoChamadoStatus(AIdUsuario: Integer): Boolean
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1322,6 +1403,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1333,6 +1415,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1360,6 +1443,7 @@ function TChamadoController.PermissoesAtividade(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1372,6 +1456,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1380,6 +1465,7 @@ function TChamadoController.PermissoesChamado(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1392,6 +1478,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1613,6 +1700,7 @@ function TChamadoController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1625,6 +1713,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1632,6 +1721,7 @@ function TChamadoController.RetornaIdOcorrencia: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1644,6 +1734,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1682,6 +1773,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -1700,6 +1792,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -1721,6 +1814,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -1739,6 +1833,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -1760,6 +1855,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -1779,6 +1875,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -1800,6 +1897,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -1818,6 +1916,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -1844,6 +1943,7 @@ begin
 
 //  rel := TDMRelChamado.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1868,6 +1968,7 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Grafico);
 //    FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -1906,6 +2007,7 @@ begin
 // serializa o objeto
   oObjetoJSON := TConverte.ObjectToJSON<TFiltroChamado>(AFiltro);
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -1932,6 +2034,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -1970,6 +2073,7 @@ begin
 // serializa o objeto
   oObjetoJSON := TConverte.ObjectToJSON<TFiltroChamado>(AFiltro);
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2002,6 +2106,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2023,6 +2128,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2042,6 +2148,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2078,6 +2185,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelAtividade.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2096,6 +2204,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2117,6 +2226,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelAtividade.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2135,6 +2245,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2156,6 +2267,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   rel := TDMRelAtividade.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2175,6 +2287,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2197,6 +2310,7 @@ begin
 //    FreeAndNil(Marshal);
 //  end;
 
+  dm.Conectar;
   rel := TDMRelAtividade.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2215,6 +2329,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2246,6 +2361,7 @@ begin
 // serializa o objeto
   oObjetoJSON := TConverte.ObjectToJSON<TFiltroChamado>(AFiltro);
 
+  dm.Conectar;
   rel := TDMRelChamado.Create(nil);
 
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -2271,6 +2387,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -2278,6 +2395,7 @@ function TChamadoController.RetornarEmails(AIdChamado, AIdUsuario, AIdStatus: In
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -2297,6 +2415,7 @@ function TChamadoController.RetornarEmailsCliente(AIdChamado: Integer): string;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -2324,6 +2443,7 @@ begin
   sb.AppendLine('	  INNER JOIN Status ON Cha_Status = Sta_Id');
   sb.AppendLine(' WHERE Cha_Id = '  + IntToStr(AIdChamado));
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -2337,6 +2457,7 @@ begin
   finally
     FreeAndNil(sb);
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -2407,6 +2528,7 @@ begin
 
   Marshal := TJSONMarshal.Create;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -2426,6 +2548,7 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(ChamadoVO);
+    dm.Desconectar;
   end;
 
 
@@ -2700,6 +2823,7 @@ begin
 
   sb := TStringBuilder.Create;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try

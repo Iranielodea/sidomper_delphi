@@ -122,11 +122,13 @@ procedure TOrcamentoController.AtualizarSituacao(ASituacao, AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoAtualizarSituacao(ASituacao, AId);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -207,7 +209,7 @@ var
   ModelDepEmail: TDepartamentoEmailVO;
   iIdUsuario: Integer;
 begin
-
+  dm.Conectar;
   try
     ListaOrcamento := TObjectList<TOrcamentoVO>.create();
     Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
@@ -277,12 +279,14 @@ function TOrcamentoController.BuscarEmailRemetenteSeteDias: Integer;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.OrcamentoBuscarEmailRemetenteSeteDias();
 
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -315,11 +319,13 @@ procedure TOrcamentoController.CalcularParcelas(AIdFormaPagto: Integer; AValor: 
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoGerarParcela(AIdFormaPagto, AValor, AValorPrimeira, AValorOutras);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -328,11 +334,13 @@ procedure TOrcamentoController.CalcularParcelasDifUltima(AQtdeParcelas: Integer;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoGerarParcelaDifUltima(AQtdeParcelas, AValor, AValorUltima, AValorOutras);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -346,11 +354,13 @@ function TOrcamentoController.CodigoAtual: Integer;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.OrcamentoProximoNumero().ToString());
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -388,12 +398,14 @@ begin
   if AIdOrcamento = 0 then
     raise Exception.Create('Não há Registro para Replicar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Id := StrToInt(Negocio.OrcamentoDuplicar(AIdOrcamento).ToString);
     FiltrarId(Id);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -405,6 +417,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -422,6 +435,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -433,6 +447,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -447,6 +462,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -457,11 +473,13 @@ begin
   if AIdOrcamento = 0 then
     raise Exception.Create('Não há Registro para Enviar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoEmailEnviado(AIdOrcamento);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -511,12 +529,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(COrcamentoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -700,6 +720,7 @@ begin
 
   oObjetoJSON := TConverte.ObjectToJSON<TFiltroOrcamento>(AFiltro);
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -714,6 +735,7 @@ procedure TOrcamentoController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -721,6 +743,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -728,6 +751,7 @@ procedure TOrcamentoController.FiltrarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -735,6 +759,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -770,6 +795,7 @@ begin
   if AIdOrcamento = 0 then
     raise Exception.Create('Não há Registro!');
 
+  dm.Conectar;
   Modelo := TModeloRelatorioController.create();
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
@@ -820,6 +846,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Modelo);
+    dm.Desconectar;
   end;
 end;
 
@@ -840,6 +867,7 @@ begin
     raise Exception.Create('Não há Registro!');
 
 //  Modelo := TModeloRelatorioController.create();
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
 //    Modelo.LocalizarCodigo(ACodigoModelo);
@@ -889,6 +917,7 @@ begin
   finally
     FreeAndNil(Negocio);
 //    FreeAndNil(Modelo);
+    dm.DesConectar;
   end;
 end;
 
@@ -897,11 +926,13 @@ var
   Negocio: TServerModule2Client;
   lRelatorio: TObjectList<TOrcamentoVO>;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(COrcamentoPrograma, AIdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -948,6 +979,7 @@ var
   obj: TOrcamentoEmailVO;
 begin
   LimparEmail();
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Lista := Tconverte.JSONToObject<TListaOrcamentoEmail>(Negocio.OrcamentoListarEmail(AIdOrcamento));
@@ -969,6 +1001,7 @@ procedure TOrcamentoController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -976,6 +1009,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -983,6 +1017,7 @@ procedure TOrcamentoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -990,6 +1025,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -997,6 +1033,7 @@ procedure TOrcamentoController.LocalizarItens(AIdOrdem: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSItens.Close;
@@ -1011,6 +1048,7 @@ procedure TOrcamentoController.LocalizarModulo(AIdOrdem: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSItensModulo.Close;
@@ -1025,6 +1063,7 @@ procedure TOrcamentoController.LocalizarOcorrencia(AIdOrdem: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.cdsOcorrencia.Close;
@@ -1039,6 +1078,7 @@ procedure TOrcamentoController.LocalizarVencimento(AIdOrdem: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSVenctos.Close;
@@ -1046,6 +1086,7 @@ begin
     FModel.CDSVenctos.Open;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -1058,6 +1099,7 @@ procedure TOrcamentoController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -1081,6 +1123,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -1110,11 +1153,13 @@ function TOrcamentoController.ProximoCodigo: Integer;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(COrcamentoPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.desConectar;
   end;
 end;
 
@@ -1122,11 +1167,13 @@ function TOrcamentoController.ProximoId: Integer;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(COrcamentoPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.desConectar;
   end;
 end;
 
@@ -1188,6 +1235,7 @@ begin
           6 - Graficos de não Aprovados
   }
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     oObjetoJSON := TConverte.ObjectToJSON<TFiltroOrcamento>(AFiltro);
@@ -1235,6 +1283,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -1259,11 +1308,13 @@ function TOrcamentoController.RetornarEmailSupervisor(
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.OrcamentoEmailSupervisor(AIdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.DesConectar;
   end;
 end;
 
@@ -1293,6 +1344,7 @@ begin
 
   Marshal := TJSONMarshal.Create;
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1310,6 +1362,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
+    dm.DesConectar;
 //    FreeAndNil(ObjVO);
   end;
 end;

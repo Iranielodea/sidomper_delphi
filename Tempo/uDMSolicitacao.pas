@@ -84,6 +84,7 @@ var
   proxy: TServerMethods1Client;
   objJson: TJSONValue;
 begin
+  dm.Conectar;
   proxy := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -97,6 +98,7 @@ begin
     end;
   finally
     FreeAndNil(proxy);
+    dm.Desconectar;
   end;
 end;
 
@@ -105,6 +107,7 @@ var
   proxy: TServerMethods1Client;
   objJson: TJSONValue;
 begin
+  dm.Conectar;
   proxy := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -118,6 +121,7 @@ begin
     end;
   finally
     FreeAndNil(proxy);
+    dm.Desconectar;
   end;
 end;
 
@@ -125,6 +129,7 @@ function TdmSolicitacao.ObterPorId(id: Integer): TSolicitacaoViewModel;
 var
   proxy: TServerMethods1Client;
 begin
+  dm.Conectar;
   proxy := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -137,6 +142,7 @@ begin
     end;
   finally
     FreeAndNil(proxy);
+    dm.Desconectar;
   end;
 end;
 

@@ -71,6 +71,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -82,6 +83,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -92,12 +94,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CModeloRelatorio, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -106,6 +110,7 @@ procedure TModeloRelatorioController.Filtrar(ACampo, ATexto, AAtivo: string;
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -120,12 +125,14 @@ procedure TModeloRelatorioController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CModeloRelatorio, ACodigo);
     FModel.CDSConsulta.Open;
   finally
+    DM.Desconectar;
     FreeAndNil(Negocio);
   end;
 end;
@@ -135,6 +142,7 @@ procedure TModeloRelatorioController.FiltrarUsuario(ACampo, ATexto,
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -142,6 +150,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -149,12 +158,14 @@ procedure TModeloRelatorioController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CModeloRelatorio, AIdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -162,12 +173,14 @@ procedure TModeloRelatorioController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CModeloRelatorio, ACodigo);
     FModel.CDSCadastro.Open;
   finally
+    DM.Desconectar;
     FreeAndNil(Negocio);
   end;
 end;
@@ -176,6 +189,7 @@ procedure TModeloRelatorioController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -183,6 +197,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -190,6 +205,7 @@ procedure TModeloRelatorioController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -203,6 +219,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -225,12 +242,14 @@ var
   Negocio: TServerModule2Client;
   iCodigo: Integer;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     iCodigo := StrToInt(Negocio.ProximoCodigo(CModeloRelatorio).ToString);
     Result := iCodigo;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -239,12 +258,14 @@ var
   Negocio: TServerModule2Client;
   iCodigo: Integer;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     iCodigo := StrToInt(Negocio.ProximoId(CModeloRelatorio).ToString);
     Result := iCodigo;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -255,6 +276,7 @@ var
   oObjetoJSON : TJSONValue;
 begin
   Model := TModeloRelatorioVO.Create;
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -278,6 +300,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Model);
+    DM.Desconectar;
   end;
 end;
 

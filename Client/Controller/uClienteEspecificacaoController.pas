@@ -59,6 +59,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -80,6 +81,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CClienteEspPrograma, AIdUsuario, AId);
@@ -93,6 +95,7 @@ procedure TClienteEspecificacaoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CClienteEspPrograma, AIdUsuario);
@@ -106,6 +109,7 @@ procedure TClienteEspecificacaoController.LocalizarCodigo(AIdCliente: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -121,6 +125,7 @@ procedure TClienteEspecificacaoController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -131,7 +136,8 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
-  end;end;
+  end;
+end;
 
 procedure TClienteEspecificacaoController.Post;
 begin
@@ -165,6 +171,7 @@ begin
 
   FModel.CDSCadastro.ApplyUpdates(0);
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Salvar(CClienteEspPrograma, AIdUsuario);

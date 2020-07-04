@@ -18,6 +18,7 @@ object DM: TDM
         '.Data.DbxClientDriver,Version=19.0.0.0,Culture=neutral,PublicKey' +
         'Token=91d62ebb5b0d1b1b'
       'Filters={}')
+    AfterDisconnect = ConexaoAfterDisconnect
     BeforeConnect = ConexaoBeforeConnect
     Left = 24
     Top = 24

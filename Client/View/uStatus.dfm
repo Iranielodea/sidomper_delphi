@@ -11,7 +11,6 @@ inherited frmStatus: TfrmStatus
   inherited pgControl: TPageControl
     Width = 692
     Height = 571
-    ActivePage = tsEdicao
     ExplicitWidth = 692
     ExplicitHeight = 571
     inherited tsPesquisa: TTabSheet

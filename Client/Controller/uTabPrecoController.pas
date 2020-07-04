@@ -61,6 +61,7 @@ var
   Negocio: TServerModule2Client;
   Resultado: Boolean;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -83,6 +84,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -90,6 +92,7 @@ procedure TTabPrecoController.Excluir(IdUsuario, Id: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -103,6 +106,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -114,6 +118,7 @@ var
 //  Lista: TObjectList<TTabPrecoConsulta>;
 begin
 //  Lista := TObjectList<TTabPrecoConsulta>.Create();
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -163,6 +168,7 @@ var
   Negocio: TServerModule2Client;
   oObjetoJSON : TJSONValue;
 begin
+  dm.Conectar;
   oObjetoJSON := TConverte.ObjectToJSON<TTabPrecoFiltro>(AFiltro);
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
@@ -211,6 +217,7 @@ procedure TTabPrecoController.Novo(IdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -233,6 +240,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -240,6 +248,7 @@ procedure TTabPrecoController.ObterPorId(Id: integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -247,6 +256,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -260,6 +270,7 @@ procedure TTabPrecoController.Relatorio(IdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -272,6 +283,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -291,6 +303,7 @@ begin
   if Trim(FModel.CDSCadastroTab_Nome.AsString) = '' then
     raise Exception.Create('Informe o Nome!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -347,6 +360,7 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(model);
+    dm.Desconectar;
   end;
 end;
 

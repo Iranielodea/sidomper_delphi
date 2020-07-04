@@ -13,12 +13,23 @@ type
     DSPConexao: TDSProviderConnection;
     procedure DataModuleCreate(Sender: TObject);
     procedure ConexaoBeforeConnect(Sender: TObject);
+    procedure ConexaoAfterDisconnect(Sender: TObject);
   private
+//    FInstanceOwner: Boolean;
+//    FServerMethods1Client: TServerMethods1Client;
+//    function GetServerMethods1Client: TServerMethods1Client;
+
     { Private declarations }
     procedure Configurar;
     procedure CarregarIni;
+   // function GetServerMethods1Client: TServerMethods1Client;
   public
     { Public declarations }
+    procedure LimpaAtributos;
+    procedure CriaAtributos;
+    procedure Desconectar;
+    procedure Conectar;
+    procedure reConectar;
   end;
 
 var
@@ -44,9 +55,49 @@ begin
   end;
 end;
 
+procedure TDM.Conectar;
+begin
+  try
+    if Conexao.Connected then
+      Conexao.Connected := False;
+    Conexao.Connected := True;
+
+  except
+    On E: Exception do
+    begin
+      raise Exception.Create(E.Message);
+      Application.Terminate;
+    end;
+  end;
+end;
+
+procedure TDM.reConectar;
+begin
+  try
+
+    if Conexao.Connected then
+      Conexao.Connected := false;
+
+    Conexao.Connected := True;
+
+  except
+    On E: Exception do
+    begin
+      raise Exception.Create(E.Message);
+      Application.Terminate;
+    end;
+  end;
+end;
+
+procedure TDM.ConexaoAfterDisconnect(Sender: TObject);
+begin
+  Desconectar;
+//    FServerMethods1Client.Free;
+end;
+
 procedure TDM.ConexaoBeforeConnect(Sender: TObject);
 begin
-//  Configurar();
+  CriaAtributos;
 end;
 
 procedure TDM.Configurar;
@@ -72,12 +123,12 @@ begin
 //  end;
 end;
 
-procedure TDM.DataModuleCreate(Sender: TObject);
+procedure TDM.CriaAtributos;
 begin
   try
+
     Configurar();
-    if not Conexao.Connected then
-      Conexao.Connected := True;
+    
 
   except
     On E: Exception do
@@ -86,7 +137,31 @@ begin
       Application.Terminate;
     end;
   end;
+end;
 
+procedure TDM.DataModuleCreate(Sender: TObject);
+begin
+  Conectar;
+end;
+
+procedure TDM.Desconectar;
+begin
+  Conexao.Connected := false;
+end;
+
+//function TDM.GetServerMethods1Client: TServerMethods1Client;
+//begin
+////  if FServerMethods1Client = nil then
+////  begin
+////    Conexao.Open;
+////    FServerMethods1Client:= TServerMethods1Client.Create(Conexao.DBXConnection, FInstanceOwner);
+////  end;
+////  Result := FServerMethods1Client;
+//end;
+
+procedure TDM.LimpaAtributos;
+begin
+//    FreeAndNil(FServerMethods1Client);
 end;
 
 end.

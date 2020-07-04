@@ -857,7 +857,7 @@ begin
   btnColaborar.Enabled := False;
 
   Usuario := TUsuarioController.Create;
-  try    { TODO : Tirar }
+  try
     Id := FController.Model.CDSChamadoOcorrenciaConsChOco_Id.AsInteger;
     bUsuarioADM := Usuario.UsuarioADM(dm.IdUsuario);
 //    bUsuarioADM := Usuario.UsuarioADMLocal(dm.IdUsuario);

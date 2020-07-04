@@ -1,6 +1,6 @@
 //
 // Created by the DataSnap proxy generator.
-// 21/08/2018 09:41:24
+// 03/07/2020 17:20:10
 //
 
 unit uRegras;
@@ -14,6 +14,8 @@ type
   private
     FEchoStringCommand: TDBXCommand;
     FReverseStringCommand: TDBXCommand;
+    FAbrirConexaoCommand: TDBXCommand;
+    FFecharConexaoCommand: TDBXCommand;
     FDuplicacaoRegistroCommand: TDBXCommand;
     FNovoCommand: TDBXCommand;
     FExcluirCommand: TDBXCommand;
@@ -71,12 +73,15 @@ type
     FLocalizarCronogramaIdCommand: TDBXCommand;
     FLocalizarOcorrenciaGeralIdSolicitacaoCommand: TDBXCommand;
     FLocalizarOcorrenciaTecnicaIdSolicitacaoCommand: TDBXCommand;
+    FLocalizarOcorrenciaRegraIdSolicitacaoCommand: TDBXCommand;
     FLocalizarSolicitacaoStatusCommand: TDBXCommand;
     FSolicitacaoAnexosCommand: TDBXCommand;
     FSolicitracaoQuadroCommand: TDBXCommand;
     FSolicitacaoQuadroJSONCommand: TDBXCommand;
+    FSolicitacaoPorCategoriaCommand: TDBXCommand;
     FSolicitacaoRelatorioCommand: TDBXCommand;
     FSolicitacaoObterPorIdCommand: TDBXCommand;
+    FSolicitacaoListarProblemaSolucaoCommand: TDBXCommand;
     FSolicitacaoTempoLocalizarIdCommand: TDBXCommand;
     FSolicitacaoTempoExcluirCommand: TDBXCommand;
     FSolicitacaoTempoLocalizarPorSolicitacaoCommand: TDBXCommand;
@@ -108,6 +113,8 @@ type
     FClienteRelatoriosCommand: TDBXCommand;
     FUsuarioUsuarioADMCommand: TDBXCommand;
     FExisteUsuarioCommand: TDBXCommand;
+    FExportarUsuarioCommand: TDBXCommand;
+    FUsuarioHorarioAcessoSistemaCommand: TDBXCommand;
     FLocalizarUsuarioCommand: TDBXCommand;
     FFiltrarUsuarioCommand: TDBXCommand;
     FRetornaNumeroSolicitacaoCommand: TDBXCommand;
@@ -148,6 +155,7 @@ type
     FDepartamentoSalvarCommand: TDBXCommand;
     FDepartamentoFiltrarIdCommand: TDBXCommand;
     FDepartamentoMostrarAnexosCommand: TDBXCommand;
+    FDepartamentoDuplicarCommand: TDBXCommand;
     FUsuarioRetornaListaPermissaoCommand: TDBXCommand;
     FBuscarTitulosQuadrosChamadosCommand: TDBXCommand;
     FParametrosAtualizarParametroCommand: TDBXCommand;
@@ -156,6 +164,7 @@ type
     FParametrosRevendaPadraoCommand: TDBXCommand;
     FParametrosExportarDadosBaseNovaCommand: TDBXCommand;
     FParametrosImportarDadosBaseNovaCommand: TDBXCommand;
+    FListarParametrosCommand: TDBXCommand;
     FStartTransacaoCommand: TDBXCommand;
     FCommitCommand: TDBXCommand;
     FRoolbackCommand: TDBXCommand;
@@ -164,13 +173,16 @@ type
     FPermissaoEditarCommand: TDBXCommand;
     FPermissaoExcluirCommand: TDBXCommand;
     FPermissaoRelatorioCommand: TDBXCommand;
+    FPermissaoSolicitacoesCommand: TDBXCommand;
     FPermissaoSolicitacaoAberturaCommand: TDBXCommand;
     FPermissaoSolicitacaoAnaliseCommand: TDBXCommand;
     FPermissaoSolicitacaoOcorrenciaGeralCommand: TDBXCommand;
     FPermissaoSolicitacaoOcorrenciaTecnicaCommand: TDBXCommand;
+    FPermissaoSolicitacaoOcorrenciaRegraCommand: TDBXCommand;
     FPermissaoSolicitacaoStatusCommand: TDBXCommand;
     FPermissaoSolicitacaoQuadroCommand: TDBXCommand;
     FPermissaoRecadoQuadroCommand: TDBXCommand;
+    FPermissoesChamadoCommand: TDBXCommand;
     FPermissaoChamadoAberturaCommand: TDBXCommand;
     FPermissaoChamadoOcorrenciaCommand: TDBXCommand;
     FPermissaoChamadoStatusCommand: TDBXCommand;
@@ -178,6 +190,7 @@ type
     FPermissaoChamadoOcorrenciaDataHoraCommand: TDBXCommand;
     FPermissaoChamadoOcorrenciaAlterarCommand: TDBXCommand;
     FPermissaoChamadoOcorrenciaExcluirCommand: TDBXCommand;
+    FPermissoesAtividadeCommand: TDBXCommand;
     FPermissaoAtividadeAberturaCommand: TDBXCommand;
     FPermissaoAtividadeOcorrenciasCommand: TDBXCommand;
     FPermissaoAtividadeStatusCommand: TDBXCommand;
@@ -192,9 +205,12 @@ type
     FPermissaoSolicitacaoOcorrenciaGeralExcluirCommand: TDBXCommand;
     FPermissaoSolicitacaoOcorrenciaTecnicaAlterarCommand: TDBXCommand;
     FPermissaoSolicitacaoOcorrenciaTecnicaExcluirCommand: TDBXCommand;
+    FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand: TDBXCommand;
+    FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand: TDBXCommand;
     FPermissaoOrcamentoAlteracaoSituacaoCommand: TDBXCommand;
     FPermissaoOrcamentoUsuarioCommand: TDBXCommand;
     FUsuarioPermissaoSalvarCommand: TDBXCommand;
+    FUsuarioPermissaoExportarCommand: TDBXCommand;
     FVisitaAtualizacaoVersaoCommand: TDBXCommand;
     FBackupCommand: TDBXCommand;
     FRelatorioChamadoCommand: TDBXCommand;
@@ -208,6 +224,8 @@ type
     destructor Destroy; override;
     function EchoString(Value: string): string;
     function ReverseString(Value: string): string;
+    procedure AbrirConexao;
+    procedure FecharConexao;
     procedure DuplicacaoRegistro(CampoWhere: string; CampoValor: string; Tabela: string);
     procedure Novo(Programa: Integer; IdUsuario: Integer);
     procedure Excluir(Programa: Integer; IdUsuario: Integer; Id: Integer);
@@ -265,12 +283,15 @@ type
     procedure LocalizarCronogramaId(Id: Integer);
     procedure LocalizarOcorrenciaGeralIdSolicitacao(IdSolicitacao: Integer);
     procedure LocalizarOcorrenciaTecnicaIdSolicitacao(IdSolicitacao: Integer);
+    procedure LocalizarOcorrenciaRegraIdSolicitacao(IdSolicitacao: Integer);
     procedure LocalizarSolicitacaoStatus(IdSolicitacao: Integer);
     procedure SolicitacaoAnexos(AIdSolicitacao: Integer);
     procedure SolicitracaoQuadro(AIdUsuario: Integer);
     function SolicitacaoQuadroJSON(AIdUsuario: Integer): TJSONValue;
+    function SolicitacaoPorCategoria(AIdCategoria: Integer; AIdUsuario: Integer): TJSONValue;
     procedure SolicitacaoRelatorio(AModelo: Integer; AIdUsuario: Integer; AFiltro: TJSONValue; var AQtdeSolicitacao: Integer);
     function SolicitacaoObterPorId(Id: Integer): TJSONValue;
+    procedure SolicitacaoListarProblemaSolucao(Filtro: TJSONValue; Texto: string; IdUsuario: Integer);
     function SolicitacaoTempoLocalizarId(AId: Integer): TJSONValue;
     procedure SolicitacaoTempoExcluir(AId: Integer);
     function SolicitacaoTempoLocalizarPorSolicitacao(AIdSolicitacao: Integer): TJSONValue;
@@ -302,6 +323,8 @@ type
     function ClienteRelatorios(AModelo: Integer; AIdUsuario: Integer; AFiltro: TJSONValue): string;
     function UsuarioUsuarioADM(AIdUsuario: Integer): Boolean;
     function ExisteUsuario: Boolean;
+    function ExportarUsuario: TJSONValue;
+    procedure UsuarioHorarioAcessoSistema(AUserName: string; APassword: string; AIdUsuario: Integer);
     procedure LocalizarUsuario(UserName: string; Password: string);
     procedure FiltrarUsuario(Filtro: TJSONValue; Campo: string; Texto: string; Ativo: string; Contem: Boolean);
     function RetornaNumeroSolicitacao(IdSolicitacao: Integer): TJSONNumber;
@@ -330,11 +353,11 @@ type
     function RetornarSolicitacaoEmails(IdSolicitacao: Integer; IdUsuario: Integer; IdStatus: Integer): string;
     function RetornarSolicitacaoEmailCliente(IdSolicitacao: Integer; IdUsuario: Integer): string;
     procedure FiltrarRevenda(Campo: string; Texto: string; Ativo: string; IdUsuario: Integer; Contem: Boolean);
-    procedure LocalizarCodigoRevenda(Codigo: Integer; IdUsuario: Integer);
+    procedure LocalizarCodigoRevenda(Codigo: Integer; IdUsuario: Integer; AMensagem: Boolean);
     procedure FiltrarModuloCliente(IdCliente: Integer; Campo: string; Texto: string; Ativo: string; Contem: Boolean);
     procedure LocalizarModuloClienteCodigo(IdCliente: Integer; Codigo: Integer);
     procedure FiltrarUsuarioRevenda(Filtro: TJSONValue; IdUsuario: Integer; Campo: string; Texto: string; Ativo: string; Contem: Boolean);
-    procedure LocalizarCodigoUsuario(Codigo: Integer; IdUsuario: Integer);
+    procedure LocalizarCodigoUsuario(Codigo: Integer; IdUsuario: Integer; AMensagem: Boolean);
     procedure FiltrarRevendaEmail(IdRevenda: Integer);
     procedure UsuarioLocalizarNome(Nome: string);
     procedure ExecutarSQL(InstrucaoSQL: string);
@@ -342,6 +365,7 @@ type
     function DepartamentoSalvar(ADepartamento: TJSONValue): TJSONNumber;
     procedure DepartamentoFiltrarId(AId: Integer);
     function DepartamentoMostrarAnexos(AIdUsuario: Integer): Boolean;
+    function DepartamentoDuplicar(AId: Integer): TJSONNumber;
     function UsuarioRetornaListaPermissao: TJSONArray;
     procedure BuscarTitulosQuadrosChamados;
     procedure ParametrosAtualizarParametro(ACodigo: Integer; APrograma: Integer; AValor: string);
@@ -350,6 +374,7 @@ type
     function ParametrosRevendaPadrao(AIdUsuario: Integer): TJSONNumber;
     procedure ParametrosExportarDadosBaseNova;
     procedure ParametrosImportarDadosBaseNova;
+    function ListarParametros: TJSONValue;
     procedure StartTransacao;
     procedure Commit;
     procedure Roolback;
@@ -358,13 +383,16 @@ type
     procedure PermissaoEditar(Programa: Integer; IdUsuario: Integer);
     procedure PermissaoExcluir(Programa: Integer; IdUsuario: Integer);
     procedure PermissaoRelatorio(Programa: Integer; IdUsuario: Integer);
+    function PermissaoSolicitacoes(AIdUsuario: Integer): TJSONValue;
     function PermissaoSolicitacaoAbertura(IdUsuario: Integer): Boolean;
     function PermissaoSolicitacaoAnalise(IdUsuario: Integer): Boolean;
     function PermissaoSolicitacaoOcorrenciaGeral(IdUsuario: Integer): Boolean;
     function PermissaoSolicitacaoOcorrenciaTecnica(IdUsuario: Integer): Boolean;
+    function PermissaoSolicitacaoOcorrenciaRegra(IdUsuario: Integer): Boolean;
     function PermissaoSolicitacaoStatus(IdUsuario: Integer): Boolean;
     function PermissaoSolicitacaoQuadro(IdUsuario: Integer): Boolean;
     function PermissaoRecadoQuadro(IdUsuario: Integer): Boolean;
+    function PermissoesChamado(AIdUsuario: Integer): TJSONValue;
     function PermissaoChamadoAbertura(IdUsuario: Integer): Boolean;
     function PermissaoChamadoOcorrencia(IdUsuario: Integer): Boolean;
     function PermissaoChamadoStatus(IdUsuario: Integer): Boolean;
@@ -372,6 +400,7 @@ type
     function PermissaoChamadoOcorrenciaDataHora(IdUsuario: Integer; out MesmoUsuario: Boolean; Id: Integer): Boolean;
     function PermissaoChamadoOcorrenciaAlterar(IdUsuario: Integer; out Perfil: Integer; Id: Integer): Boolean;
     function PermissaoChamadoOcorrenciaExcluir(IdUsuario: Integer; Id: Integer): Boolean;
+    function PermissoesAtividade(AIdUsuario: Integer): TJSONValue;
     function PermissaoAtividadeAbertura(IdUsuario: Integer): Boolean;
     function PermissaoAtividadeOcorrencias(IdUsuario: Integer): Boolean;
     function PermissaoAtividadeStatus(IdUsuario: Integer): Boolean;
@@ -386,9 +415,12 @@ type
     function PermissaoSolicitacaoOcorrenciaGeralExcluir(IdUsuario: Integer; Id: Integer): Boolean;
     function PermissaoSolicitacaoOcorrenciaTecnicaAlterar(IdUsuario: Integer; Id: Integer): Boolean;
     function PermissaoSolicitacaoOcorrenciaTecnicaExcluir(IdUsuario: Integer; Id: Integer): Boolean;
+    function PermissaoSolicitacaoOcorrenciaRegraAlterar(IdUsuario: Integer; Id: Integer): Boolean;
+    function PermissaoSolicitacaoOcorrenciaRegraExcluir(IdUsuario: Integer; Id: Integer): Boolean;
     function PermissaoOrcamentoAlteracaoSituacao(IdUsuario: Integer): Boolean;
     function PermissaoOrcamentoUsuario(IdUsuario: Integer): Boolean;
     procedure UsuarioPermissaoSalvar(IdUsuario: Integer; Sigla: string);
+    function UsuarioPermissaoExportar: TJSONValue;
     function VisitaAtualizacaoVersao(AIdCliente: Integer; AIdTipo: Integer; AVersao: string): string;
     procedure Backup(Destino: string);
     procedure RelatorioChamado(Modelo: Integer; IdUsuario: Integer; Filtro: TJSONValue; Ordem: string; ATipo: Integer);
@@ -411,6 +443,13 @@ type
     FProximoIdCommand: TDBXCommand;
     FProximoCodigoCommand: TDBXCommand;
     FRelatorioCommand: TDBXCommand;
+    FTabPrecoNovoCommand: TDBXCommand;
+    FTabPrecoEditarCommand: TDBXCommand;
+    FTabPrecoExcluirCommand: TDBXCommand;
+    FTabPrecoFiltrarCommand: TDBXCommand;
+    FTabPrecoLocalizarIdCommand: TDBXCommand;
+    FTabPrecoSalvarCommand: TDBXCommand;
+    FTabPrecoRelatorioCommand: TDBXCommand;
     FAgendamentoNovoCommand: TDBXCommand;
     FAgendamentoExcluirCommand: TDBXCommand;
     FAgendamentoEditarCommand: TDBXCommand;
@@ -519,6 +558,13 @@ type
     function ProximoId(Programa: Integer): TJSONNumber;
     function ProximoCodigo(Programa: Integer): TJSONNumber;
     procedure Relatorio(Programa: Integer; IdUsuario: Integer);
+    procedure TabPrecoNovo(Programa: Integer; IdUsuario: Integer);
+    function TabPrecoEditar(Programa: Integer; IdUsuario: Integer): Boolean;
+    procedure TabPrecoExcluir(Programa: Integer; IdUsuario: Integer; Id: Integer);
+    procedure TabPrecoFiltrar(Campo: string; Texto: string; Ativo: string; Contem: Boolean; AFiltro: TJSONValue; Id: Integer);
+    function TabPrecoLocalizarId(Id: Integer): TJSONValue;
+    function TabPrecoSalvar(Programa: Integer; IdUsuario: Integer; ATabPreco: TJSONValue): TJSONNumber;
+    procedure TabPrecoRelatorio(Programa: Integer; IdUsuario: Integer);
     procedure AgendamentoNovo(APrograma: Integer; AIdUsuario: Integer);
     procedure AgendamentoExcluir(APrograma: Integer; AIdUsuario: Integer; AId: Integer);
     function AgendamentoEditar(APrograma: Integer; AIdUsuario: Integer; AId: Integer): Boolean;
@@ -598,7 +644,7 @@ type
     function RecadoPermissaoUsuario(AIdUsuario: Integer; AAcao: string): Boolean;
     function StatusEncerramentoRecados: TJSONValue;
     function StatusAberturaRecados: TJSONValue;
-    procedure UsuarioRelRendimento(ADataInicial: string; ADataFinal: string);
+    procedure UsuarioRelRendimento(ADataInicial: string; ADataFinal: string; AFiltroUsuario: TJSONValue);
     function UsuarioDiasTrabalhados(ADataInicial: string; ADataFinal: string): TJSONValue;
     procedure ContatoExcluir(AId: Integer);
     function ContatoLocalizarPorId(AId: Integer): TJSONValue;
@@ -642,6 +688,30 @@ begin
   FReverseStringCommand.Parameters[0].Value.SetWideString(Value);
   FReverseStringCommand.ExecuteUpdate;
   Result := FReverseStringCommand.Parameters[1].Value.GetWideString;
+end;
+
+procedure TServerMethods1Client.AbrirConexao;
+begin
+  if FAbrirConexaoCommand = nil then
+  begin
+    FAbrirConexaoCommand := FDBXConnection.CreateCommand;
+    FAbrirConexaoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FAbrirConexaoCommand.Text := 'TServerMethods1.AbrirConexao';
+    FAbrirConexaoCommand.Prepare;
+  end;
+  FAbrirConexaoCommand.ExecuteUpdate;
+end;
+
+procedure TServerMethods1Client.FecharConexao;
+begin
+  if FFecharConexaoCommand = nil then
+  begin
+    FFecharConexaoCommand := FDBXConnection.CreateCommand;
+    FFecharConexaoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FFecharConexaoCommand.Text := 'TServerMethods1.FecharConexao';
+    FFecharConexaoCommand.Prepare;
+  end;
+  FFecharConexaoCommand.ExecuteUpdate;
 end;
 
 procedure TServerMethods1Client.DuplicacaoRegistro(CampoWhere: string; CampoValor: string; Tabela: string);
@@ -1428,6 +1498,19 @@ begin
   FLocalizarOcorrenciaTecnicaIdSolicitacaoCommand.ExecuteUpdate;
 end;
 
+procedure TServerMethods1Client.LocalizarOcorrenciaRegraIdSolicitacao(IdSolicitacao: Integer);
+begin
+  if FLocalizarOcorrenciaRegraIdSolicitacaoCommand = nil then
+  begin
+    FLocalizarOcorrenciaRegraIdSolicitacaoCommand := FDBXConnection.CreateCommand;
+    FLocalizarOcorrenciaRegraIdSolicitacaoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FLocalizarOcorrenciaRegraIdSolicitacaoCommand.Text := 'TServerMethods1.LocalizarOcorrenciaRegraIdSolicitacao';
+    FLocalizarOcorrenciaRegraIdSolicitacaoCommand.Prepare;
+  end;
+  FLocalizarOcorrenciaRegraIdSolicitacaoCommand.Parameters[0].Value.SetInt32(IdSolicitacao);
+  FLocalizarOcorrenciaRegraIdSolicitacaoCommand.ExecuteUpdate;
+end;
+
 procedure TServerMethods1Client.LocalizarSolicitacaoStatus(IdSolicitacao: Integer);
 begin
   if FLocalizarSolicitacaoStatusCommand = nil then
@@ -1481,6 +1564,21 @@ begin
   Result := TJSONValue(FSolicitacaoQuadroJSONCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
 end;
 
+function TServerMethods1Client.SolicitacaoPorCategoria(AIdCategoria: Integer; AIdUsuario: Integer): TJSONValue;
+begin
+  if FSolicitacaoPorCategoriaCommand = nil then
+  begin
+    FSolicitacaoPorCategoriaCommand := FDBXConnection.CreateCommand;
+    FSolicitacaoPorCategoriaCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FSolicitacaoPorCategoriaCommand.Text := 'TServerMethods1.SolicitacaoPorCategoria';
+    FSolicitacaoPorCategoriaCommand.Prepare;
+  end;
+  FSolicitacaoPorCategoriaCommand.Parameters[0].Value.SetInt32(AIdCategoria);
+  FSolicitacaoPorCategoriaCommand.Parameters[1].Value.SetInt32(AIdUsuario);
+  FSolicitacaoPorCategoriaCommand.ExecuteUpdate;
+  Result := TJSONValue(FSolicitacaoPorCategoriaCommand.Parameters[2].Value.GetJSONValue(FInstanceOwner));
+end;
+
 procedure TServerMethods1Client.SolicitacaoRelatorio(AModelo: Integer; AIdUsuario: Integer; AFiltro: TJSONValue; var AQtdeSolicitacao: Integer);
 begin
   if FSolicitacaoRelatorioCommand = nil then
@@ -1510,6 +1608,21 @@ begin
   FSolicitacaoObterPorIdCommand.Parameters[0].Value.SetInt32(Id);
   FSolicitacaoObterPorIdCommand.ExecuteUpdate;
   Result := TJSONValue(FSolicitacaoObterPorIdCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
+end;
+
+procedure TServerMethods1Client.SolicitacaoListarProblemaSolucao(Filtro: TJSONValue; Texto: string; IdUsuario: Integer);
+begin
+  if FSolicitacaoListarProblemaSolucaoCommand = nil then
+  begin
+    FSolicitacaoListarProblemaSolucaoCommand := FDBXConnection.CreateCommand;
+    FSolicitacaoListarProblemaSolucaoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FSolicitacaoListarProblemaSolucaoCommand.Text := 'TServerMethods1.SolicitacaoListarProblemaSolucao';
+    FSolicitacaoListarProblemaSolucaoCommand.Prepare;
+  end;
+  FSolicitacaoListarProblemaSolucaoCommand.Parameters[0].Value.SetJSONValue(Filtro, FInstanceOwner);
+  FSolicitacaoListarProblemaSolucaoCommand.Parameters[1].Value.SetWideString(Texto);
+  FSolicitacaoListarProblemaSolucaoCommand.Parameters[2].Value.SetInt32(IdUsuario);
+  FSolicitacaoListarProblemaSolucaoCommand.ExecuteUpdate;
 end;
 
 function TServerMethods1Client.SolicitacaoTempoLocalizarId(AId: Integer): TJSONValue;
@@ -1953,6 +2066,34 @@ begin
   Result := FExisteUsuarioCommand.Parameters[0].Value.GetBoolean;
 end;
 
+function TServerMethods1Client.ExportarUsuario: TJSONValue;
+begin
+  if FExportarUsuarioCommand = nil then
+  begin
+    FExportarUsuarioCommand := FDBXConnection.CreateCommand;
+    FExportarUsuarioCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FExportarUsuarioCommand.Text := 'TServerMethods1.ExportarUsuario';
+    FExportarUsuarioCommand.Prepare;
+  end;
+  FExportarUsuarioCommand.ExecuteUpdate;
+  Result := TJSONValue(FExportarUsuarioCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
+end;
+
+procedure TServerMethods1Client.UsuarioHorarioAcessoSistema(AUserName: string; APassword: string; AIdUsuario: Integer);
+begin
+  if FUsuarioHorarioAcessoSistemaCommand = nil then
+  begin
+    FUsuarioHorarioAcessoSistemaCommand := FDBXConnection.CreateCommand;
+    FUsuarioHorarioAcessoSistemaCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FUsuarioHorarioAcessoSistemaCommand.Text := 'TServerMethods1.UsuarioHorarioAcessoSistema';
+    FUsuarioHorarioAcessoSistemaCommand.Prepare;
+  end;
+  FUsuarioHorarioAcessoSistemaCommand.Parameters[0].Value.SetWideString(AUserName);
+  FUsuarioHorarioAcessoSistemaCommand.Parameters[1].Value.SetWideString(APassword);
+  FUsuarioHorarioAcessoSistemaCommand.Parameters[2].Value.SetInt32(AIdUsuario);
+  FUsuarioHorarioAcessoSistemaCommand.ExecuteUpdate;
+end;
+
 procedure TServerMethods1Client.LocalizarUsuario(UserName: string; Password: string);
 begin
   if FLocalizarUsuarioCommand = nil then
@@ -2375,7 +2516,7 @@ begin
   FFiltrarRevendaCommand.ExecuteUpdate;
 end;
 
-procedure TServerMethods1Client.LocalizarCodigoRevenda(Codigo: Integer; IdUsuario: Integer);
+procedure TServerMethods1Client.LocalizarCodigoRevenda(Codigo: Integer; IdUsuario: Integer; AMensagem: Boolean);
 begin
   if FLocalizarCodigoRevendaCommand = nil then
   begin
@@ -2386,6 +2527,7 @@ begin
   end;
   FLocalizarCodigoRevendaCommand.Parameters[0].Value.SetInt32(Codigo);
   FLocalizarCodigoRevendaCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FLocalizarCodigoRevendaCommand.Parameters[2].Value.SetBoolean(AMensagem);
   FLocalizarCodigoRevendaCommand.ExecuteUpdate;
 end;
 
@@ -2438,7 +2580,7 @@ begin
   FFiltrarUsuarioRevendaCommand.ExecuteUpdate;
 end;
 
-procedure TServerMethods1Client.LocalizarCodigoUsuario(Codigo: Integer; IdUsuario: Integer);
+procedure TServerMethods1Client.LocalizarCodigoUsuario(Codigo: Integer; IdUsuario: Integer; AMensagem: Boolean);
 begin
   if FLocalizarCodigoUsuarioCommand = nil then
   begin
@@ -2449,6 +2591,7 @@ begin
   end;
   FLocalizarCodigoUsuarioCommand.Parameters[0].Value.SetInt32(Codigo);
   FLocalizarCodigoUsuarioCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FLocalizarCodigoUsuarioCommand.Parameters[2].Value.SetBoolean(AMensagem);
   FLocalizarCodigoUsuarioCommand.ExecuteUpdate;
 end;
 
@@ -2544,6 +2687,20 @@ begin
   FDepartamentoMostrarAnexosCommand.Parameters[0].Value.SetInt32(AIdUsuario);
   FDepartamentoMostrarAnexosCommand.ExecuteUpdate;
   Result := FDepartamentoMostrarAnexosCommand.Parameters[1].Value.GetBoolean;
+end;
+
+function TServerMethods1Client.DepartamentoDuplicar(AId: Integer): TJSONNumber;
+begin
+  if FDepartamentoDuplicarCommand = nil then
+  begin
+    FDepartamentoDuplicarCommand := FDBXConnection.CreateCommand;
+    FDepartamentoDuplicarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FDepartamentoDuplicarCommand.Text := 'TServerMethods1.DepartamentoDuplicar';
+    FDepartamentoDuplicarCommand.Prepare;
+  end;
+  FDepartamentoDuplicarCommand.Parameters[0].Value.SetInt32(AId);
+  FDepartamentoDuplicarCommand.ExecuteUpdate;
+  Result := TJSONNumber(FDepartamentoDuplicarCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
 end;
 
 function TServerMethods1Client.UsuarioRetornaListaPermissao: TJSONArray;
@@ -2648,6 +2805,19 @@ begin
     FParametrosImportarDadosBaseNovaCommand.Prepare;
   end;
   FParametrosImportarDadosBaseNovaCommand.ExecuteUpdate;
+end;
+
+function TServerMethods1Client.ListarParametros: TJSONValue;
+begin
+  if FListarParametrosCommand = nil then
+  begin
+    FListarParametrosCommand := FDBXConnection.CreateCommand;
+    FListarParametrosCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FListarParametrosCommand.Text := 'TServerMethods1.ListarParametros';
+    FListarParametrosCommand.Prepare;
+  end;
+  FListarParametrosCommand.ExecuteUpdate;
+  Result := TJSONValue(FListarParametrosCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
 end;
 
 procedure TServerMethods1Client.StartTransacao;
@@ -2756,6 +2926,20 @@ begin
   FPermissaoRelatorioCommand.ExecuteUpdate;
 end;
 
+function TServerMethods1Client.PermissaoSolicitacoes(AIdUsuario: Integer): TJSONValue;
+begin
+  if FPermissaoSolicitacoesCommand = nil then
+  begin
+    FPermissaoSolicitacoesCommand := FDBXConnection.CreateCommand;
+    FPermissaoSolicitacoesCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FPermissaoSolicitacoesCommand.Text := 'TServerMethods1.PermissaoSolicitacoes';
+    FPermissaoSolicitacoesCommand.Prepare;
+  end;
+  FPermissaoSolicitacoesCommand.Parameters[0].Value.SetInt32(AIdUsuario);
+  FPermissaoSolicitacoesCommand.ExecuteUpdate;
+  Result := TJSONValue(FPermissaoSolicitacoesCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
+end;
+
 function TServerMethods1Client.PermissaoSolicitacaoAbertura(IdUsuario: Integer): Boolean;
 begin
   if FPermissaoSolicitacaoAberturaCommand = nil then
@@ -2812,6 +2996,20 @@ begin
   Result := FPermissaoSolicitacaoOcorrenciaTecnicaCommand.Parameters[1].Value.GetBoolean;
 end;
 
+function TServerMethods1Client.PermissaoSolicitacaoOcorrenciaRegra(IdUsuario: Integer): Boolean;
+begin
+  if FPermissaoSolicitacaoOcorrenciaRegraCommand = nil then
+  begin
+    FPermissaoSolicitacaoOcorrenciaRegraCommand := FDBXConnection.CreateCommand;
+    FPermissaoSolicitacaoOcorrenciaRegraCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FPermissaoSolicitacaoOcorrenciaRegraCommand.Text := 'TServerMethods1.PermissaoSolicitacaoOcorrenciaRegra';
+    FPermissaoSolicitacaoOcorrenciaRegraCommand.Prepare;
+  end;
+  FPermissaoSolicitacaoOcorrenciaRegraCommand.Parameters[0].Value.SetInt32(IdUsuario);
+  FPermissaoSolicitacaoOcorrenciaRegraCommand.ExecuteUpdate;
+  Result := FPermissaoSolicitacaoOcorrenciaRegraCommand.Parameters[1].Value.GetBoolean;
+end;
+
 function TServerMethods1Client.PermissaoSolicitacaoStatus(IdUsuario: Integer): Boolean;
 begin
   if FPermissaoSolicitacaoStatusCommand = nil then
@@ -2852,6 +3050,20 @@ begin
   FPermissaoRecadoQuadroCommand.Parameters[0].Value.SetInt32(IdUsuario);
   FPermissaoRecadoQuadroCommand.ExecuteUpdate;
   Result := FPermissaoRecadoQuadroCommand.Parameters[1].Value.GetBoolean;
+end;
+
+function TServerMethods1Client.PermissoesChamado(AIdUsuario: Integer): TJSONValue;
+begin
+  if FPermissoesChamadoCommand = nil then
+  begin
+    FPermissoesChamadoCommand := FDBXConnection.CreateCommand;
+    FPermissoesChamadoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FPermissoesChamadoCommand.Text := 'TServerMethods1.PermissoesChamado';
+    FPermissoesChamadoCommand.Prepare;
+  end;
+  FPermissoesChamadoCommand.Parameters[0].Value.SetInt32(AIdUsuario);
+  FPermissoesChamadoCommand.ExecuteUpdate;
+  Result := TJSONValue(FPermissoesChamadoCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
 end;
 
 function TServerMethods1Client.PermissaoChamadoAbertura(IdUsuario: Integer): Boolean;
@@ -2955,6 +3167,20 @@ begin
   FPermissaoChamadoOcorrenciaExcluirCommand.Parameters[1].Value.SetInt32(Id);
   FPermissaoChamadoOcorrenciaExcluirCommand.ExecuteUpdate;
   Result := FPermissaoChamadoOcorrenciaExcluirCommand.Parameters[2].Value.GetBoolean;
+end;
+
+function TServerMethods1Client.PermissoesAtividade(AIdUsuario: Integer): TJSONValue;
+begin
+  if FPermissoesAtividadeCommand = nil then
+  begin
+    FPermissoesAtividadeCommand := FDBXConnection.CreateCommand;
+    FPermissoesAtividadeCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FPermissoesAtividadeCommand.Text := 'TServerMethods1.PermissoesAtividade';
+    FPermissoesAtividadeCommand.Prepare;
+  end;
+  FPermissoesAtividadeCommand.Parameters[0].Value.SetInt32(AIdUsuario);
+  FPermissoesAtividadeCommand.ExecuteUpdate;
+  Result := TJSONValue(FPermissoesAtividadeCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
 end;
 
 function TServerMethods1Client.PermissaoAtividadeAbertura(IdUsuario: Integer): Boolean;
@@ -3162,6 +3388,36 @@ begin
   Result := FPermissaoSolicitacaoOcorrenciaTecnicaExcluirCommand.Parameters[2].Value.GetBoolean;
 end;
 
+function TServerMethods1Client.PermissaoSolicitacaoOcorrenciaRegraAlterar(IdUsuario: Integer; Id: Integer): Boolean;
+begin
+  if FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand = nil then
+  begin
+    FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand := FDBXConnection.CreateCommand;
+    FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.Text := 'TServerMethods1.PermissaoSolicitacaoOcorrenciaRegraAlterar';
+    FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.Prepare;
+  end;
+  FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.Parameters[0].Value.SetInt32(IdUsuario);
+  FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.Parameters[1].Value.SetInt32(Id);
+  FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.ExecuteUpdate;
+  Result := FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.Parameters[2].Value.GetBoolean;
+end;
+
+function TServerMethods1Client.PermissaoSolicitacaoOcorrenciaRegraExcluir(IdUsuario: Integer; Id: Integer): Boolean;
+begin
+  if FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand = nil then
+  begin
+    FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand := FDBXConnection.CreateCommand;
+    FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.Text := 'TServerMethods1.PermissaoSolicitacaoOcorrenciaRegraExcluir';
+    FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.Prepare;
+  end;
+  FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.Parameters[0].Value.SetInt32(IdUsuario);
+  FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.Parameters[1].Value.SetInt32(Id);
+  FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.ExecuteUpdate;
+  Result := FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.Parameters[2].Value.GetBoolean;
+end;
+
 function TServerMethods1Client.PermissaoOrcamentoAlteracaoSituacao(IdUsuario: Integer): Boolean;
 begin
   if FPermissaoOrcamentoAlteracaoSituacaoCommand = nil then
@@ -3202,6 +3458,19 @@ begin
   FUsuarioPermissaoSalvarCommand.Parameters[0].Value.SetInt32(IdUsuario);
   FUsuarioPermissaoSalvarCommand.Parameters[1].Value.SetWideString(Sigla);
   FUsuarioPermissaoSalvarCommand.ExecuteUpdate;
+end;
+
+function TServerMethods1Client.UsuarioPermissaoExportar: TJSONValue;
+begin
+  if FUsuarioPermissaoExportarCommand = nil then
+  begin
+    FUsuarioPermissaoExportarCommand := FDBXConnection.CreateCommand;
+    FUsuarioPermissaoExportarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FUsuarioPermissaoExportarCommand.Text := 'TServerMethods1.UsuarioPermissaoExportar';
+    FUsuarioPermissaoExportarCommand.Prepare;
+  end;
+  FUsuarioPermissaoExportarCommand.ExecuteUpdate;
+  Result := TJSONValue(FUsuarioPermissaoExportarCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
 end;
 
 function TServerMethods1Client.VisitaAtualizacaoVersao(AIdCliente: Integer; AIdTipo: Integer; AVersao: string): string;
@@ -3328,6 +3597,8 @@ destructor TServerMethods1Client.Destroy;
 begin
   FEchoStringCommand.DisposeOf;
   FReverseStringCommand.DisposeOf;
+  FAbrirConexaoCommand.DisposeOf;
+  FFecharConexaoCommand.DisposeOf;
   FDuplicacaoRegistroCommand.DisposeOf;
   FNovoCommand.DisposeOf;
   FExcluirCommand.DisposeOf;
@@ -3385,12 +3656,15 @@ begin
   FLocalizarCronogramaIdCommand.DisposeOf;
   FLocalizarOcorrenciaGeralIdSolicitacaoCommand.DisposeOf;
   FLocalizarOcorrenciaTecnicaIdSolicitacaoCommand.DisposeOf;
+  FLocalizarOcorrenciaRegraIdSolicitacaoCommand.DisposeOf;
   FLocalizarSolicitacaoStatusCommand.DisposeOf;
   FSolicitacaoAnexosCommand.DisposeOf;
   FSolicitracaoQuadroCommand.DisposeOf;
   FSolicitacaoQuadroJSONCommand.DisposeOf;
+  FSolicitacaoPorCategoriaCommand.DisposeOf;
   FSolicitacaoRelatorioCommand.DisposeOf;
   FSolicitacaoObterPorIdCommand.DisposeOf;
+  FSolicitacaoListarProblemaSolucaoCommand.DisposeOf;
   FSolicitacaoTempoLocalizarIdCommand.DisposeOf;
   FSolicitacaoTempoExcluirCommand.DisposeOf;
   FSolicitacaoTempoLocalizarPorSolicitacaoCommand.DisposeOf;
@@ -3422,6 +3696,8 @@ begin
   FClienteRelatoriosCommand.DisposeOf;
   FUsuarioUsuarioADMCommand.DisposeOf;
   FExisteUsuarioCommand.DisposeOf;
+  FExportarUsuarioCommand.DisposeOf;
+  FUsuarioHorarioAcessoSistemaCommand.DisposeOf;
   FLocalizarUsuarioCommand.DisposeOf;
   FFiltrarUsuarioCommand.DisposeOf;
   FRetornaNumeroSolicitacaoCommand.DisposeOf;
@@ -3462,6 +3738,7 @@ begin
   FDepartamentoSalvarCommand.DisposeOf;
   FDepartamentoFiltrarIdCommand.DisposeOf;
   FDepartamentoMostrarAnexosCommand.DisposeOf;
+  FDepartamentoDuplicarCommand.DisposeOf;
   FUsuarioRetornaListaPermissaoCommand.DisposeOf;
   FBuscarTitulosQuadrosChamadosCommand.DisposeOf;
   FParametrosAtualizarParametroCommand.DisposeOf;
@@ -3470,6 +3747,7 @@ begin
   FParametrosRevendaPadraoCommand.DisposeOf;
   FParametrosExportarDadosBaseNovaCommand.DisposeOf;
   FParametrosImportarDadosBaseNovaCommand.DisposeOf;
+  FListarParametrosCommand.DisposeOf;
   FStartTransacaoCommand.DisposeOf;
   FCommitCommand.DisposeOf;
   FRoolbackCommand.DisposeOf;
@@ -3478,13 +3756,16 @@ begin
   FPermissaoEditarCommand.DisposeOf;
   FPermissaoExcluirCommand.DisposeOf;
   FPermissaoRelatorioCommand.DisposeOf;
+  FPermissaoSolicitacoesCommand.DisposeOf;
   FPermissaoSolicitacaoAberturaCommand.DisposeOf;
   FPermissaoSolicitacaoAnaliseCommand.DisposeOf;
   FPermissaoSolicitacaoOcorrenciaGeralCommand.DisposeOf;
   FPermissaoSolicitacaoOcorrenciaTecnicaCommand.DisposeOf;
+  FPermissaoSolicitacaoOcorrenciaRegraCommand.DisposeOf;
   FPermissaoSolicitacaoStatusCommand.DisposeOf;
   FPermissaoSolicitacaoQuadroCommand.DisposeOf;
   FPermissaoRecadoQuadroCommand.DisposeOf;
+  FPermissoesChamadoCommand.DisposeOf;
   FPermissaoChamadoAberturaCommand.DisposeOf;
   FPermissaoChamadoOcorrenciaCommand.DisposeOf;
   FPermissaoChamadoStatusCommand.DisposeOf;
@@ -3492,6 +3773,7 @@ begin
   FPermissaoChamadoOcorrenciaDataHoraCommand.DisposeOf;
   FPermissaoChamadoOcorrenciaAlterarCommand.DisposeOf;
   FPermissaoChamadoOcorrenciaExcluirCommand.DisposeOf;
+  FPermissoesAtividadeCommand.DisposeOf;
   FPermissaoAtividadeAberturaCommand.DisposeOf;
   FPermissaoAtividadeOcorrenciasCommand.DisposeOf;
   FPermissaoAtividadeStatusCommand.DisposeOf;
@@ -3506,9 +3788,12 @@ begin
   FPermissaoSolicitacaoOcorrenciaGeralExcluirCommand.DisposeOf;
   FPermissaoSolicitacaoOcorrenciaTecnicaAlterarCommand.DisposeOf;
   FPermissaoSolicitacaoOcorrenciaTecnicaExcluirCommand.DisposeOf;
+  FPermissaoSolicitacaoOcorrenciaRegraAlterarCommand.DisposeOf;
+  FPermissaoSolicitacaoOcorrenciaRegraExcluirCommand.DisposeOf;
   FPermissaoOrcamentoAlteracaoSituacaoCommand.DisposeOf;
   FPermissaoOrcamentoUsuarioCommand.DisposeOf;
   FUsuarioPermissaoSalvarCommand.DisposeOf;
+  FUsuarioPermissaoExportarCommand.DisposeOf;
   FVisitaAtualizacaoVersaoCommand.DisposeOf;
   FBackupCommand.DisposeOf;
   FRelatorioChamadoCommand.DisposeOf;
@@ -3677,6 +3962,112 @@ begin
   FRelatorioCommand.Parameters[0].Value.SetInt32(Programa);
   FRelatorioCommand.Parameters[1].Value.SetInt32(IdUsuario);
   FRelatorioCommand.ExecuteUpdate;
+end;
+
+procedure TServerModule2Client.TabPrecoNovo(Programa: Integer; IdUsuario: Integer);
+begin
+  if FTabPrecoNovoCommand = nil then
+  begin
+    FTabPrecoNovoCommand := FDBXConnection.CreateCommand;
+    FTabPrecoNovoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoNovoCommand.Text := 'TServerModule2.TabPrecoNovo';
+    FTabPrecoNovoCommand.Prepare;
+  end;
+  FTabPrecoNovoCommand.Parameters[0].Value.SetInt32(Programa);
+  FTabPrecoNovoCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FTabPrecoNovoCommand.ExecuteUpdate;
+end;
+
+function TServerModule2Client.TabPrecoEditar(Programa: Integer; IdUsuario: Integer): Boolean;
+begin
+  if FTabPrecoEditarCommand = nil then
+  begin
+    FTabPrecoEditarCommand := FDBXConnection.CreateCommand;
+    FTabPrecoEditarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoEditarCommand.Text := 'TServerModule2.TabPrecoEditar';
+    FTabPrecoEditarCommand.Prepare;
+  end;
+  FTabPrecoEditarCommand.Parameters[0].Value.SetInt32(Programa);
+  FTabPrecoEditarCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FTabPrecoEditarCommand.ExecuteUpdate;
+  Result := FTabPrecoEditarCommand.Parameters[2].Value.GetBoolean;
+end;
+
+procedure TServerModule2Client.TabPrecoExcluir(Programa: Integer; IdUsuario: Integer; Id: Integer);
+begin
+  if FTabPrecoExcluirCommand = nil then
+  begin
+    FTabPrecoExcluirCommand := FDBXConnection.CreateCommand;
+    FTabPrecoExcluirCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoExcluirCommand.Text := 'TServerModule2.TabPrecoExcluir';
+    FTabPrecoExcluirCommand.Prepare;
+  end;
+  FTabPrecoExcluirCommand.Parameters[0].Value.SetInt32(Programa);
+  FTabPrecoExcluirCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FTabPrecoExcluirCommand.Parameters[2].Value.SetInt32(Id);
+  FTabPrecoExcluirCommand.ExecuteUpdate;
+end;
+
+procedure TServerModule2Client.TabPrecoFiltrar(Campo: string; Texto: string; Ativo: string; Contem: Boolean; AFiltro: TJSONValue; Id: Integer);
+begin
+  if FTabPrecoFiltrarCommand = nil then
+  begin
+    FTabPrecoFiltrarCommand := FDBXConnection.CreateCommand;
+    FTabPrecoFiltrarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoFiltrarCommand.Text := 'TServerModule2.TabPrecoFiltrar';
+    FTabPrecoFiltrarCommand.Prepare;
+  end;
+  FTabPrecoFiltrarCommand.Parameters[0].Value.SetWideString(Campo);
+  FTabPrecoFiltrarCommand.Parameters[1].Value.SetWideString(Texto);
+  FTabPrecoFiltrarCommand.Parameters[2].Value.SetWideString(Ativo);
+  FTabPrecoFiltrarCommand.Parameters[3].Value.SetBoolean(Contem);
+  FTabPrecoFiltrarCommand.Parameters[4].Value.SetJSONValue(AFiltro, FInstanceOwner);
+  FTabPrecoFiltrarCommand.Parameters[5].Value.SetInt32(Id);
+  FTabPrecoFiltrarCommand.ExecuteUpdate;
+end;
+
+function TServerModule2Client.TabPrecoLocalizarId(Id: Integer): TJSONValue;
+begin
+  if FTabPrecoLocalizarIdCommand = nil then
+  begin
+    FTabPrecoLocalizarIdCommand := FDBXConnection.CreateCommand;
+    FTabPrecoLocalizarIdCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoLocalizarIdCommand.Text := 'TServerModule2.TabPrecoLocalizarId';
+    FTabPrecoLocalizarIdCommand.Prepare;
+  end;
+  FTabPrecoLocalizarIdCommand.Parameters[0].Value.SetInt32(Id);
+  FTabPrecoLocalizarIdCommand.ExecuteUpdate;
+  Result := TJSONValue(FTabPrecoLocalizarIdCommand.Parameters[1].Value.GetJSONValue(FInstanceOwner));
+end;
+
+function TServerModule2Client.TabPrecoSalvar(Programa: Integer; IdUsuario: Integer; ATabPreco: TJSONValue): TJSONNumber;
+begin
+  if FTabPrecoSalvarCommand = nil then
+  begin
+    FTabPrecoSalvarCommand := FDBXConnection.CreateCommand;
+    FTabPrecoSalvarCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoSalvarCommand.Text := 'TServerModule2.TabPrecoSalvar';
+    FTabPrecoSalvarCommand.Prepare;
+  end;
+  FTabPrecoSalvarCommand.Parameters[0].Value.SetInt32(Programa);
+  FTabPrecoSalvarCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FTabPrecoSalvarCommand.Parameters[2].Value.SetJSONValue(ATabPreco, FInstanceOwner);
+  FTabPrecoSalvarCommand.ExecuteUpdate;
+  Result := TJSONNumber(FTabPrecoSalvarCommand.Parameters[3].Value.GetJSONValue(FInstanceOwner));
+end;
+
+procedure TServerModule2Client.TabPrecoRelatorio(Programa: Integer; IdUsuario: Integer);
+begin
+  if FTabPrecoRelatorioCommand = nil then
+  begin
+    FTabPrecoRelatorioCommand := FDBXConnection.CreateCommand;
+    FTabPrecoRelatorioCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FTabPrecoRelatorioCommand.Text := 'TServerModule2.TabPrecoRelatorio';
+    FTabPrecoRelatorioCommand.Prepare;
+  end;
+  FTabPrecoRelatorioCommand.Parameters[0].Value.SetInt32(Programa);
+  FTabPrecoRelatorioCommand.Parameters[1].Value.SetInt32(IdUsuario);
+  FTabPrecoRelatorioCommand.ExecuteUpdate;
 end;
 
 procedure TServerModule2Client.AgendamentoNovo(APrograma: Integer; AIdUsuario: Integer);
@@ -4811,7 +5202,7 @@ begin
   Result := TJSONValue(FStatusAberturaRecadosCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
 end;
 
-procedure TServerModule2Client.UsuarioRelRendimento(ADataInicial: string; ADataFinal: string);
+procedure TServerModule2Client.UsuarioRelRendimento(ADataInicial: string; ADataFinal: string; AFiltroUsuario: TJSONValue);
 begin
   if FUsuarioRelRendimentoCommand = nil then
   begin
@@ -4822,6 +5213,7 @@ begin
   end;
   FUsuarioRelRendimentoCommand.Parameters[0].Value.SetWideString(ADataInicial);
   FUsuarioRelRendimentoCommand.Parameters[1].Value.SetWideString(ADataFinal);
+  FUsuarioRelRendimentoCommand.Parameters[2].Value.SetJSONValue(AFiltroUsuario, FInstanceOwner);
   FUsuarioRelRendimentoCommand.ExecuteUpdate;
 end;
 
@@ -5033,6 +5425,13 @@ begin
   FProximoIdCommand.DisposeOf;
   FProximoCodigoCommand.DisposeOf;
   FRelatorioCommand.DisposeOf;
+  FTabPrecoNovoCommand.DisposeOf;
+  FTabPrecoEditarCommand.DisposeOf;
+  FTabPrecoExcluirCommand.DisposeOf;
+  FTabPrecoFiltrarCommand.DisposeOf;
+  FTabPrecoLocalizarIdCommand.DisposeOf;
+  FTabPrecoSalvarCommand.DisposeOf;
+  FTabPrecoRelatorioCommand.DisposeOf;
   FAgendamentoNovoCommand.DisposeOf;
   FAgendamentoExcluirCommand.DisposeOf;
   FAgendamentoEditarCommand.DisposeOf;

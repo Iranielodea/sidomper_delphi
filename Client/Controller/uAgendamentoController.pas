@@ -72,6 +72,7 @@ begin
   if Trim(ATexto) = '' then
     raise Exception.Create('Informe o Texto!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoCancelamento(dm.IdUsuario, AIdAgendamento, DateToStr(AData), TimeToStr(AHora), ATexto);
@@ -105,6 +106,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -116,6 +118,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -126,11 +129,13 @@ begin
   if AIdAgendamento = 0 then
     raise Exception.Create('Informe o Id do Agendamento!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoEncerramento(dm.IdUsuario, AIdAgendamento, AIdPrograma);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -141,11 +146,13 @@ begin
   if AIdAgendamento = 0 then
     raise Exception.Create('Informe o Id do Agendamento!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoEncerramentoWEB(dm.IdUsuario, AIdAgendamento);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -191,12 +198,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoExcluir(CAgendamentoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -217,6 +226,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -231,6 +241,7 @@ procedure TAgendamentoController.FiltrarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -238,6 +249,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -246,6 +258,7 @@ procedure TAgendamentoController.Quadro(ADataInicial, ADataFinal: TDate;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     FModel.CDSQuadro.Close;
@@ -253,6 +266,7 @@ begin
     FModel.CDSQuadro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -261,6 +275,7 @@ function TAgendamentoController.QuadroJSON(ADataInicial, ADataFinal: TDate;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -293,6 +308,7 @@ begin
   if Trim(ATexto) = '' then
     raise Exception.Create('Informe o Texto!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoReagendamento(DM.IdUsuario, AIdAgendamento, DateToStr(AData), TimeToStr(AHora), ATexto);
@@ -306,6 +322,7 @@ function TAgendamentoController.RetornarEmails(AIdAgenda, AIdUsuario,
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoRetornarEmails(AIdAgenda, AIdUsuario, AIdStatus);
@@ -319,6 +336,7 @@ function TAgendamentoController.RetornarEmailsCliente(
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoRetornarCliente(AIdAgenda, dm.IdUsuario);
@@ -332,6 +350,7 @@ function TAgendamentoController.RetornaTipoPrograma(
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoTipoPrograma(AIdAgenda);
@@ -344,11 +363,13 @@ procedure TAgendamentoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.AgendamentoRelatorio(CAgendamentoPrograma, AIdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -356,6 +377,7 @@ procedure TAgendamentoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -363,6 +385,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -371,6 +394,7 @@ var
   Negocio: TServerModule2Client;
   StatusController: TStatusController;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -421,11 +445,13 @@ function TAgendamentoController.PermissaoQuadro(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoPermissaoQuadro(AIdUsuario);
   finally
     FreeAndNil(Negocio);
+//    dm.Desconectar;
   end;
 end;
 
@@ -466,12 +492,14 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoSalvar(CAgendamentoPrograma, AIdUsuario, oObjetoJSON);
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Obj);
+    dm.Desconectar;
   end;
 end;
 
@@ -500,11 +528,13 @@ var
   Negocio: TServerModule2Client;
   bResult: Boolean;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     bResult := Negocio.AgendamentoAberto(dm.IdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 
   if bResult then

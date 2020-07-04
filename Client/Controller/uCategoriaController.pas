@@ -67,6 +67,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -78,6 +79,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -88,12 +90,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CCategoriaPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -102,6 +106,7 @@ procedure TCategoriaController.Filtrar(ACampo, ATexto, AAtivo: string;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -116,6 +121,7 @@ procedure TCategoriaController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -123,6 +129,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -130,12 +137,14 @@ procedure TCategoriaController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CCategoriaPrograma, AIdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -143,6 +152,7 @@ procedure TCategoriaController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -150,6 +160,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -157,6 +168,7 @@ procedure TCategoriaController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -164,6 +176,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -171,6 +184,7 @@ procedure TCategoriaController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -184,6 +198,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -206,12 +221,14 @@ var
   Negocio: TServerModule2Client;
   iCodigo: Integer;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     iCodigo := StrToInt(Negocio.ProximoCodigo(CCategoriaPrograma).ToString);
     Result := iCodigo;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -220,12 +237,14 @@ var
   Negocio: TServerModule2Client;
   iCodigo: Integer;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     iCodigo := StrToInt(Negocio.ProximoId(CCategoriaPrograma).ToString);
     Result := iCodigo;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -241,6 +260,7 @@ begin
   if Trim(FModel.CDSCadastroCat_Nome.AsString) = '' then
     raise Exception.Create('Informe o Nome!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -258,6 +278,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

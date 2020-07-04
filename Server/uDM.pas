@@ -16,6 +16,7 @@ type
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
+    procedure ConexaoBeforeConnect(Sender: TObject);
   private
     { Private declarations }
     procedure CarregarIni;
@@ -26,6 +27,8 @@ type
     procedure StartTransacao;
     procedure Commit;
     procedure Roolback;
+    procedure AbrirConexao;
+    procedure FecharConexao;
   end;
 
 var
@@ -38,6 +41,13 @@ implementation
 {$R *.dfm}
 
 { TDM }
+
+procedure TDM.AbrirConexao;
+begin
+  Exit;
+  if Conexao.Connected = False then
+    Conexao.Connected := True;
+end;
 
 procedure TDM.CarregarIni;
 var
@@ -61,6 +71,11 @@ begin
     Conexao.Commit;
 end;
 
+procedure TDM.ConexaoBeforeConnect(Sender: TObject);
+begin
+  CarregarIni();
+end;
+
 procedure TDM.DataModuleCreate(Sender: TObject);
 begin
   Conexao.Connected := False;
@@ -76,6 +91,13 @@ end;
 procedure TDM.ExecutarSQL(InstrucaoSQL: string);
 begin
   dm.Conexao.ExecSQL(InstrucaoSQL);
+end;
+
+procedure TDM.FecharConexao;
+begin
+  Exit;
+  if Conexao.Connected then
+    Conexao.Connected := False;
 end;
 
 procedure TDM.Roolback;

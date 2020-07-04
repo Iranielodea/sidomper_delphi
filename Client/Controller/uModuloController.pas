@@ -68,6 +68,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -79,6 +80,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -89,12 +91,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CModuloPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -103,6 +107,7 @@ procedure TModuloController.Filtrar(ACampo, ATexto, AAtivo: string;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -118,6 +123,7 @@ procedure TModuloController.FiltrarCliente(AIdCliente: Integer; ACampo, ATexto,
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -125,6 +131,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -132,6 +139,7 @@ procedure TModuloController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -139,6 +147,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -146,12 +155,14 @@ procedure TModuloController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CModuloPrograma, AIdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -159,6 +170,7 @@ procedure TModuloController.LocalizarCodigo(ACodigo: Integer; AIdCliente: intege
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -169,6 +181,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -176,6 +189,7 @@ procedure TModuloController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -183,6 +197,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -190,6 +205,7 @@ procedure TModuloController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -204,6 +220,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -219,11 +236,13 @@ function TModuloController.ProximoCodigo: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CModuloPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -231,10 +250,12 @@ function TModuloController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CModuloPrograma).ToString);
   finally
+    DM.Desconectar;
     FreeAndNil(Negocio);
   end;
 end;
@@ -249,6 +270,7 @@ begin
   if Trim(FModel.CDSCadastroMod_Nome.AsString) = '' then
     raise Exception.Create('Informe o Nome!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -268,6 +290,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 

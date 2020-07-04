@@ -25,6 +25,7 @@ procedure TContatoController.Excluir(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.ContatoExcluir(AId);
@@ -39,6 +40,7 @@ var
   oObjetoJSON : TJSONValue;
   model: TContatoVO;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     model := TConverte.JSONToObject<TContatoVO>(Negocio.ContatoLocalizarPorId(AId));
@@ -54,6 +56,7 @@ var
   Negocio: TServerModule2Client;
   Lista: TObjectList<TContatoVO>;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Lista := TConverte.JSONToObject<TListaContato>(Negocio.ContatoLocalizarPorCliente(AIdCliente));
@@ -69,6 +72,7 @@ var
   Negocio: TServerModule2Client;
   Lista: TObjectList<TContatoVO>;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Lista := TConverte.JSONToObject<TListaContato>(Negocio.ContatoLocalizarPorOrcamento(AIdOrcamento));
@@ -83,6 +87,7 @@ var
   Negocio: TServerModule2Client;
   objJson: TJSONValue;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     objJson := TConverte.ObjectToJSON<TListaContato>(AContato);

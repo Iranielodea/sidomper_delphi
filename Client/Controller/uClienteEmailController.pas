@@ -56,6 +56,7 @@ procedure TClienteEmailController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;

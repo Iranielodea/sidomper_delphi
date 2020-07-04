@@ -104,6 +104,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -115,6 +116,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -125,12 +127,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CEscala, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -139,6 +143,7 @@ procedure TEscalaController.Filtrar(ACampo, ATexto, AAtivo: string;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -156,6 +161,7 @@ var
   Negocio: TServerModule2Client;
   oObjetoJSON : TJSONValue;
 begin
+  dm.Conectar;
   oObjetoJSON := TConverte.ObjectToJSON<TEscalaFiltro>(AFiltro);
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
@@ -172,6 +178,7 @@ procedure TEscalaController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -179,6 +186,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -198,12 +206,14 @@ procedure TEscalaController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CEscala, AIdUsuario);
    // FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -216,6 +226,7 @@ procedure TEscalaController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -223,6 +234,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -236,6 +248,7 @@ procedure TEscalaController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -247,6 +260,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -268,11 +282,13 @@ function TEscalaController.ProximoCodigo: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CRevendaPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -280,11 +296,13 @@ function TEscalaController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CRevendaPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -297,6 +315,7 @@ var
 begin
   oObjetoJSON := TConverte.ObjectToJSON<TEscalaFiltro>(AFiltro);
   lDM := TDMRelEscala.Create(nil);
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     lDM.cdsRelatorio1.Close;
@@ -305,6 +324,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(lDM);
+    dm.Desconectar;
   end;
 end;
 
@@ -329,6 +349,7 @@ begin
 //  if AEscalaVO.HoraInicio > AEscalaVO.HoraFim then
 //    raise Exception.Create('Hora inicial maior que Hora final!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -353,6 +374,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -360,11 +382,13 @@ function TEscalaController.UltimaData: string;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.EscalaBuscarUltimaData();
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -388,6 +412,7 @@ begin
   if FModel.CDSCadastroEsc_HoraInicio.AsDateTime > FModel.CDSCadastroEsc_HoraFim.AsDateTime then
     raise Exception.Create('Hora inicial maior que Hora final!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -408,6 +433,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

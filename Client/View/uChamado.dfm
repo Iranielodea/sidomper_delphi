@@ -194,7 +194,7 @@
           Top = 1
           Width = 1008
           Height = 599
-          ActivePage = tsChamadoOcorrencia
+          ActivePage = tsPrincipal
           Align = alClient
           TabOrder = 0
           OnChange = PageControl1Change

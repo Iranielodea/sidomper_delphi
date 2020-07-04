@@ -1046,6 +1046,7 @@ var
   Lista: TObjectList<TRecadoQuadroViewModel>;
 begin
   objRecado := TRecado.Create;
+  dm.AbrirConexao;
   try
     try
       QRecadoQuadro.Close;
@@ -1064,6 +1065,7 @@ begin
 
     Result := TConverte.ObjectToJSON<TListaRecadoQuadroViewModel>(Lista);
   finally
+    dm.FecharConexao;
     FreeAndNil(objRecado);
     FreeAndNil(Lista);
   end;
@@ -2406,6 +2408,7 @@ var
   Lista: TObjectList<TAgendamentoVO>;
 begin
   obj := TAgendamento.Create;
+  dm.AbrirConexao;
   try
     try
       QAgendaQuadro.Close;
@@ -2423,6 +2426,7 @@ begin
 
     Result := TConverte.ObjectToJSON<TListaAgendamentoVO>(Lista);
   finally
+    dm.FecharConexao;
     FreeAndNil(obj);
     FreeAndNil(Lista);
   end;

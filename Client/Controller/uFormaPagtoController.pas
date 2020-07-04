@@ -73,6 +73,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -88,6 +89,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -98,12 +100,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CFormaPagto, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -112,6 +116,7 @@ procedure TFormaPagtoController.Filtrar(ACampo, ATexto, AAtivo: string;
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -126,6 +131,7 @@ procedure TFormaPagtoController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -133,6 +139,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -140,12 +147,14 @@ procedure TFormaPagtoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CFormaPagto, AIdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -153,6 +162,7 @@ procedure TFormaPagtoController.ListarFormaPagto(AIdFormaPagto: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSItens.Close;
@@ -160,6 +170,7 @@ begin
     FModel.CDSItens.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -167,6 +178,7 @@ procedure TFormaPagtoController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -174,6 +186,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -181,6 +194,7 @@ procedure TFormaPagtoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -188,6 +202,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -195,6 +210,7 @@ procedure TFormaPagtoController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -212,6 +228,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -234,12 +251,14 @@ var
   Negocio: TServerModule2Client;
   iCodigo: Integer;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     iCodigo := StrToInt(Negocio.ProximoCodigo(CFormaPagto).ToString);
     Result := iCodigo;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -248,12 +267,14 @@ var
   Negocio: TServerModule2Client;
   iCodigo: Integer;
 begin
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     iCodigo := StrToInt(Negocio.ProximoId(CFormaPagto).ToString);
     Result := iCodigo;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -266,6 +287,7 @@ var
 begin
   ObjVO := TFormaPagtoVO.Create;
   Marshal := TJSONMarshal.Create;
+  DM.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -291,6 +313,7 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(ObjVO);
+    DM.Desconectar;
   end;
 end;
 

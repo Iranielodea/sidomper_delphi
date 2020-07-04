@@ -187,6 +187,7 @@ var
 begin
   dm.IdSelecionado := 0;
   dm.IdCadastro := 0;
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try

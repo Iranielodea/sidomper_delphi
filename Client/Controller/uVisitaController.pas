@@ -68,6 +68,7 @@ procedure TVisitaController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -75,6 +76,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -89,6 +91,7 @@ var
   Negocio: TServerMethods1Client;
   sResult: string;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -103,6 +106,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -132,6 +136,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -143,6 +148,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -153,12 +159,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CVisitaPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -167,6 +175,7 @@ procedure TVisitaController.Filtrar(APrograma:Integer; ACampo, ATexto, AAtivo: s
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -194,6 +203,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -208,12 +218,14 @@ procedure TVisitaController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CVisitaPrograma, AIdUsuario);
 //    FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -221,6 +233,7 @@ procedure TVisitaController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -228,6 +241,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -243,6 +257,7 @@ var
   Usuario: TUsuarioController;
   IdCliente: Integer;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -285,6 +300,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -319,11 +335,13 @@ function TVisitaController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CVisitaPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -365,6 +383,7 @@ begin
 
   rel := TDMRelVisita.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelVisitaModelo1.Close;
@@ -374,6 +393,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -397,6 +417,7 @@ begin
 
   rel := TDMRelVisita.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelVisitaModelo2.Close;
@@ -406,6 +427,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -429,6 +451,7 @@ begin
 
   rel := TDMRelVisita.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelVisitaModelo3.Close;
@@ -438,6 +461,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -461,6 +485,7 @@ begin
 
   rel := TDMRelVisita.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelVisitaModelo4.Close;
@@ -470,6 +495,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -521,6 +547,7 @@ begin
 
   rel := TDMRelChamado.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelChamadoModelo6.Close;
@@ -530,6 +557,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -571,6 +599,7 @@ begin
 
   rel := TDMRelChamado.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelChamadoModelo6.Close;
@@ -580,6 +609,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -594,6 +624,7 @@ var
 begin
   oObjetoJSON := TConverte.ObjectToJSON<TFiltroVisita>(AFiltro);
 
+  dm.Conectar;
   rel := TDMRelVisita.Create(nil);
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
@@ -604,6 +635,7 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(rel);
     FreeAndNil(lista);
+    dm.Desconectar;
   end;
 end;
 
@@ -627,6 +659,7 @@ begin
 
   rel := TDMRelVisita.Create(nil);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     rel.CDSRelVisitaModelo8.Close;
@@ -636,6 +669,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
+    dm.Desconectar;
   end;
 end;
 
@@ -644,11 +678,13 @@ function TVisitaController.RetornarEmails(AIdVisita, AIdUsuario,
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornarVisitaEmails(AIdVisita, AIdUsuario, AIdStatus);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -656,11 +692,13 @@ function TVisitaController.RetornarEmailsCliente(AIdVisita: Integer): string;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornarVisitaEmailCliente(AIdVisita, dm.IdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -708,10 +746,9 @@ begin
 
   lOperacao := FOperacao;
   try
-
+    dm.Conectar;
     Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
     try
-      Negocio.StartTransacao;
 
       if FOperacao = opIncluir then
         FModel.CDSCadastroVis_Id.AsInteger := Negocio.ProximoId(CVisitaPrograma).AsInt;
@@ -726,23 +763,25 @@ begin
 
       AtualizaVersao(FModel.CDSCadastroVis_Cliente.AsInteger, FModel.CDSCadastroVis_Tipo.AsInteger, FModel.CDSCadastroVis_Versao.AsString);
 
-      Negocio.Salvar(CVisitaPrograma, DM.IdUsuario);
+      //dm.Conectar;
+//      Negocio.Salvar(CVisitaPrograma, DM.IdUsuario);
 
       dm.IdCadastro := FModel.CDSCadastroVis_Id.AsInteger;
 
-      Negocio.Commit;
+//      Negocio.Commit;
 
       FOperacao := opNavegar;
     except
       ON E: Exception do
       begin
         FOperacao := lOperacao;
-        Negocio.Roolback;
+//        Negocio.Roolback;
         raise Exception.Create(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

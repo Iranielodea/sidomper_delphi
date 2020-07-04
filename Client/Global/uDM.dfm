@@ -20,6 +20,7 @@ object DM: TDM
         'Token=91d62ebb5b0d1b1b'
       'Filters={}'
       'DSProxyPort=8888')
+    AfterDisconnect = ConexaoAfterDisconnect
     BeforeConnect = ConexaoBeforeConnect
     Left = 24
     Top = 24

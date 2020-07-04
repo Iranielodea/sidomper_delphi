@@ -54,6 +54,7 @@ procedure TVersaoController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -61,6 +62,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -73,11 +75,13 @@ function TVersaoController.BuscarStatusVersaoDesenvolvimento: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.VersaoBuscarStatusDesenvolvimento();
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -107,6 +111,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -118,6 +123,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -128,12 +134,14 @@ begin
   if Id = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CVersaoPrograma, AIdUsuario, Id);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -142,6 +150,7 @@ procedure TVersaoController.Filtrar(APrograma:Integer; ACampo, ATexto, AAtivo: s
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -170,6 +179,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -184,12 +194,14 @@ procedure TVersaoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CVersaoPrograma, AIdUsuario);
 //    FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -197,6 +209,7 @@ procedure TVersaoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -204,6 +217,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -211,6 +225,7 @@ procedure TVersaoController.LocalizarVersao(AVersao: string);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -225,6 +240,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -239,6 +255,7 @@ var
   Cliente: TClienteController;
   Usuario: TUsuarioController;
 begin
+  dm.Conectar;
   Usuario := TUsuarioController.Create;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
@@ -262,6 +279,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Usuario);
+    dm.Desconectar;
   end;
 end;
 
@@ -296,11 +314,13 @@ function TVersaoController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CVersaoPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -311,6 +331,7 @@ var
   QtdeTotal: Integer;
 begin
   Relatorio := TDMRelVersao.Create(nil);
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -325,6 +346,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
+    dm.Desconectar;
   end;
 end;
 
@@ -341,6 +363,7 @@ begin
   AFiltro.DataLiberacaoInicial := '/  /';
   AFiltro.DataLiberacaoFinal := '/  /';
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -356,6 +379,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
+    dm.Desconectar;
   end;
 end;
 
@@ -373,6 +397,7 @@ begin
   if (AFiltro.DataLiberacaoInicial.Trim <> DataEmBranco) or (AFiltro.DataLiberacaoFinal.Trim <> DataEmBranco) then
     sPeriodo := 'Dt. Liberação: ' + AFiltro.DataLiberacaoInicial + ' A ' + AFiltro.DataLiberacaoFinal;
 
+  dm.Conectar;
   Relatorio := TDMRelVersao.Create(nil);
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
@@ -389,6 +414,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
+    dm.Desconectar;
   end;
 end;
 
@@ -419,6 +445,7 @@ begin
   if FModel.CDSCadastroVer_Tipo.AsInteger = 0 then
     raise Exception.Create('Informe o Tipo!');
 
+  dm.Conectar;
   lOperacao := FOperacao;
   try
 
@@ -449,6 +476,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

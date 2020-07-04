@@ -398,6 +398,7 @@ begin
 
   if AAtualizar then
   begin
+    DM.Conectar;
     dm.StartTransacao();
     try
       Id := FController.Model.CDSConsultaOrc_Id.AsInteger;

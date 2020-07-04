@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, uDMSolicitacao,
-  uSolicitacaoVO, uSolicitacaoViewModel;
+  uSolicitacaoVO, uSolicitacaoViewModel, uDM;
 
   Const C_PARAR: string = 'Parar';
         C_INICIAR: string = 'Iniciar';
@@ -117,8 +117,8 @@ begin
   lblTempoDecorrido.Caption := '';
 
 
-//  FIdSolicitacao := 1115;
-//  FIdUsuarioLogado := 21;
+  FIdSolicitacao := 1115;
+  FIdUsuarioLogado := 21;
 
   if FIdSolicitacao = 0 then
   begin

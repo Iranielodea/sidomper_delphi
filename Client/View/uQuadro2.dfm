@@ -26,7 +26,7 @@ object frmQuadro2: TfrmQuadro2
     Top = 0
     Width = 924
     Height = 573
-    ActivePage = tsRecados
+    ActivePage = tsChamados
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -769,6 +769,10 @@ object frmQuadro2: TfrmQuadro2
       Caption = 'Solicita'#231#245'es'
       ImageIndex = 1
       OnShow = tsSolicitacaoShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel7: TPanel
         Left = 0
         Top = 0
@@ -1964,6 +1968,10 @@ object frmQuadro2: TfrmQuadro2
     object tsCodigos: TTabSheet
       Caption = 'tsCodigos'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object edtChaCodigo1: TEdit
         Left = 24
         Top = 32
@@ -2161,6 +2169,10 @@ object frmQuadro2: TfrmQuadro2
       Caption = 'Atividades'
       ImageIndex = 3
       OnShow = tsAtividadesShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel25: TPanel
         Left = 0
         Top = 0
@@ -2899,6 +2911,10 @@ object frmQuadro2: TfrmQuadro2
       Caption = 'Agendamento'
       ImageIndex = 4
       OnShow = tsAgendamentoShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlAgendaColuna2: TPanel
         Left = 337
         Top = 33
@@ -3218,6 +3234,7 @@ object frmQuadro2: TfrmQuadro2
         Height = 33
         Align = alTop
         TabOrder = 0
+        ExplicitTop = -4
         DesignSize = (
           916
           33)

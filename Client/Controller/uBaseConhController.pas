@@ -47,6 +47,7 @@ procedure TBaseConhController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -61,6 +62,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -109,6 +111,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -127,6 +130,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -137,6 +141,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -150,6 +155,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -158,6 +164,7 @@ procedure TBaseConhController.Filtrar(APrograma:Integer; ACampo, ATexto, Ativo: 
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -192,6 +199,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -213,6 +221,7 @@ procedure TBaseConhController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -227,6 +236,7 @@ begin
 
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
   raise Exception.Create('Relatório não disponível no momento(a Desenvolver).');
 end;
@@ -235,6 +245,7 @@ procedure TBaseConhController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -249,6 +260,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -263,6 +275,7 @@ var
   Cliente: TClienteController;
   Usuario: TUsuarioController;
 begin
+  dm.Conectar;
   Usuario := TUsuarioController.Create;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
@@ -293,6 +306,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Usuario);
+    dm.Desconectar;
   end;
 end;
 
@@ -327,6 +341,7 @@ function TBaseConhController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -339,6 +354,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -369,6 +385,7 @@ begin
       raise Exception.Create('Arquivo do Anexo não Existe');
   end;
 
+  dm.Conectar;
   lOperacao := FOperacao;
   try
     Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -398,6 +415,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

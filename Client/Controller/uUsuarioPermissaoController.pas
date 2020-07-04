@@ -47,6 +47,7 @@ var
   lista: TObjectList<TUsuarioPermissaoVO>;
   model: TUsuarioPermissaoVO;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     lista := TConverte.JSONToObject<TListaUsuarioPermissao>(Negocio.UsuarioPermissaoExportar());

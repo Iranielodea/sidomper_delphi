@@ -98,6 +98,7 @@ begin
   if Id = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -109,6 +110,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -165,12 +167,14 @@ begin
   if Id = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CContaEmailPrograma, IdUsuario, Id);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -179,6 +183,7 @@ procedure TContaEmailController.Filtrar(Campo, Texto, Ativo: string;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -193,6 +198,7 @@ procedure TContaEmailController.FiltrarCodigo(Codigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -200,6 +206,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -207,12 +214,14 @@ procedure TContaEmailController.Imprimir(IdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CContaEmailPrograma, IdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -220,6 +229,7 @@ procedure TContaEmailController.LocalizarCodigo(Codigo: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -227,6 +237,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -234,6 +245,7 @@ procedure TContaEmailController.LocalizarId(Id: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -241,6 +253,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -248,6 +261,7 @@ procedure TContaEmailController.Novo(IdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -261,6 +275,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -282,6 +297,14 @@ begin
   FMeuEmail       := FModel.CDSCadastroCtaEm_Email.AsString;
   FAutenticar     := FModel.CDSCadastroCtaEm_Autenticar.AsBoolean;
   FAutenticarSSL  := FModel.CDSCadastroCtaEm_AutenticarSSL.AsBoolean;
+
+
+//  FHost := 'smtp.office365.com';
+//  FPorta := 587;
+//  FMeuEmail := 'irani@domper.com.br';
+//  FPassword := 'domper@123';
+//  FUserName := FMeuEmail;
+
 end;
 
 procedure TContaEmailController.Post;
@@ -294,11 +317,13 @@ function TContaEmailController.ProximoCodigo: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CContaEmailPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -306,11 +331,13 @@ function TContaEmailController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CContaEmailPrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -336,7 +363,7 @@ begin
   if (FModel.CDSCadastroCtaEm_Porta.AsInteger) <= 0 then
     raise Exception.Create('Informe a Porta!');
 
-
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -354,6 +381,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

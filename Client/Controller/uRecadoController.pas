@@ -103,6 +103,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -114,6 +115,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -152,12 +154,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CRecadoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -167,6 +171,7 @@ var
   Negocio: TServerModule2Client;
   oJSON: TJSONValue;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     oJSON := TConverte.ObjectToJSON<TRecadoFiltro>(AFiltro);
@@ -182,6 +187,7 @@ procedure TRecadoController.FiltrarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -189,6 +195,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -196,12 +203,14 @@ procedure TRecadoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CRecadoPrograma, AIdUsuario);
 //    FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -209,6 +218,7 @@ procedure TRecadoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -216,6 +226,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -223,6 +234,7 @@ procedure TRecadoController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
 
@@ -243,6 +255,7 @@ begin
     FModoAbrEnc := 'A';
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -250,11 +263,13 @@ function TRecadoController.PermissaoAcessar(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.RecadoPermissaoUsuario(AIdUsuario, 'Acessar');
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -262,11 +277,13 @@ function TRecadoController.PermissaoAcessarQuadro(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoRecadoQuadro(AIdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -281,6 +298,7 @@ function TRecadoController.BuscarQuadroJSON(AIdUsuario,
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -293,6 +311,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -300,6 +319,7 @@ procedure TRecadoController.Quadro(AIdUsuario, AIdRevenda: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     FModel.CDSQuadro.Close;
@@ -410,6 +430,7 @@ var
   ObjVO: TRecadoVO;
   oObjetoJSON : TJSONValue;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -454,6 +475,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(ObjVO);
+    dm.Desconectar;
   end;
 end;
 
@@ -461,11 +483,13 @@ function TRecadoController.StatusAbertura: TStatusVO;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TStatusVO>(Negocio.StatusAberturaRecados);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 

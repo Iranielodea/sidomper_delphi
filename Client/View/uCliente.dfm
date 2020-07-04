@@ -4,6 +4,7 @@ inherited frmCliente: TfrmCliente
   ClientHeight = 634
   ClientWidth = 1018
   OnDestroy = FormDestroy
+  ExplicitTop = -268
   ExplicitWidth = 1024
   ExplicitHeight = 663
   PixelsPerInch = 96
@@ -11,7 +12,6 @@ inherited frmCliente: TfrmCliente
   inherited pgControl: TPageControl
     Width = 1018
     Height = 634
-    ActivePage = tsEdicao
     ParentFont = False
     ExplicitWidth = 1018
     ExplicitHeight = 634
@@ -795,10 +795,6 @@ inherited frmCliente: TfrmCliente
             Caption = 'Em&ails'
             ImageIndex = 1
             OnShow = tsEmailShow
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Panel8: TPanel
               Left = 0
               Top = 0

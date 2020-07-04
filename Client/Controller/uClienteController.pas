@@ -135,6 +135,7 @@ begin
     raise Exception.Create('Não há Registro para Editar!');
 
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -150,6 +151,7 @@ begin
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -160,12 +162,14 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Excluir(CClientePrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -184,6 +188,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -198,6 +203,7 @@ procedure TClienteController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSConsulta.Close;
@@ -205,6 +211,7 @@ begin
     FModel.CDSConsulta.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -268,6 +275,7 @@ begin
 
   FModel.cdsHistorico.IndexFieldNames := 'Tipo';
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Lista := TConverte.JSONToObject<TListaChamadoOcorrencia>(Negocio.ClienteHistorico(AIdCliente));
@@ -1283,6 +1291,7 @@ var
   Negocio: TServerMethods1Client;
   oObjetoJSON : TJSONValue;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     oObjetoJSON := TConverte.ObjectToJSON(ACliente);
@@ -1320,12 +1329,14 @@ procedure TClienteController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CClientePrograma, AIdUsuario);
     FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1345,6 +1356,7 @@ begin
     FreeAndNil(Parametro);
   end;
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1372,6 +1384,7 @@ begin
     Desserializa objecto
   }
   UnMarshal := TJSONUnMarshal.Create;
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1385,6 +1398,7 @@ begin
   finally
     FreeAndNil(UnMarshal);
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
   Result := oObjVO;
 end;
@@ -1393,6 +1407,7 @@ procedure TClienteController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -1400,6 +1415,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1407,6 +1423,7 @@ procedure TClienteController.LocalizarCodigoCliente(ACodigo, AIdUsuario: Integer
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1421,6 +1438,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1428,6 +1446,7 @@ procedure TClienteController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -1435,6 +1454,7 @@ begin
     FModel.CDSCadastro.Open;
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1450,6 +1470,7 @@ procedure TClienteController.Novo(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
@@ -1466,6 +1487,7 @@ begin
     FOperacao := opIncluir;
   finally
     FreeAndNil(Negocio);
+//    DM.Desconectar;
   end;
 end;
 
@@ -1487,11 +1509,13 @@ function TClienteController.ProximoCodigo: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CClientePrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1499,11 +1523,13 @@ function TClienteController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CClientePrograma).ToString);
   finally
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1516,6 +1542,7 @@ var
   rel: TDMRelCliente;
 begin
   rel := TDMRelCliente.Create(nil);
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -1561,6 +1588,7 @@ begin
   if Trim(sCPF) <> '' then
     TValidacao.ValidaCPF(sCPF);
 
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -1636,6 +1664,7 @@ begin
   finally
     FreeAndNil(model);
     FreeAndNil(Negocio);
+    DM.Desconectar;
   end;
 end;
 
@@ -1648,6 +1677,7 @@ var
 begin
   Marshal := TJSONMarshal.Create;
   ObjVO := TClienteVO.create;
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1682,6 +1712,7 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(ObjVO);
+    DM.Desconectar;
   end;
 end;
 
@@ -1800,6 +1831,7 @@ begin
     Desserializa objecto
   }
   UnMarshal := TJSONUnMarshal.Create;
+  DM.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     oObjVO := TClienteVO(UnMarshal.Unmarshal(Negocio.ClienteSalvarTeste));

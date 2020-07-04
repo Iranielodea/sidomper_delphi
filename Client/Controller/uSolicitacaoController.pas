@@ -154,6 +154,7 @@ procedure TSolicitacaoController.FiltrarCodigo(ACodigo: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -168,6 +169,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -175,11 +177,13 @@ function TSolicitacaoController.CodigoAtual: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornaIdAtual('Solicitacao');
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -188,11 +192,13 @@ function TSolicitacaoController.ConferenciaPorData(AData: string;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.ConferenciaFiltrarPorData(AData, AIdUsuario));
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -200,6 +206,7 @@ procedure TSolicitacaoController.AbrirQuadro(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -221,6 +228,7 @@ procedure TSolicitacaoController.AbrirQuadro1(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -242,6 +250,7 @@ procedure TSolicitacaoController.AbrirQuadro10(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -263,6 +272,7 @@ procedure TSolicitacaoController.AbrirQuadro11(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -284,6 +294,7 @@ procedure TSolicitacaoController.AbrirQuadro12(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -305,6 +316,7 @@ procedure TSolicitacaoController.AbrirQuadro2(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -326,6 +338,7 @@ procedure TSolicitacaoController.AbrirQuadro3(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -347,6 +360,7 @@ procedure TSolicitacaoController.AbrirQuadro4(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -368,6 +382,7 @@ procedure TSolicitacaoController.AbrirQuadro5(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -389,6 +404,7 @@ procedure TSolicitacaoController.AbrirQuadro6(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -410,6 +426,7 @@ procedure TSolicitacaoController.AbrirQuadro7(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -431,6 +448,7 @@ procedure TSolicitacaoController.AbrirQuadro8(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -452,6 +470,7 @@ procedure TSolicitacaoController.AbrirQuadro9(AIdUsuario: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -474,6 +493,7 @@ function TSolicitacaoController.AbrirQuadroSolicitacaoJSON(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -556,6 +576,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -580,6 +601,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -590,6 +612,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -603,6 +626,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -645,7 +669,7 @@ procedure TSolicitacaoController.Filtrar(APrograma:Integer; ACampo, ATexto, AAti
 var
   Negocio: TServerMethods1Client;
 begin
-
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -680,6 +704,7 @@ begin
     FreeAndNil(Marshal);
   end;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -703,12 +728,14 @@ var
   Negocio: TServerMethods1Client;
   objJson: TJSONValue;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     objJson := TConverte.ObjectToJSON(ASolicitacaoTempo);
     Negocio.SolicitacaoTempoFinalizar(AIdUsuario, objJson, AValidarUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -716,6 +743,7 @@ procedure TSolicitacaoController.Imprimir(AIdUsuario: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -729,6 +757,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -738,13 +767,14 @@ var
   Negocio: TServerMethods1Client;
   objJson: TJSONValue;
 begin
-
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     objJson := TConverte.ObjectToJSON(ASolicitacaoTempo);
     Negocio.SolicitacaoTempoIniciar(dm.IdUsuario, objJson);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -777,6 +807,7 @@ begin
 
   oObjetoJSON := TConverte.ObjectToJSON(AFiltro);
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -812,6 +843,7 @@ procedure TSolicitacaoController.LocalizarCronograma(AIdSolicitacao: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -833,6 +865,7 @@ procedure TSolicitacaoController.LocalizarId(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -847,6 +880,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -855,6 +889,7 @@ procedure TSolicitacaoController.LocalizarOcorrenciaGeral(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -877,6 +912,7 @@ procedure TSolicitacaoController.LocalizarOcorrenciaRegra(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -899,6 +935,7 @@ procedure TSolicitacaoController.LocalizarOcorrenciaTecnica(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -920,6 +957,7 @@ procedure TSolicitacaoController.LocalizarStatus(AIdSolicitacao: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -969,6 +1007,7 @@ var
   Cliente: TClienteController;
   IdCliente: Integer;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1023,6 +1062,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1043,6 +1083,7 @@ function TSolicitacaoController.PermissaoAbertura(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1055,6 +1096,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1062,6 +1104,7 @@ function TSolicitacaoController.PermissaoAnalise(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1074,6 +1117,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1085,6 +1129,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Editar!');
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1109,6 +1154,7 @@ function TSolicitacaoController.PermissaoOcorrenciaGeral(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1121,6 +1167,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1129,6 +1176,7 @@ function TSolicitacaoController.PermissaoOcorrenciaRegra(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1141,6 +1189,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1149,6 +1198,7 @@ function TSolicitacaoController.PermissaoOcorrenciaTecnica(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1161,6 +1211,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1168,6 +1219,7 @@ function TSolicitacaoController.PermissaoQuadro(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1180,6 +1232,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1187,6 +1240,7 @@ function TSolicitacaoController.PermissaoStatus(AIdUsuario: Integer): Boolean;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1199,6 +1253,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1207,11 +1262,13 @@ function TSolicitacaoController.PermissoesSolicitacao(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TPermissaoSolicitacaoVO>(Negocio.PermissaoSolicitacoes(AIdUsuario));
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1399,6 +1456,7 @@ function TSolicitacaoController.ProximoId: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1411,6 +1469,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1422,6 +1481,7 @@ var
   objRelatorio: TDMRelSolicitacao;
   Qtde: Integer;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   objRelatorio := TDMRelSolicitacao.Create(nil);
   Qtde := 0;
@@ -1444,6 +1504,7 @@ begin
   finally
     FreeAndNil(objRelatorio);
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1452,6 +1513,7 @@ function TSolicitacaoController.RetornaIdSolicitacao(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1464,6 +1526,7 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1480,6 +1543,7 @@ begin
   sb.AppendLine('	  INNER JOIN Status ON Sol_Status = Sta_Id');
   sb.AppendLine(' WHERE Sol_Id = '  + IntToStr(AIdSolicitacao));
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1493,6 +1557,7 @@ begin
   finally
     FreeAndNil(sb);
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1501,6 +1566,7 @@ function TSolicitacaoController.RetornarEmails(AIdSolicitacao, AIdUsuario,
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1521,6 +1587,7 @@ function TSolicitacaoController.RetornarEmailsCliente(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1543,6 +1610,7 @@ var
   i: Integer;
   Lista: TList<string>;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     ListaJSon := Negocio.SolicitacaoTempoListarStatus();
@@ -1603,7 +1671,7 @@ begin
   lOperacao := FOperacao;
 
   try
-
+    dm.Conectar;
     Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
     try
       Negocio.StartTransacao;
@@ -1658,6 +1726,7 @@ begin
   finally
     FreeAndNil(Negocio);
 //    FreeAndNil(oObjetoJSON);
+    dm.Desconectar;
   end;
 end;
 
@@ -1762,6 +1831,7 @@ procedure TSolicitacaoController.SolicitacaoAnexos(AIdSolicitacao: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     try
@@ -1784,11 +1854,13 @@ function TSolicitacaoController.SolicitacaoAtualAberta(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.SolicitacaoTempoAtualAberta(AIdSolicitacao);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1797,6 +1869,7 @@ function TSolicitacaoController.SolicitacaoPorCategoria(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1816,11 +1889,13 @@ procedure TSolicitacaoController.SolicitacaoTempoExcluir(AId: Integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.SolicitacaoTempoExcluir(AId);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1829,11 +1904,13 @@ function TSolicitacaoController.SolicitacaoTempoFiltrarPorData(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.SolicitacaoTempoFiltrarPorData(AData, AId, dm.IdUsuario));
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1842,11 +1919,13 @@ function TSolicitacaoController.SolicitacaoTempoLocalizarPorSolicitacao(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.SolicitacaoTempoLocalizarPorSolicitacao(AIdSolicitacao));
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1855,11 +1934,13 @@ function TSolicitacaoController.SolicitacaoTempoObterPorId(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TSolicitacaoTempoVO>(Negocio.SolicitacaoTempoLocalizarId(AId));
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1868,11 +1949,13 @@ function TSolicitacaoController.SolicitacaoTempoPermissao(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.SolicitacaoPermissaoSolicitacaoTempo(AIdUsuario);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1881,11 +1964,13 @@ function TSolicitacaoController.SolicitacaoTempoRetornarAgrupadoStatus(
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.SolicitacaoTempoRetornarHorasAgrupadoPorStatus(AIdSolicitacao));
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1895,12 +1980,14 @@ var
   Negocio: TServerMethods1Client;
   objJsonValue: TJSONValue;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     objJsonValue := TConverte.ObjectToJSON(ASolicitacaoTempo);
     Result := StrToIntDef(Negocio.SolicitacaoTempoSalvar(objJsonValue).ToString(),0);
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
@@ -1970,6 +2057,7 @@ var
 begin
   sb := TStringBuilder.Create;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -1987,6 +2075,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(sb);
+    dm.Desconectar;
   end;
 end;
 
@@ -1997,6 +2086,7 @@ var
 begin
   sb := TStringBuilder.Create;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -2015,6 +2105,7 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(sb);
+    dm.Desconectar;
   end;
 end;
 
