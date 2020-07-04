@@ -188,7 +188,7 @@
           Top = 1
           Width = 1008
           Height = 564
-          ActivePage = tsAnalista
+          ActivePage = tsAbertura
           Align = alClient
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -636,6 +636,10 @@
           object tsDescricaoAbertura: TTabSheet
             Caption = 'Descri'#231#227'o Abertura'
             ImageIndex = 5
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
             object Panel22: TPanel
               Left = 0
               Top = 0
@@ -1388,10 +1392,6 @@
             Caption = 'Oc&orr'#234'ncia Geral'
             ImageIndex = 2
             OnShow = tsOcorrenciaGeralShow
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Panel9: TPanel
               Left = 0
               Top = 0
@@ -1487,10 +1487,6 @@
                 TabOrder = 0
                 object tsEdicaoGeral: TTabSheet
                   Caption = 'Edi'#231#227'o Geral'
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object Panel29: TPanel
                     Left = 0
                     Top = 0
@@ -1755,10 +1751,6 @@
           object tsOcorrenciaTecnica: TTabSheet
             Caption = 'Oco&rr'#234'ncia T'#233'cnica'
             ImageIndex = 4
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Panel11: TPanel
               Left = 0
               Top = 0
@@ -1850,10 +1842,6 @@
                 TabOrder = 0
                 object tsEdicaoTecnica: TTabSheet
                   Caption = 'Edi'#231#227'o T'#233'cnica'
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object Panel23: TPanel
                     Left = 0
                     Top = 0

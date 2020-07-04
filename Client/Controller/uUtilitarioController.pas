@@ -48,6 +48,7 @@ begin
   if Copy(Trim(ComandoSQL.ToUpper),1,3) = 'SEL' then
     iTipo := 2;
 
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -70,6 +71,7 @@ procedure TUtilitarioController.ExportarDadosBaseNova;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -89,6 +91,7 @@ procedure TUtilitarioController.GerarBackup(Destino: string);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -108,6 +111,7 @@ procedure TUtilitarioController.ImportarDadosBaseNova;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -127,6 +131,7 @@ procedure TUtilitarioController.ListarCamposTabelaBancoDados(Tabela: string);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSListarCampos.Close;
@@ -141,6 +146,7 @@ procedure TUtilitarioController.ListarTabelasBancoDados;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSListarTabelas.Close;

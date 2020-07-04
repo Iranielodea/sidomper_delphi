@@ -48,6 +48,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.PlanoBackupExcluir(AId);
@@ -63,6 +64,7 @@ begin
   if AId = 0 then
     raise Exception.Create('Não há Registro para Excluir!');
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.PlanoBackupExcluirItem(AId);
@@ -75,6 +77,7 @@ procedure TPlanoBackupController.Localizar;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;

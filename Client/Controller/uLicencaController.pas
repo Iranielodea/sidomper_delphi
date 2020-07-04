@@ -31,6 +31,7 @@ var
 begin
   objJSON := TConverte.ObjectToJSON<TFiltroLicenca>(AFiltro);
 
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaLicenca>(Negocio.LicencasListarTodos(objJSON));
@@ -57,6 +58,7 @@ procedure TLicencaController.Importar;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.LicencasImportar();
@@ -69,6 +71,7 @@ function TLicencaController.LimparLicencas: string;
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.LicencasLimpar();
@@ -81,6 +84,7 @@ procedure TLicencaController.PermissaoAcessar(AIdUsuario: Integer);
 var
   Negocio: TServerModule2Client;
 begin
+  dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.LicencaPermissaoAcessar(CLicenca, AIdUsuario);

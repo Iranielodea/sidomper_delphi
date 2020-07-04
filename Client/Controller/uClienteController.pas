@@ -100,11 +100,13 @@ function TClienteController.IdAtual: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornaIdAtual('Cliente');
   finally
     FreeAndNil(Negocio);
+    dm.Desconectar;
   end;
 end;
 
