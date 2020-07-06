@@ -117,8 +117,8 @@ begin
   lblTempoDecorrido.Caption := '';
 
 
-  FIdSolicitacao := 1115;
-  FIdUsuarioLogado := 21;
+//  FIdSolicitacao := 1115;
+//  FIdUsuarioLogado := 21;
 
   if FIdSolicitacao = 0 then
   begin

@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, Data.DBXDataSnap, IPPeerClient,
   Data.DBXCommon, Data.DB, Data.SqlExpr, Datasnap.DBClient, Datasnap.DSConnect,
-  uConfig, Vcl.Controls, MidasLib, uRegras, Vcl.Dialogs, vcl.Forms;
+  uConfig, Vcl.Controls, MidasLib, uRegras, Vcl.Dialogs, vcl.Forms, uEnumerador;
 
 type
   TDM = class(TDataModule)
@@ -33,7 +33,6 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure ConexaoBeforeConnect(Sender: TObject);
-    procedure ConexaoAfterDisconnect(Sender: TObject);
   private
     { Private declarations }
     FIdSelecionado: integer;
@@ -43,10 +42,10 @@ type
     procedure CarregarIni;
     procedure SetTema(const Value: string);
     function GetTema: string;
-
+    procedure BuscarRamal();
   public
     { Public declarations }
-    procedure Conectar;
+    procedure Conectar();
     procedure Desconectar;
     procedure StartTransacao;
     procedure Commit;
@@ -63,9 +62,28 @@ var
 
 implementation
 
+  uses uDMRamal;
+
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
+
+procedure TDM.BuscarRamal;
+var
+  Negocio: TServerModule2Client;
+  FModel: TDMRamal;
+begin
+  FModel := TDMRamal.create(Self);
+  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  try
+    FModel.CDSCadastro.Close;
+    Negocio.LocalizarId(CRamal, 0);
+    FModel.CDSCadastro.Open;
+  finally
+    FreeAndNil(Negocio);
+    FreeAndNil(FModel);
+  end;
+end;
 
 procedure TDM.CarregarIni;
 var
@@ -94,24 +112,31 @@ begin
   end;
 end;
 
-procedure TDM.Conectar;
+procedure TDM.Conectar();
+var
+  bErro: Boolean;
 begin
+  bErro := False;
   try
-    if Conexao.Connected then
-      Conexao.Connected := False;
-    Conexao.Connected := True;
+    if not Conexao.Connected then
+      Conexao.Connected := True;
+
+    BuscarRamal;
   except
     On E: Exception do
     begin
-      raise Exception.Create(E.Message);
-      Application.Terminate;
+      Conexao.Connected := False;
+
+      try
+        Conexao.Connected := True;
+//        BuscarRamal;
+      except
+        bErro := True;
+      end;
+      if bErro then
+        raise Exception.Create(E.Message);
     end;
   end;
-end;
-
-procedure TDM.ConexaoAfterDisconnect(Sender: TObject);
-begin
-  Desconectar;
 end;
 
 procedure TDM.ConexaoBeforeConnect(Sender: TObject);
@@ -131,6 +156,7 @@ begin
       Application.Terminate;
     end;
   end;
+
   cdsUsuario.CreateDataSet;
   cdsUsuarioPermissao.CreateDataSet;
   cdsParametro.CreateDataSet;
@@ -138,13 +164,14 @@ end;
 
 procedure TDM.DataModuleDestroy(Sender: TObject);
 begin
-  Desconectar;
+  if dm.Conexao.Connected then
+    dm.Conexao.Connected := False;
 end;
 
 procedure TDM.Desconectar;
 begin
-  if dm.Conexao.Connected then
-    dm.Conexao.Connected := False;
+//  if dm.Conexao.Connected then
+//    dm.Conexao.Connected := False;
 end;
 
 function TDM.GetTema: string;
