@@ -161,6 +161,7 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarCodigo(CSolicitacaoPrograma, ACodigo);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -169,7 +170,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -181,9 +181,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornaIdAtual('Solicitacao');
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -196,9 +196,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.ConferenciaFiltrarPorData(AData, AIdUsuario));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -213,6 +213,7 @@ begin
       FModel.CDSQuadro.Close;
       Negocio.SolicitracaoQuadro(AIdUsuario);
       FModel.CDSQuadro.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -235,6 +236,7 @@ begin
       FModel.CDSSolicitacaoQuadro1.Close;
   //    Negocio.FiltrarSolicitacaoQuadro1(IdUsuario);
       FModel.CDSSolicitacaoQuadro1.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -257,6 +259,7 @@ begin
       FModel.CDSSolicitacaoQuadro10.Close;
       Negocio.FiltrarSolicitacaoQuadro10(AIdUsuario);
       FModel.CDSSolicitacaoQuadro10.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -279,6 +282,7 @@ begin
       FModel.CDSSolicitacaoQuadro11.Close;
       Negocio.FiltrarSolicitacaoQuadro11(AIdUsuario);
       FModel.CDSSolicitacaoQuadro11.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -301,6 +305,7 @@ begin
       FModel.CDSSolicitacaoQuadro12.Close;
       Negocio.FiltrarSolicitacaoQuadro12(AIdUsuario);
       FModel.CDSSolicitacaoQuadro12.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -323,6 +328,7 @@ begin
       FModel.CDSSolicitacaoQuadro2.Close;
       Negocio.FiltrarSolicitacaoQuadro2(AIdUsuario);
       FModel.CDSSolicitacaoQuadro2.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -345,6 +351,7 @@ begin
       FModel.CDSSolicitacaoQuadro3.Close;
       Negocio.FiltrarSolicitacaoQuadro3(AIdUsuario);
       FModel.CDSSolicitacaoQuadro3.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -367,6 +374,7 @@ begin
       FModel.CDSSolicitacaoQuadro4.Close;
       Negocio.FiltrarSolicitacaoQuadro4(AIdUsuario);
       FModel.CDSSolicitacaoQuadro4.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -389,6 +397,7 @@ begin
       FModel.CDSSolicitacaoQuadro5.Close;
       Negocio.FiltrarSolicitacaoQuadro5(AIdUsuario);
       FModel.CDSSolicitacaoQuadro5.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -411,6 +420,7 @@ begin
       FModel.CDSSolicitacaoQuadro6.Close;
       Negocio.FiltrarSolicitacaoQuadro6(AIdUsuario);
       FModel.CDSSolicitacaoQuadro6.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -433,6 +443,7 @@ begin
       FModel.CDSSolicitacaoQuadro7.Close;
       Negocio.FiltrarSolicitacaoQuadro7(AIdUsuario);
       FModel.CDSSolicitacaoQuadro7.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -455,6 +466,7 @@ begin
       FModel.CDSSolicitacaoQuadro8.Close;
       Negocio.FiltrarSolicitacaoQuadro8(AIdUsuario);
       FModel.CDSSolicitacaoQuadro8.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -477,6 +489,7 @@ begin
       FModel.CDSSolicitacaoQuadro9.Close;
       Negocio.FiltrarSolicitacaoQuadro9(AIdUsuario);
       FModel.CDSSolicitacaoQuadro9.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -498,6 +511,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TListaSolicitacaoViewModel>(Negocio.SolicitacaoQuadroJSON(AIdUsuario));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -593,6 +607,7 @@ begin
       TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
       FOperacao := opEditar;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -601,7 +616,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -618,6 +632,7 @@ begin
     try
       Negocio.Excluir(CSolicitacaoPrograma, AIdUsuario, AId);
       FModel.CDSConsulta.Delete;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -626,7 +641,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -676,6 +690,7 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.Filtrar(APrograma, ACampo, ATexto,  AAtivo, AContem);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -717,6 +732,7 @@ begin
         TFuncoes.Excessao(E, 'TSolicitacaoController.FiltrarSolicitacao');
       end;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -733,9 +749,9 @@ begin
   try
     objJson := TConverte.ObjectToJSON(ASolicitacaoTempo);
     Negocio.SolicitacaoTempoFinalizar(AIdUsuario, objJson, AValidarUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -748,6 +764,7 @@ begin
   try
     try
       Negocio.Relatorio(CSolicitacaoPrograma, AIdUsuario);
+      dm.Desconectar;
 //    FModel.Rel.Print;
     except
       On E: Exception do
@@ -772,9 +789,9 @@ begin
   try
     objJson := TConverte.ObjectToJSON(ASolicitacaoTempo);
     Negocio.SolicitacaoTempoIniciar(dm.IdUsuario, objJson);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -814,6 +831,7 @@ begin
       FModel.CDSListarProblemaSolucao.Close;
       Negocio.SolicitacaoListarProblemaSolucao(oObjetoJSON, ATexto, AIdUsuario);
       FModel.CDSListarProblemaSolucao.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -850,6 +868,7 @@ begin
       FModel.CDSCronogramaConsulta.Close;
       Negocio.LocalizarCronogramaIdSolicitacao(AIdSolicitacao);
       FModel.CDSCronogramaConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -878,9 +897,9 @@ begin
         TFuncoes.Excessao(E, 'TSolicitacaoController.LocalizarId');
       end;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -896,6 +915,7 @@ begin
       FModel.CDSOcorrenciaGeralConsulta.Close;
       Negocio.LocalizarOcorrenciaGeralIdSolicitacao(AIdSolicitacao);
       FModel.CDSOcorrenciaGeralConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -919,6 +939,7 @@ begin
       FModel.CDSOcorrenciaRegraConsulta.Close;
       Negocio.LocalizarOcorrenciaRegraIdSolicitacao(AIdSolicitacao);
       FModel.CDSOcorrenciaRegraConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -942,6 +963,7 @@ begin
       FModel.CDSOcorrenciaTecnicaConsulta.Close;
       Negocio.LocalizarOcorrenciaTecnicaIdSolicitacao(AIdSolicitacao);
       FModel.CDSOcorrenciaTecnicaConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -964,6 +986,7 @@ begin
       FModel.CDSStatusConsulta.Close;
       Negocio.LocalizarSolicitacaoStatus(AIdSolicitacao);
       FModel.CDSStatusConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1054,6 +1077,7 @@ begin
       TipoUmRegistro();
 
       FOperacao := opIncluir;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1062,7 +1086,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1088,6 +1111,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoAbertura(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1096,7 +1120,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1109,6 +1132,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoAnalise(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1117,7 +1141,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1138,6 +1161,7 @@ begin
       FModel.CDSCadastro.Open;
 
       Result := Resultado;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1159,6 +1183,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoOcorrenciaGeral(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1167,7 +1192,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1181,6 +1205,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoOcorrenciaRegra(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1189,7 +1214,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1203,6 +1227,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoOcorrenciaTecnica(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1211,7 +1236,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1224,6 +1248,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoQuadro(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1232,7 +1257,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1245,6 +1269,7 @@ begin
   try
     try
       Result := Negocio.PermissaoSolicitacaoStatus(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1253,7 +1278,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1266,9 +1290,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TPermissaoSolicitacaoVO>(Negocio.PermissaoSolicitacoes(AIdUsuario));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1461,6 +1485,7 @@ begin
   try
     try
       Result := StrToInt(Negocio.ProximoId(CSolicitacaoPrograma).ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1469,7 +1494,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1494,7 +1518,7 @@ begin
         2: objRelatorio.ImprimirRelatorioPorTipo(AFiltro.DataInicial, AFiltro.DataFinal);
         3: objRelatorio.ImprimirRelatorioPorStatus(AFiltro.DataInicial, AFiltro.DataFinal);
       end;
-
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1504,7 +1528,6 @@ begin
   finally
     FreeAndNil(objRelatorio);
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1518,6 +1541,7 @@ begin
   try
     try
       Result := StrToInt(Negocio.RetornaNumeroSolicitacao(AIdSolicitacao).ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1526,7 +1550,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1548,6 +1571,7 @@ begin
   try
     try
       Result := Negocio.SelectSQL(sb.ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1557,7 +1581,6 @@ begin
   finally
     FreeAndNil(sb);
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1571,6 +1594,7 @@ begin
   try
     try
       Result := Negocio.RetornarSolicitacaoEmails(AIdSolicitacao, AIdUsuario, AIdStatus);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1592,6 +1616,7 @@ begin
   try
     try
       Result := Negocio.RetornarSolicitacaoEmailCliente(AIdSolicitacao, dm.IdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1618,7 +1643,7 @@ begin
 
     for I := 0 to ListaJSon.Size -1 do
       Lista.Add(ListaJSon.Get(i).Value);
-
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -1715,6 +1740,7 @@ begin
       Negocio.Commit;
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
@@ -1726,7 +1752,6 @@ begin
   finally
     FreeAndNil(Negocio);
 //    FreeAndNil(oObjetoJSON);
-    dm.Desconectar;
   end;
 end;
 
@@ -1838,6 +1863,7 @@ begin
       FModel.CDSSolicitacaoAnexo.Close;
       Negocio.SolicitacaoAnexos(AIdSolicitacao);
       FModel.CDSSolicitacaoAnexo.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1858,9 +1884,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.SolicitacaoTempoAtualAberta(AIdSolicitacao);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1874,6 +1900,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TListaSolicitacao>(Negocio.SolicitacaoPorCategoria(AIdCategoria, AIdUsuario));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1893,9 +1920,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.SolicitacaoTempoExcluir(AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1908,9 +1935,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.SolicitacaoTempoFiltrarPorData(AData, AId, dm.IdUsuario));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1923,9 +1950,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.SolicitacaoTempoLocalizarPorSolicitacao(AIdSolicitacao));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1938,9 +1965,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TSolicitacaoTempoVO>(Negocio.SolicitacaoTempoLocalizarId(AId));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1953,9 +1980,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.SolicitacaoPermissaoSolicitacaoTempo(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1968,9 +1995,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaSolicitacaoTempo>(Negocio.SolicitacaoTempoRetornarHorasAgrupadoPorStatus(AIdSolicitacao));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1985,9 +2012,9 @@ begin
   try
     objJsonValue := TConverte.ObjectToJSON(ASolicitacaoTempo);
     Result := StrToIntDef(Negocio.SolicitacaoTempoSalvar(objJsonValue).ToString(),0);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -2066,6 +2093,7 @@ begin
       sb.AppendLine(' WHERE Sol_Id = ' + IntToStr(AIdSolicitacao));
 
       Negocio.ExecutarSQL(sb.ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -2075,7 +2103,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(sb);
-    dm.Desconectar;
   end;
 end;
 
@@ -2096,6 +2123,7 @@ begin
       sb.AppendLine(' WHERE Sol_Id = ' + IntToStr(AIdSolicitacao));
 
       Negocio.ExecutarSQL(sb.ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -2105,7 +2133,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(sb);
-    dm.Desconectar;
   end;
 end;
 

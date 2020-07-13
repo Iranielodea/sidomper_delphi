@@ -1,6 +1,6 @@
 //
 // Created by the DataSnap proxy generator.
-// 03/07/2020 13:41:29
+// 09/07/2020 13:49:22
 //
 
 unit uRegras;
@@ -14,6 +14,8 @@ type
   private
     FEchoStringCommand: TDBXCommand;
     FReverseStringCommand: TDBXCommand;
+    FAbrirConexaoCommand: TDBXCommand;
+    FFecharConexaoCommand: TDBXCommand;
     FDuplicacaoRegistroCommand: TDBXCommand;
     FNovoCommand: TDBXCommand;
     FExcluirCommand: TDBXCommand;
@@ -163,6 +165,7 @@ type
     FParametrosExportarDadosBaseNovaCommand: TDBXCommand;
     FParametrosImportarDadosBaseNovaCommand: TDBXCommand;
     FListarParametrosCommand: TDBXCommand;
+    FValidarSIDomperClientCommand: TDBXCommand;
     FStartTransacaoCommand: TDBXCommand;
     FCommitCommand: TDBXCommand;
     FRoolbackCommand: TDBXCommand;
@@ -222,6 +225,8 @@ type
     destructor Destroy; override;
     function EchoString(Value: string): string;
     function ReverseString(Value: string): string;
+    procedure AbrirConexao;
+    procedure FecharConexao;
     procedure DuplicacaoRegistro(CampoWhere: string; CampoValor: string; Tabela: string);
     procedure Novo(Programa: Integer; IdUsuario: Integer);
     procedure Excluir(Programa: Integer; IdUsuario: Integer; Id: Integer);
@@ -371,6 +376,7 @@ type
     procedure ParametrosExportarDadosBaseNova;
     procedure ParametrosImportarDadosBaseNova;
     function ListarParametros: TJSONValue;
+    function ValidarSIDomperClient(ADataHora: string): Boolean;
     procedure StartTransacao;
     procedure Commit;
     procedure Roolback;
@@ -684,6 +690,30 @@ begin
   FReverseStringCommand.Parameters[0].Value.SetWideString(Value);
   FReverseStringCommand.ExecuteUpdate;
   Result := FReverseStringCommand.Parameters[1].Value.GetWideString;
+end;
+
+procedure TServerMethods1Client.AbrirConexao;
+begin
+  if FAbrirConexaoCommand = nil then
+  begin
+    FAbrirConexaoCommand := FDBXConnection.CreateCommand;
+    FAbrirConexaoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FAbrirConexaoCommand.Text := 'TServerMethods1.AbrirConexao';
+    FAbrirConexaoCommand.Prepare;
+  end;
+  FAbrirConexaoCommand.ExecuteUpdate;
+end;
+
+procedure TServerMethods1Client.FecharConexao;
+begin
+  if FFecharConexaoCommand = nil then
+  begin
+    FFecharConexaoCommand := FDBXConnection.CreateCommand;
+    FFecharConexaoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FFecharConexaoCommand.Text := 'TServerMethods1.FecharConexao';
+    FFecharConexaoCommand.Prepare;
+  end;
+  FFecharConexaoCommand.ExecuteUpdate;
 end;
 
 procedure TServerMethods1Client.DuplicacaoRegistro(CampoWhere: string; CampoValor: string; Tabela: string);
@@ -2792,6 +2822,20 @@ begin
   Result := TJSONValue(FListarParametrosCommand.Parameters[0].Value.GetJSONValue(FInstanceOwner));
 end;
 
+function TServerMethods1Client.ValidarSIDomperClient(ADataHora: string): Boolean;
+begin
+  if FValidarSIDomperClientCommand = nil then
+  begin
+    FValidarSIDomperClientCommand := FDBXConnection.CreateCommand;
+    FValidarSIDomperClientCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FValidarSIDomperClientCommand.Text := 'TServerMethods1.ValidarSIDomperClient';
+    FValidarSIDomperClientCommand.Prepare;
+  end;
+  FValidarSIDomperClientCommand.Parameters[0].Value.SetWideString(ADataHora);
+  FValidarSIDomperClientCommand.ExecuteUpdate;
+  Result := FValidarSIDomperClientCommand.Parameters[1].Value.GetBoolean;
+end;
+
 procedure TServerMethods1Client.StartTransacao;
 begin
   if FStartTransacaoCommand = nil then
@@ -3569,6 +3613,8 @@ destructor TServerMethods1Client.Destroy;
 begin
   FEchoStringCommand.DisposeOf;
   FReverseStringCommand.DisposeOf;
+  FAbrirConexaoCommand.DisposeOf;
+  FFecharConexaoCommand.DisposeOf;
   FDuplicacaoRegistroCommand.DisposeOf;
   FNovoCommand.DisposeOf;
   FExcluirCommand.DisposeOf;
@@ -3718,6 +3764,7 @@ begin
   FParametrosExportarDadosBaseNovaCommand.DisposeOf;
   FParametrosImportarDadosBaseNovaCommand.DisposeOf;
   FListarParametrosCommand.DisposeOf;
+  FValidarSIDomperClientCommand.DisposeOf;
   FStartTransacaoCommand.DisposeOf;
   FCommitCommand.DisposeOf;
   FRoolbackCommand.DisposeOf;

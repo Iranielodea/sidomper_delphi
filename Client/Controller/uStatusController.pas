@@ -83,9 +83,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -101,9 +101,9 @@ begin
   try
     Negocio.Excluir(CStatusPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -118,6 +118,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CStatusPrograma, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -133,9 +134,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CStatusPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -153,6 +154,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarStatusPrograma(ACampo, ATexto, AAtivo, iEnum, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -167,9 +169,9 @@ begin
   try
     Negocio.Relatorio(CStatusPrograma, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -183,9 +185,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CStatusPrograma, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -202,9 +204,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigoStatusPrograma(iEnum, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -218,9 +220,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CStatusPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -233,9 +235,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := TConverte.JSONToObject<TListaStatus>(Negocio.Status_LocalizarPorPrograma(ATipo));
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -254,9 +256,9 @@ begin
     FModel.CDSCadastroSta_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -291,9 +293,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CStatusPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -305,9 +307,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CStatusPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -331,16 +333,15 @@ begin
       FModel.CDSCadastro.ApplyUpdates(0);
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 

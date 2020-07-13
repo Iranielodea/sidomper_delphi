@@ -70,16 +70,22 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    FModel.CDSCadastro.Close;
-    Resultado :=  Negocio.Editar(CCategoriaPrograma, dm.IdUsuario, AId);
-    FModel.CDSCadastro.Open;
-
-    TFuncoes.HabilitarCampo(AFormulario, Resultado);
+    try
+      FModel.CDSCadastro.Close;
+      Resultado :=  Negocio.Editar(CCategoriaPrograma, dm.IdUsuario, AId);
+      FModel.CDSCadastro.Open;
+      TFuncoes.HabilitarCampo(AFormulario, Resultado);
+      dm.Desconectar;
+    except
+      On E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
 
     FOperacao := opEditar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -93,11 +99,17 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    Negocio.Excluir(CCategoriaPrograma, AIdUsuario, AId);
-    FModel.CDSConsulta.Delete;
-  finally
+    try
+      Negocio.Excluir(CCategoriaPrograma, AIdUsuario, AId);
+      FModel.CDSConsulta.Delete;
+      dm.Desconectar;
+    except
+      on E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;  finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -109,9 +121,17 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    FModel.CDSConsulta.Close;
-    Negocio.Filtrar(CCategoriaPrograma, ACampo, ATexto, AAtivo, AContem);
-    FModel.CDSConsulta.Open;
+    try
+      FModel.CDSConsulta.Close;
+      Negocio.Filtrar(CCategoriaPrograma, ACampo, ATexto, AAtivo, AContem);
+      FModel.CDSConsulta.Open;
+      dm.Desconectar;
+    except
+      On E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
   end;
@@ -124,12 +144,19 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    FModel.CDSConsulta.Close;
-    Negocio.FiltrarCodigo(CCategoriaPrograma, ACodigo);
-    FModel.CDSConsulta.Open;
+    try
+      FModel.CDSConsulta.Close;
+      Negocio.FiltrarCodigo(CCategoriaPrograma, ACodigo);
+      FModel.CDSConsulta.Open;
+      dm.Desconectar;
+    except
+      on E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -140,11 +167,18 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
-    Negocio.Relatorio(CCategoriaPrograma, AIdUsuario);
-    FModel.Rel.Print;
+    try
+      Negocio.Relatorio(CCategoriaPrograma, AIdUsuario);
+      FModel.Rel.Print;
+      dm.Desconectar;
+    except
+      on E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -155,12 +189,19 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    FModel.CDSCadastro.Close;
-    Negocio.LocalizarCodigo(CCategoriaPrograma, ACodigo);
-    FModel.CDSCadastro.Open;
+    try
+      FModel.CDSCadastro.Close;
+      Negocio.LocalizarCodigo(CCategoriaPrograma, ACodigo);
+      FModel.CDSCadastro.Open;
+      dm.Desconectar;
+    except
+      on E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -171,12 +212,19 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    FModel.CDSCadastro.Close;
-    Negocio.LocalizarId(CCategoriaPrograma, AId);
-    FModel.CDSCadastro.Open;
+    try
+      FModel.CDSCadastro.Close;
+      Negocio.LocalizarId(CCategoriaPrograma, AId);
+      FModel.CDSCadastro.Open;
+      dm.Desconectar;
+    except
+      On E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -187,18 +235,25 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    FModel.CDSCadastro.Close;
-    Negocio.Novo(CCategoriaPrograma, AIdUsuario);
-    FModel.CDSCadastro.Open;
+    try
+      FModel.CDSCadastro.Close;
+      Negocio.Novo(CCategoriaPrograma, AIdUsuario);
+      FModel.CDSCadastro.Open;
 
-    FModel.CDSCadastro.Append;
+      FModel.CDSCadastro.Append;
 
-    FModel.CDSCadastroCat_Codigo.AsInteger := ProximoCodigo();
+      FModel.CDSCadastroCat_Codigo.AsInteger := ProximoCodigo();
 
-    FOperacao := opIncluir;
+      FOperacao := opIncluir;
+      dm.Desconectar;
+    except
+      On E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -224,11 +279,18 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    iCodigo := StrToInt(Negocio.ProximoCodigo(CCategoriaPrograma).ToString);
-    Result := iCodigo;
+    try
+      iCodigo := StrToInt(Negocio.ProximoCodigo(CCategoriaPrograma).ToString);
+      Result := iCodigo;
+      dm.Desconectar;
+    except
+      on E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -240,11 +302,18 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    iCodigo := StrToInt(Negocio.ProximoId(CCategoriaPrograma).ToString);
-    Result := iCodigo;
+    try
+      iCodigo := StrToInt(Negocio.ProximoId(CCategoriaPrograma).ToString);
+      Result := iCodigo;
+      dm.Desconectar;
+    except
+      on E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -263,22 +332,13 @@ begin
   dm.Conectar;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
-    try
-      Post();
-      Negocio.Salvar(CCategoriaPrograma, AIdUsuario);
-      FModel.CDSCadastro.ApplyUpdates(0);
-      FOperacao := opNavegar;
-//      FModel.CDSCadastro.Refresh;
-    except
-      on E: Exception do
-      begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
-      end;
-    end;
+    Post();
+    Negocio.Salvar(CCategoriaPrograma, AIdUsuario);
+    FModel.CDSCadastro.ApplyUpdates(0);
+    FOperacao := opNavegar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

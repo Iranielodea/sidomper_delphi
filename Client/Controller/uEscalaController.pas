@@ -114,9 +114,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -132,9 +132,9 @@ begin
   try
     Negocio.Excluir(CEscala, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -150,6 +150,7 @@ begin
     Negocio.Filtrar(CEscala, ACampo, ATexto, AAtivo, AContem);
 //    Negocio.Filtrar(CRevendaPrograma, Campo, Texto, Ativo, Contem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -168,6 +169,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.EscalaFiltrar(oObjetoJSON, ACampo, ATexto, dm.IdUsuario, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -184,9 +186,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CEscala, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -210,10 +212,10 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CEscala, AIdUsuario);
+    dm.Desconectar;
    // FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -232,9 +234,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CEscala, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -258,9 +260,9 @@ begin
     FModel.CDSCadastro.Append;
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -286,9 +288,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CRevendaPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -300,9 +302,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CRevendaPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -321,10 +323,10 @@ begin
     lDM.cdsRelatorio1.Close;
     Negocio.EscalaRelatorios(oObjetoJSON, AModelo);
     lDM.Impressao(AModelo, AFiltro.DataInicial, AFiltro.DataFinal);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(lDM);
-    dm.Desconectar;
   end;
 end;
 
@@ -365,6 +367,7 @@ begin
 //      FModel.CDSCadastro.ApplyUpdates(0);
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
@@ -374,7 +377,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -386,9 +388,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.EscalaBuscarUltimaData();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -424,6 +426,7 @@ begin
       FModel.CDSCadastro.ApplyUpdates(0);
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
@@ -433,7 +436,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

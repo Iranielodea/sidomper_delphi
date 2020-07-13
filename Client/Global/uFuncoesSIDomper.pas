@@ -270,12 +270,18 @@ class procedure TFuncoes.Excessao(var Excess: Exception; Metodo: string);
 begin
 //  MensagemErroBanco(Excess.Message, 'Método: ' + Metodo);
 //  Abort;
-  raise Exception.Create(Excess.Message
+  dm.ErroConexao(Excess.Message
                         + sLineBreak
                         + sLineBreak
                         + sLineBreak
                         + sLineBreak
                         +  'Método: ' + Metodo);
+//  raise Exception.Create(Excess.Message
+//                        + sLineBreak
+//                        + sLineBreak
+//                        + sLineBreak
+//                        + sLineBreak
+//                        +  'Método: ' + Metodo);
 end;
 
 class function TFuncoes.FormatarMascara(Mascara, Valor: string): string;
@@ -307,6 +313,7 @@ class function TFuncoes.FormularioEstaCriado(Formulario: TClass): Boolean;
 var
   i: Integer;
 begin
+  dm.ConexaoBanco();
   Result := False;
   for i := 0 to Screen.FormCount -1 do
   begin

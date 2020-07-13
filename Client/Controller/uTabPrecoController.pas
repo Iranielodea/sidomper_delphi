@@ -76,15 +76,15 @@ begin
       TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
       FOperacao := opEditar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TTabPrecoController.Editar');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -98,15 +98,15 @@ begin
     try
       Negocio.TabPrecoExcluir(cTabelaPreco, IdUsuario, Id);
       FModel.CDSConsulta.Delete;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TTabPrecoController.Excluir');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -175,6 +175,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.TabPrecoFiltrar(ACampo, ATexto, AAtivo, AContem, oObjetoJSON, AId);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -232,15 +233,15 @@ begin
       FModel.CDSItens.Open;
 
       FOperacao := opIncluir;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TTabPrecoController.Novo');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -254,9 +255,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(cTabelaPreco, Id);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -275,15 +276,15 @@ begin
   try
     try
       Negocio.TabPrecoRelatorio(cTabelaPreco, IdUsuario);
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TTabPrecoController.Relatório');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -348,19 +349,18 @@ begin
       //Salvar(cTabelaPreco, IdUsuario);
 //      FModel.CDSCadastro.ApplyUpdates(0);
       FOperacao := opNavegar;
+      dm.Desconectar;
 //      FModel.CDSCadastro.Refresh;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(model);
-    dm.Desconectar;
   end;
 end;
 

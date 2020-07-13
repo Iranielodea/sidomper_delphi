@@ -100,12 +100,12 @@ begin
       Negocio.Salvar(CUsuarioPrograma, AIdUsuario);
       FModel.CDSCadastro.ApplyUpdates(0);
       Negocio.Commit();
+      dm.Desconectar;
     except
       on E: Exception do
       begin
         Negocio.Roolback();
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        DM.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -147,6 +147,7 @@ begin
   try
     Lista := TConverte.JSONToObject<TListaUsuario>(Negocio.UsuarioDiasTrabalhados(ADataInicial, ADataFinal));
     Result := Lista;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -190,6 +191,7 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -209,10 +211,11 @@ begin
     try
       Negocio.Excluir(CUsuarioPrograma, AIdUsuario, AId);
       FModel.CDSConsulta.Delete;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        raise Exception.Create(TFuncoes.MensagemBanco(E.Message));
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -229,6 +232,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.ExisteUsuario();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -260,6 +264,7 @@ begin
       dm.cdsUsuarioNotificar.AsBoolean := model.Notificar;
       dm.cdsUsuario.Post;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(ListaUsuario);
@@ -293,6 +298,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarUsuario(oObjetoJSON, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -319,6 +325,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarUsuarioRevenda(oObjetoJSON, AIdUsuario, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -334,6 +341,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CUsuarioPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -349,6 +357,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.UsuarioHorarioAcessoSistema(AUserName, APassword, AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -366,6 +375,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CUsuarioPrograma, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -416,6 +426,7 @@ begin
     Negocio.LocalizarCodigoUsuario(ACodigo, dm.IdUsuario, AMensagem);
 //    Negocio.LocalizarCodigo(CUsuarioPrograma, Codigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -432,6 +443,7 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CUsuarioPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -448,6 +460,7 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.UsuarioLocalizarNome(ANome);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -464,6 +477,7 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarUsuario(AUserNome, APassword);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -531,6 +545,7 @@ begin
     FModel.CDSCadastroUsu_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -552,6 +567,7 @@ begin
   try
 //    Result := Negocio.PermissaoAtividadeOcorrencia(AIdUsuario, 2, AId);
     Result := Negocio.PermissaoAtividadeOcorrenciaAlterar(AIdUsuario, APerfil, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -567,6 +583,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoAtividadeOcorrenciaDataHora(AIdUsuario, AMesmoUsuario, AId);
+    dm.Desconectar;
 //    Result := Negocio.PermissaoAtividadeOcorrencia(AIdUsuario, 1, AId);
   finally
     FreeAndNil(Negocio);
@@ -583,6 +600,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoAtividadeOcorrenciaExcluir(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -598,6 +616,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoChamadoOcorrenciaAlterar(AIdUsuario, APerfil, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -627,6 +646,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoChamadoOcorrenciaDataHora(AIdUsuario, AMesmoUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -642,6 +662,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoChamadoOcorrenciaExcluir(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -657,6 +678,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoConferenciaTempoGeral(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -672,6 +694,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoOrcamentoAlteracaoSituacao(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -687,6 +710,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoOrcamentoUsuario(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -702,6 +726,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoSolicitacaoOcorrenciaGeralAlterar(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -717,6 +742,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoSolicitacaoOcorrenciaGeralExcluir(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -732,6 +758,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoSolicitacaoOcorrenciaRegraAlterar(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -747,6 +774,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoSolicitacaoOcorrenciaRegraExcluir(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -762,6 +790,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoSolicitacaoOcorrenciaTecnicaAlterar(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -777,6 +806,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoSolicitacaoOcorrenciaTecnicaExcluir(AIdUsuario, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -805,6 +835,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CUsuarioPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -819,6 +850,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CUsuarioPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -833,6 +865,7 @@ begin
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CUsuarioPrograma, AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -856,6 +889,7 @@ begin
     Relatorio.CDSRendimento.Open;
 
     Relatorio.ListarRendimento(StrToIntDef(ADias, 0), ADataInicial, ADataFinal);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
@@ -878,7 +912,7 @@ begin
 
     for I := 0 to ListaJSon.Size -1 do
       Lista.Add(ListaJSon.Get(i).Value);
-
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -909,12 +943,12 @@ begin
       SalvarPermissao(IdUsuario, Negocio);
 
       Negocio.Commit();
+      dm.Desconectar;
     except
       on E: Exception do
       begin
         Negocio.Roolback();
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -956,6 +990,7 @@ begin
     FModel.CDSUsuarioAcessoMenu.Close;
     Negocio.UsuarioAcessoMenu(AIdUsuario);
     FModel.CDSUsuarioAcessoMenu.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;
@@ -970,6 +1005,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.UsuarioUsuarioADM(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    DM.Desconectar;

@@ -74,9 +74,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -92,9 +92,9 @@ begin
   try
     Negocio.Excluir(CRamal, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -109,6 +109,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CRamal, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -124,9 +125,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.RamalFiltrarId(AId);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -139,9 +140,9 @@ begin
   try
     Negocio.Relatorio(CRamal, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -156,9 +157,9 @@ begin
     FModel.CDSItens.Close;
     Negocio.RamalListarItens(AIdRamal);
     FModel.CDSItens.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -178,9 +179,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CRamal, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -200,9 +201,9 @@ begin
     FModel.CDSCadastro.Append;
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -252,17 +253,16 @@ begin
       Result := StrToIntDef(Negocio.RamalSalvar(AIdUsuario, oObjetoJSON).ToString(),0);
       Post;
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(ObjVO);
-    DM.Desconectar;
   end;
 end;
 

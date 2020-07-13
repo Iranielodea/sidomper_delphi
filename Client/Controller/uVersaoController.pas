@@ -60,9 +60,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CVersaoPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -79,9 +79,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.VersaoBuscarStatusDesenvolvimento();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -121,9 +121,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -139,9 +139,9 @@ begin
   try
     Negocio.Excluir(CVersaoPrograma, AIdUsuario, Id);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -156,6 +156,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(APrograma, ACampo, ATexto,  AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -185,6 +186,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarVersao(oObjetoJSON, ACampo, ATexto, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -199,9 +201,9 @@ begin
   try
     Negocio.Relatorio(CVersaoPrograma, AIdUsuario);
 //    FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -215,9 +217,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CVersaoPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -232,6 +234,7 @@ begin
       FModel.CDSCadastro.Close;
       Negocio.LocalizarVersao(AVersao);
       FModel.CDSCadastro.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -240,7 +243,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -276,10 +278,10 @@ begin
     TipoUmRegistro();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Usuario);
-    dm.Desconectar;
   end;
 end;
 
@@ -318,9 +320,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CVersaoPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -337,6 +339,7 @@ begin
     try
       Negocio.RelatorioVersao(1, AIdVersao, QtdeTotal, nil);
       Relatorio.ImpressaoRelatorio1(QtdeTotal);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -346,7 +349,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
-    dm.Desconectar;
   end;
 end;
 
@@ -370,6 +372,7 @@ begin
       objJson := TConverte.ObjectToJSON(AFiltro);
       Negocio.RelatorioVersao(2, AIdVersao, QtdeTotal, objJson);
       Relatorio.ImpressaoRelatorio2();
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -379,7 +382,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
-    dm.Desconectar;
   end;
 end;
 
@@ -405,6 +407,7 @@ begin
       objJson := TConverte.ObjectToJSON(AFiltro);
       Negocio.RelatorioVersao(3, AIdVersao, QtdeTotal, objJson);
       Relatorio.ImpressaoRelatorio3(sPeriodo);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -414,7 +417,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Relatorio);
-    dm.Desconectar;
   end;
 end;
 
@@ -466,6 +468,7 @@ begin
       Negocio.Commit;
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
@@ -476,7 +479,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

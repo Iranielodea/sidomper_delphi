@@ -56,6 +56,7 @@ begin
       Negocio.InstrucaoSQL(ComandoSQL, iTipo);
       if iTipo = 2 then
         FModel.CDSInstrucaoSQL.Open;
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
@@ -76,6 +77,7 @@ begin
   try
     try
       Negocio.ParametrosExportarDadosBaseNova();
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -96,6 +98,7 @@ begin
   try
     try
       Negocio.Backup(Destino);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -116,6 +119,7 @@ begin
   try
     try
       Negocio.ParametrosImportarDadosBaseNova();
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -137,6 +141,7 @@ begin
     FModel.CDSListarCampos.Close;
     Negocio.ListarTabelasCamposBancoDados(Tabela);
     FModel.CDSListarCampos.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -152,6 +157,7 @@ begin
     FModel.CDSListarTabelas.Close;
     Negocio.ListarTabelasBancoDados();
     FModel.CDSListarTabelas.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;

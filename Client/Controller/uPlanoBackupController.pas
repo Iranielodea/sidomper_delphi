@@ -52,6 +52,7 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.PlanoBackupExcluir(AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -68,6 +69,7 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.PlanoBackupExcluirItem(AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -87,6 +89,7 @@ begin
     FModel.CDSItens.Close;
     Negocio.PlanoBackupLocalizarItem(FModel.CDSCadastroPlb_Id.AsInteger);
     FModel.CDSItens.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -151,6 +154,7 @@ begin
     FModel.CDSItens.EnableControls;
   end;
 
+  dm.Conectar;
   Marshal := TJSONMarshal.Create;
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   Transacao := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
@@ -161,6 +165,7 @@ begin
       Transacao.StartTransacao();
       Negocio.PlanoBackupSalvar(oObjetoJSON, oObjetoItemJSON);
       Transacao.Commit();
+      dm.Desconectar;
     except
       On E: Exception do
       begin

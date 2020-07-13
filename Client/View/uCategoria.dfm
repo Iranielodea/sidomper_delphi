@@ -7,6 +7,7 @@ inherited frmCategoria: TfrmCategoria
   PixelsPerInch = 96
   TextHeight = 14
   inherited pgControl: TPageControl
+    ActivePage = tsEdicao
     inherited tsPesquisa: TTabSheet
       ExplicitLeft = 4
       ExplicitTop = 25

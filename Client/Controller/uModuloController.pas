@@ -78,9 +78,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -96,9 +96,9 @@ begin
   try
     Negocio.Excluir(CModuloPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -113,6 +113,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CModuloPrograma, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -129,9 +130,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarModuloCliente(AIdCliente, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -145,9 +146,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CModuloPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -160,9 +161,9 @@ begin
   try
     Negocio.Relatorio(CModuloPrograma, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -179,9 +180,9 @@ begin
     else
       Negocio.LocalizarModuloClienteCodigo(AIdCliente, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -195,9 +196,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CModuloPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -218,9 +219,9 @@ begin
     FModel.CDSCadastroMod_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -240,9 +241,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CModuloPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -254,8 +255,8 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CModuloPrograma).ToString);
+    dm.Desconectar;
   finally
-    DM.Desconectar;
     FreeAndNil(Negocio);
   end;
 end;
@@ -281,16 +282,15 @@ begin
       FModel.CDSCadastro.ApplyUpdates(0);
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 

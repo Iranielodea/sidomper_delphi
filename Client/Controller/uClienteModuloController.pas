@@ -61,9 +61,10 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.LocalizarCodigo(CClienteModuloPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
+
   end;
 end;
 
@@ -79,9 +80,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarClienteModuloProduto(AIdCliente, AIdModulo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

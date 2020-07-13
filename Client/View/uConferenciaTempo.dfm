@@ -14,6 +14,7 @@ object frmConferenciaTempo: TfrmConferenciaTempo
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyPress = FormKeyPress
@@ -458,7 +459,6 @@ object frmConferenciaTempo: TfrmConferenciaTempo
     end
   end
   object dsCad: TDataSource
-    DataSet = DMSolicitacao.CDSTempo
     Left = 388
     Top = 121
   end

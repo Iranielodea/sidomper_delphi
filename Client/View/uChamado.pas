@@ -458,6 +458,7 @@ end;
 
 procedure TfrmChamado.btnNovoClick(Sender: TObject);
 begin
+  dm.ConexaoBanco;
   FController.Novo(dm.IdUsuario, FTipoMovimento);
   PageControl1.ActivePageIndex := 0;
   UsuarioAdministrador();

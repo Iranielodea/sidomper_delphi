@@ -126,9 +126,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoAtualizarSituacao(ASituacao, AId);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -283,10 +283,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.OrcamentoBuscarEmailRemetenteSeteDias();
-
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -323,9 +322,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoGerarParcela(AIdFormaPagto, AValor, AValorPrimeira, AValorOutras);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -338,9 +337,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoGerarParcelaDifUltima(AQtdeParcelas, AValor, AValorUltima, AValorOutras);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -358,9 +357,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.OrcamentoProximoNumero().ToString());
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -403,9 +402,9 @@ begin
   try
     Id := StrToInt(Negocio.OrcamentoDuplicar(AIdOrcamento).ToString);
     FiltrarId(Id);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -433,9 +432,9 @@ begin
       TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -460,9 +459,9 @@ begin
     LocalizarVencimento(AId);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -477,9 +476,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.OrcamentoEmailEnviado(AIdOrcamento);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -534,9 +533,9 @@ begin
   try
     Negocio.Excluir(COrcamentoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -726,6 +725,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarOrcamento(oObjetoJSON, ACampo, ATexto, dm.IdUsuario, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -741,9 +741,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(COrcamentoPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -757,9 +757,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.OrcamentoFiltrarId(AId);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -843,10 +843,10 @@ begin
       FModel.RelImpressaoSimples.print;
 
     FModel.CDSImpressao.close;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Modelo);
-    dm.Desconectar;
   end;
 end;
 
@@ -914,10 +914,10 @@ begin
       FModel.RelImpressaoSimples.print;
 
     FModel.CDSImpressao.close;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    FreeAndNil(Modelo);
-    dm.DesConectar;
   end;
 end;
 
@@ -930,9 +930,9 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(COrcamentoPrograma, AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -991,6 +991,7 @@ begin
       FModel.CDSEmail.Post;
     end;
     FModel.CDSEmail.First;
+    dm.Desconectar;
   finally
     FreeAndNil(Lista);
     FreeAndNil(Negocio);
@@ -1007,9 +1008,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(COrcamentoPrograma, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1023,9 +1024,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(COrcamentoPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1039,6 +1040,7 @@ begin
     FModel.CDSItens.Close;
     Negocio.OrcamentoItemLocalizar(AIdOrdem);
     FModel.CDSItens.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -1054,6 +1056,7 @@ begin
     FModel.CDSItensModulo.Close;
     Negocio.OrcamentoItemModuloLocalizar(AIdOrdem);
     FModel.CDSItensModulo.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -1069,6 +1072,7 @@ begin
     FModel.cdsOcorrencia.Close;
     Negocio.OrcamentoOcorrenciaLocalizar(AIdOrdem);
     FModel.cdsOcorrencia.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -1084,9 +1088,9 @@ begin
     FModel.CDSVenctos.Close;
     Negocio.OrcamentoVenctoLocalizar(AIdOrdem);
     FModel.CDSVenctos.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -1121,9 +1125,9 @@ begin
     BuscarUsuarioLogado(AIdUsuario, 'ORC');
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -1157,9 +1161,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(COrcamentoPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.desConectar;
   end;
 end;
 
@@ -1171,9 +1175,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(COrcamentoPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.desConectar;
   end;
 end;
 
@@ -1281,9 +1285,9 @@ begin
         FModel.Relatorio03();
       end;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -1312,9 +1316,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.OrcamentoEmailSupervisor(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.DesConectar;
   end;
 end;
 
@@ -1359,10 +1363,10 @@ begin
         Abort;
       end;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
-    dm.DesConectar;
 //    FreeAndNil(ObjVO);
   end;
 end;

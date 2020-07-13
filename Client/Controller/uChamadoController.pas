@@ -172,6 +172,7 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarCodigo(CChamadoPrograma, ACodigo);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -192,6 +193,7 @@ begin
   try
     try
       Result := Negocio.RetornaIdAtual('Chamado');
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -200,7 +202,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -215,6 +216,7 @@ begin
       FModel.CDSAtividade.Close;
       Negocio.AtividadeQuadro(AIdUsuario, AIdRevenda);
       FModel.CDSAtividade.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -223,7 +225,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -237,6 +238,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TListaChamadoQuadroViewModel>(Negocio.AtividadeQuadroJSON(AIdUsuario, AIdRevenda));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -259,6 +261,7 @@ begin
       FModel.CDSAtividadeQuadro1.Close;
       Negocio.FiltrarAtividadeQuadro1(AIdUsuario);
       FModel.CDSAtividadeQuadro1.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -281,6 +284,7 @@ begin
       FModel.CDSAtividadeQuadro2.Close;
       Negocio.FiltrarAtividadeQuadro2(AIdUsuario);
       FModel.CDSAtividadeQuadro2.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -303,6 +307,7 @@ begin
       FModel.CDSAtividadeQuadro3.Close;
       Negocio.FiltrarAtividadeQuadro3(AIdUsuario);
       FModel.CDSAtividadeQuadro3.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -325,6 +330,7 @@ begin
       FModel.CDSAtividadeQuadro4.Close;
       Negocio.FiltrarAtividadeQuadro4(AIdUsuario);
       FModel.CDSAtividadeQuadro4.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -347,6 +353,7 @@ begin
       FModel.CDSAtividadeQuadro5.Close;
       Negocio.FiltrarAtividadeQuadro5(AIdUsuario);
       FModel.CDSAtividadeQuadro5.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -369,6 +376,7 @@ begin
       FModel.CDSAtividadeQuadro6.Close;
       Negocio.FiltrarAtividadeQuadro6(AIdUsuario);
       FModel.CDSAtividadeQuadro6.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -390,6 +398,7 @@ begin
       FModel.CDSChamadoOcorrenciaCons.Close;
       Negocio.LocalizarChamadoOcorrencia(0);
       FModel.CDSChamadoOcorrenciaCons.Open;
+      dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -406,6 +415,7 @@ begin
       FModel.CDSQuadro.Close;
       Negocio.ChamadoQuadro(AIdUsuario, AIdRevenda);
       FModel.CDSQuadro.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -414,7 +424,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -429,6 +438,7 @@ begin
       FModel.CDSChamadoQuadro1.Close;
       Negocio.FiltrarChamadoQuadro1(AIdUsuario);
       FModel.CDSChamadoQuadro1.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -437,7 +447,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -452,6 +461,7 @@ begin
       FModel.CDSChamadoQuadro2.Close;
       Negocio.FiltrarChamadoQuadro2(AIdUsuario);
       FModel.CDSChamadoQuadro2.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -460,7 +470,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -475,6 +484,7 @@ begin
       FModel.CDSChamadoQuadro3.Close;
       Negocio.FiltrarChamadoQuadro3(AIdUsuario);
       FModel.CDSChamadoQuadro3.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -483,7 +493,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -498,6 +507,7 @@ begin
       FModel.CDSChamadoQuadro4.Close;
       Negocio.FiltrarChamadoQuadro4(AIdUsuario);
       FModel.CDSChamadoQuadro4.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -506,7 +516,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -521,6 +530,7 @@ begin
       FModel.CDSChamadoQuadro5.Close;
       Negocio.FiltrarChamadoQuadro5(AIdUsuario);
       FModel.CDSChamadoQuadro5.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -529,7 +539,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -544,6 +553,7 @@ begin
       FModel.CDSChamadoQuadro6.Close;
       Negocio.FiltrarChamadoQuadro6(AIdUsuario);
       FModel.CDSChamadoQuadro6.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -552,7 +562,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -566,6 +575,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TListaChamadoQuadroViewModel>(Negocio.ChamadoQuadroJSON(AIdUsuario, AIdRevenda));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -599,6 +609,7 @@ begin
       FModel.CDSListarProblemaSolucao.Close;
       Negocio.AtividadeListarProblemaSolucao(oObjetoJSON, ATexto, AIdUsuario);
       FModel.CDSListarProblemaSolucao.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -619,6 +630,7 @@ begin
   try
     try
       Result := StrToInt(Negocio.ProximoIdGeral('Chamado_Ocorrencia').ToString());
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -627,7 +639,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -643,6 +654,7 @@ begin
     try
       cHoras := Negocio.ChamadoBuscarTotalHorasDoChamado(AIdChamado);
       Result :=  TFuncoes.DecimalToHora(cHoras);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -680,6 +692,7 @@ begin
       FModel.CDSChamadoAnexo.Close;
       Negocio.ChamadoAnexos(AIdChamado);
       FModel.CDSChamadoAnexo.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -749,15 +762,15 @@ begin
       LocalizarChamadoStatus(AId);
 
       FOperacao := opEditar;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Editar');
+        DM.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -778,15 +791,15 @@ begin
         Negocio.AtividadeExcluir(AIdUsuario, AId);
 
       FModel.CDSConsulta.Delete;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Excluir');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -807,10 +820,11 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.Filtrar(APrograma, ACampo, ATexto,  AAtivo, AContem);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Filtrar');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -842,10 +856,11 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarAtividade(oObjetoJSON, ACampo, ATexto, AIdUsuario, AContem);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.FiltrarAtividade');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -877,10 +892,11 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarChamado(oObjetoJSON, ACampo, ATexto, AIdUsuario, AContem);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.FiltrarChamado');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -899,10 +915,11 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarIdChamado(AIdChamado);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.FiltrarIdChamado');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -980,6 +997,7 @@ begin
   try
     try
       Negocio.Relatorio(CChamadoPrograma, AIdUsuario);
+      dm.Desconectar;
 //    FModel.Rel.Print;
     except
       On E: Exception do
@@ -990,7 +1008,6 @@ begin
 
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1022,6 +1039,7 @@ begin
       FModel.CDSListarProblemaSolucao.Close;
       Negocio.ChamadoListarProblemaSolucao(oObjetoJSON, ATexto, AIdUsuario);
       FModel.CDSListarProblemaSolucao.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1051,15 +1069,15 @@ begin
       FModel.CDSChamadoOcorrenciaCons.Close;
       Negocio.LocalizarChamadoOcorrencia(AIdChamado);
       FModel.CDSChamadoOcorrenciaCons.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.LocalizarChamadoColaborador');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1074,15 +1092,15 @@ begin
       FModel.CDSChamadoStatus.Close;
       Negocio.LocalizarChamadoStatus(AIdChamado);
       FModel.CDSChamadoStatus.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.LocalizarChamadoStatus');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1097,15 +1115,15 @@ begin
       FModel.CDSCadastro.Close;
       Negocio.LocalizarId(CChamadoPrograma, AId);
       FModel.CDSCadastro.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.LocalizarId');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1177,10 +1195,11 @@ begin
       TipoUmRegistro(ATipo);
 
       FOperacao := opIncluir;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Novo');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -1243,6 +1262,7 @@ begin
   try
     try
       Result := Negocio.PermissaoAtividadeAbertura(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1251,7 +1271,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1265,6 +1284,7 @@ begin
   try
     try
       Result := Negocio.PermissaoAtividadeOcorrencias(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1273,7 +1293,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1287,6 +1306,7 @@ begin
   try
     try
       Result := Negocio.PermissaoAtividadeQuadro(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1295,7 +1315,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1309,6 +1328,7 @@ begin
   try
     try
       Result := Negocio.PermissaoAtividadeStatus(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1317,7 +1337,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1331,6 +1350,7 @@ begin
   try
     try
       Result := Negocio.PermissaoChamadoAbertura(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1339,7 +1359,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1353,6 +1372,7 @@ begin
   try
     try
       Result := Negocio.PermissaoChamadoOcorrencia(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1361,7 +1381,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1374,6 +1393,7 @@ begin
   try
     try
       Result := Negocio.PermissaoChamadoQuadro(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1382,7 +1402,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1395,6 +1414,7 @@ begin
   try
     try
       Result := Negocio.PermissaoChamadoStatus(AIdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1403,7 +1423,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1427,6 +1446,7 @@ begin
       FModel.CDSCadastro.Open;
 
       Result := Resultado;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1448,6 +1468,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TPermissaoAtividadeVO>(Negocio.PermissoesAtividade(AIdUsuario));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1456,7 +1477,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1470,6 +1490,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TPermissaoChamadoVO>(Negocio.PermissoesChamado(AIdUsuario));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1478,7 +1499,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1705,6 +1725,7 @@ begin
   try
     try
       Result := StrToInt(Negocio.ProximoId(CChamadoPrograma).ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -1713,7 +1734,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -1783,16 +1803,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, '', Integer(caChamado));
       rel.lblPeriodoModelo1.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
       rel.RelChamadoModelo1.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio1');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -1824,16 +1844,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caChamado));
       rel.lblPeriodoModelo2.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
       rel.RelChamadoModelo2.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio2');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -1866,16 +1886,16 @@ begin
       rel.CDSRelChamadoModelo3.Open;
 
       rel.ImpressaoModelo3(AFiltro.DataInicial, AFiltro.DataFinal, AOrdem);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio3');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -1907,16 +1927,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caChamado));
       rel.lblPeriodoModelo4.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
       rel.RelChamadoModelo4.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio4');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -1957,10 +1977,11 @@ begin
       Grafico.DBChart1.Title.Text.Add('Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal);
       Grafico.CDSGrafico1.Open;
       Grafico.ShowModal;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio5');
+        dm.ErroConexao(E.Message);
       end;
     end;
 
@@ -1968,7 +1989,6 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Grafico);
 //    FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2025,16 +2045,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caChamado));
       rel.lblRelatorio06.Caption := 'Período de ' + sMesAnoInicial + ' Até ' + sMesAnoFinal;
       rel.RelChamadoModelo6.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio6');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2097,16 +2117,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, iTipo);
       rel.lblRelatorio07.Caption := 'Período de ' + sMesAnoInicial + ' Até ' + sMesAnoFinal;
       rel.RelChamadoModelo7.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio6');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2139,16 +2159,16 @@ begin
       rel.CDSRelChamadoModelo8.Open;
 
       rel.ImpressaoModelo8(AFiltro.DataInicial, AFiltro.DataFinal, AOrdem);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio3');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2195,16 +2215,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, '', Integer(caAtividade));
       rel.lblPeriodoModelo1.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
       rel.RelChamadoModelo1.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.RelatorioAtividade01');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2236,16 +2256,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caAtividade));
       rel.lblPeriodoModelo2.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
       rel.RelChamadoModelo2.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.RelatorioAtividade02');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2278,16 +2298,16 @@ begin
       rel.CDSRelChamadoModelo3.Open;
 
       rel.ImpressaoModelo3(AFiltro.DataInicial, AFiltro.DataFinal);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.RelatorioAtividade03');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2320,16 +2340,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caAtividade));
       rel.lblPeriodoModelo4.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
       rel.RelChamadoModelo4.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.RelatorioAtividade04');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2378,16 +2398,16 @@ begin
       Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caChamado));
       rel.lblRelatorio06.Caption := 'Período de ' + sMesAnoInicial + ' Até ' + sMesAnoFinal;
       rel.RelChamadoModelo6.Print;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Relatorio6');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -2400,6 +2420,7 @@ begin
   try
     try
       Result := Negocio.RetornarChamadoEmails(AIdChamado, AIdUsuario, AIdStatus);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -2420,6 +2441,7 @@ begin
   try
     try
       Result := Negocio.RetornarChamadoEmailCliente(AIdChamado, dm.IdUsuario);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -2448,6 +2470,7 @@ begin
   try
     try
       Result := Negocio.SelectSQL(sb.ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -2536,10 +2559,11 @@ begin
       Result := StrToIntDef(Negocio.SalvarChamadoObj(AIdUsuario, oObjetoJSON).ToString(),0);
       Post;
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.Excessao(E, 'TChamadoController.Salvar');
+        dm.ErroConexao(E.Message);
 //        TFuncoes.MensagemErroBanco(E.Message);
 //        Abort;
       end;
@@ -2548,7 +2572,6 @@ begin
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(ChamadoVO);
-    dm.Desconectar;
   end;
 
 
@@ -2836,6 +2859,7 @@ begin
       sb.AppendLine(' WHERE Cha_Id = ' + IntToStr(AIdChamado));
 
       Negocio.ExecutarSQL(sb.ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin

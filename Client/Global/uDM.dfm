@@ -10,7 +10,7 @@ object DM: TDM
     LoginPrompt = False
     Params.Strings = (
       'DriverUnit=Data.DBXDataSnap'
-      'HostName=acesso.domper.com.br'
+      'HostName=localhost'
       'Port=211'
       'CommunicationProtocol=tcp/ip'
       'DatasnapContext=datasnap/'

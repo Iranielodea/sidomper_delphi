@@ -46,6 +46,7 @@ type
     function CaminhoAnexos(): string;
     function CaminhoXMLClientes(): string;
     function RevendaPadrao(): Integer;
+    function ValidarSIDomperClient(ADataHora: string): Boolean;
     procedure Exportar();
 
     property Model: TDMParametros read FModel write FModel;
@@ -74,9 +75,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CParametrosPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -89,9 +90,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.ParametrosAtualizarParametro(ACodigo, APrograma, AValor);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -103,9 +104,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.BuscarCaminhoImportacaoXML();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -129,9 +130,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.parametrosCaminhoAnexos();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -143,9 +144,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio. ParametrosCaminhoAplicativoImportarLicencas();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -157,9 +158,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.ParametrosCaminhoXMLClientes();
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -199,9 +200,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -217,9 +218,9 @@ begin
   try
     Negocio.Excluir(CParametrosPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -241,10 +242,10 @@ begin
       dm.cdsParametroValor.AsString := model.Valor;
       dm.cdsParametro.Post;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(listaParametro);
-    dm.Desconectar;
   end;
 end;
 
@@ -259,6 +260,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CParametrosPrograma, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -273,9 +275,9 @@ begin
   try
     Negocio.Relatorio(CParametrosPrograma, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -283,11 +285,13 @@ procedure TParametrosController.LocalizarCodigo(ACodigo: integer);
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CParametrosPrograma, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -303,9 +307,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CParametrosPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -318,9 +322,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.LocalizarParametro(ACodigo, APrograma);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -340,9 +344,9 @@ begin
     FModel.CDSCadastroPar_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -386,9 +390,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CParametrosPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -400,9 +404,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CParametrosPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -414,9 +418,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToIntDef(Negocio.ParametrosRevendaPadrao(dm.IdUsuario).ToString(),0);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -440,6 +444,7 @@ begin
       Post();
       FModel.CDSCadastro.ApplyUpdates(0);
       Negocio.Salvar(CParametrosPrograma, AIdUsuario);
+      dm.Desconectar;
     except
       on E: Exception do
       begin
@@ -449,7 +454,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 
   FOperacao := opNavegar;
@@ -485,9 +489,26 @@ begin
     FModel.CDSParametrosTitulosChamados.Close;
     Negocio.BuscarTitulosQuadrosChamados();
     FModel.CDSParametrosTitulosChamados.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
+  end;
+end;
+
+function TParametrosController.ValidarSIDomperClient(
+  ADataHora: string): Boolean;
+var
+  Negocio: TServerMethods1Client;
+  Resultado: Boolean;
+begin
+// TESTE
+  DM.Conectar;
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    Result := Negocio.ValidarSIDomperClient(ADataHora);
     dm.Desconectar;
+  finally
+    FreeAndNil(Negocio);
   end;
 end;
 

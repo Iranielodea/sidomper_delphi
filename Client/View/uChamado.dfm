@@ -12,7 +12,6 @@
   inherited pgControl: TPageControl
     Width = 1018
     Height = 671
-    ActivePage = tsEdicao
     ExplicitWidth = 1018
     ExplicitHeight = 671
     inherited tsPesquisa: TTabSheet

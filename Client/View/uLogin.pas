@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
   Vcl.Imaging.pngimage, uUsuarioVO, Vcl.Imaging.jpeg, uUtilitarioController, Vcl.FileCtrl,
-  uFuncoesSIDomper;
+  uFuncoesSIDomper, uParametrosController;
 
 type
   TfrmLogin = class(TForm)
@@ -36,6 +36,7 @@ type
     procedure ExportarBaseDados();
     procedure ImportarBaseDados();
     procedure VerificaSeExisteLogo();
+    function ValidarExecutavel: Boolean;
   public
     { Public declarations }
     property Logou: Boolean read FLogou;
@@ -64,7 +65,10 @@ procedure TfrmLogin.edtSenhaKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Key = VK_RETURN then
-    EntrarSistema();
+  begin
+    if ValidarExecutavel() then
+      EntrarSistema();
+  end;
 end;
 
 procedure TfrmLogin.EntrarSistema;
@@ -223,6 +227,30 @@ begin
     Result := usuario.ExisteUsuario();
   finally
     FreeAndNil(usuario);
+  end;
+end;
+
+function TfrmLogin.ValidarExecutavel: Boolean;
+var
+  sArquivo: string;
+  sData: string;
+  ParametroController: TParametrosController;
+begin
+  Result := True;
+  sArquivo := ExtractFileDir(Application.ExeName) + '\SIDomper.exe';
+  if FileExists(sArquivo) then
+  begin
+    sData := DateTimeToStr(FileDateToDateTime(FileAge(sArquivo)));
+    ParametroController := TParametrosController.Create;
+    try
+      if ParametroController.ValidarSIDomperClient(sData) = False then
+      begin
+        ShowMessage('Sistema está Desatualizado. Solicite Atualização!');
+        Result := False;
+      end;
+    finally
+      FreeAndNil(ParametroController);
+    end;
   end;
 end;
 

@@ -69,6 +69,7 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    DM.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -86,6 +87,7 @@ begin
   try
     Negocio.Excluir(CClienteEspPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    DM.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -100,6 +102,7 @@ begin
   try
     Negocio.Relatorio(CClienteEspPrograma, AIdUsuario);
     FModel.Rel.Print;
+    DM.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -115,6 +118,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.LocalizarCodigo(CClienteEspPrograma, AIdCliente);
     FModel.CDSConsulta.Open;
+    DM.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -134,6 +138,7 @@ begin
 
     FModel.CDSCadastro.Append;
     FOperacao := opIncluir;
+    DM.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -175,6 +180,7 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.Salvar(CClienteEspPrograma, AIdUsuario);
+    DM.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;

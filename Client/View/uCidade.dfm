@@ -4,6 +4,7 @@ inherited frmCidade: TfrmCidade
   ClientHeight = 471
   ClientWidth = 694
   OnDestroy = FormDestroy
+  ExplicitTop = -88
   ExplicitWidth = 700
   ExplicitHeight = 500
   PixelsPerInch = 96
@@ -11,6 +12,7 @@ inherited frmCidade: TfrmCidade
   inherited pgControl: TPageControl
     Width = 694
     Height = 471
+    ActivePage = tsEdicao
     ExplicitWidth = 694
     ExplicitHeight = 471
     inherited tsPesquisa: TTabSheet

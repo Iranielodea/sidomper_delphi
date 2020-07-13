@@ -76,6 +76,7 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoCancelamento(dm.IdUsuario, AIdAgendamento, DateToStr(AData), TimeToStr(AHora), ATexto);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -116,9 +117,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -133,9 +134,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoEncerramento(dm.IdUsuario, AIdAgendamento, AIdPrograma);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -150,9 +151,9 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoEncerramentoWEB(dm.IdUsuario, AIdAgendamento);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -203,9 +204,9 @@ begin
   try
     Negocio.AgendamentoExcluir(CAgendamentoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -232,6 +233,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.AgendamentoFiltrar(oObjetoJSON, ACampo, ATexto, dm.IdUsuario, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -247,9 +249,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.AgendamentoFiltarId(AId);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -264,9 +266,9 @@ begin
     FModel.CDSQuadro.Close;
     Negocio.AgendamentoQuadro(DateToStr(ADataInicial), DateToStr(ADataFinal), AIdUsuario, AIdRevenda);
     FModel.CDSQuadro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -280,10 +282,11 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TListaAgendamentoVO>(Negocio.AgendamentoQuadroJSON(DateToStr(ADataInicial), DateToStr(ADataFinal), AIdUsuario, AIdRevenda));
+      dm.Desconectar;
     except
       On E: Exception do
       begin
-        TFuncoes.Excessao(E, 'AbrirAgendamentoJSON');
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
@@ -312,6 +315,7 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Negocio.AgendamentoReagendamento(DM.IdUsuario, AIdAgendamento, DateToStr(AData), TimeToStr(AHora), ATexto);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -326,6 +330,7 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoRetornarEmails(AIdAgenda, AIdUsuario, AIdStatus);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -340,6 +345,7 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoRetornarCliente(AIdAgenda, dm.IdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -354,6 +360,7 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoTipoPrograma(AIdAgenda);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -367,9 +374,9 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.AgendamentoRelatorio(CAgendamentoPrograma, AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -383,9 +390,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.AgendamentoLocalizarId(CAgendamentoPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -421,6 +428,7 @@ begin
     TipoUmRegistro();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -449,6 +457,7 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoPermissaoQuadro(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
 //    dm.Desconectar;
@@ -496,10 +505,10 @@ begin
   Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.AgendamentoSalvar(CAgendamentoPrograma, AIdUsuario, oObjetoJSON);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Obj);
-    dm.Desconectar;
   end;
 end;
 
@@ -532,9 +541,9 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     bResult := Negocio.AgendamentoAberto(dm.IdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 
   if bResult then

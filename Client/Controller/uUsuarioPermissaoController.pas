@@ -59,6 +59,7 @@ begin
       dm.cdsUsuarioPermissaoSigla.AsString := model.Sigla;
       dm.cdsUsuarioPermissao.Post;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(lista);

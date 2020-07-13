@@ -52,6 +52,7 @@ type
     procedure Importar();
 
     function VisitaTipoObrigatorio(ACodTipo: string): Boolean;
+    function ValidarSIDomperCliente(ADataHora: string): Boolean;
 
   end;
 
@@ -183,6 +184,72 @@ end;
 function TParametros.CaminhoAplicativoImportarLicencas: string;
 begin
   Result := LocalizarParametro(47,0);
+end;
+
+function TParametros.ValidarSIDomperCliente(ADataHora: string): Boolean;
+var
+  sResultado: string;
+  DataBanco, DataParam: TDate;
+  HoraBanco, HoraParam: TTime;
+  bDataValida: Boolean;
+begin
+  Result := True;
+  try
+    sResultado := LocalizarParametro(53, 0);
+    DataBanco := StrToDate(Copy(sResultado, 1, 10));
+    bDataValida := True;
+  except
+    bDataValida := False;
+  end;
+
+  if bDataValida = False then
+  begin
+    AtualizarParametro(53, 0, QuotedStr(ADataHora));
+    Exit;
+  end;
+
+  try
+
+    DataBanco := StrToDate(Copy(sResultado, 1, 10));
+    HoraBanco := StrToTime(Trim(Copy(sResultado, 11, 15)));
+    DataParam := StrToDate(Copy(ADataHora, 1, 10));
+    HoraParam := StrToTime(Trim(Copy(ADataHora, 11, 15)));
+
+    if DataParam > DataBanco then
+    begin
+      // gravar no banco
+      AtualizarParametro(53, 0, QuotedStr(ADataHora));
+      Result := True;
+    end;
+
+    if DataParam = DataBanco then
+    begin
+      if HoraParam > HoraBanco then
+      begin
+        // grava banco
+        AtualizarParametro(53, 0, QuotedStr(ADataHora));
+        Result := True;
+        Exit;
+      end;
+
+      if HoraParam = HoraBanco then
+      begin
+        Result := True;
+        Exit;
+      end;
+
+      if HoraParam < HoraBanco then
+      begin
+        Result := False;
+        Exit;
+      end;
+    end;
+
+    if DataParam < DataBanco then
+      Result := False;
+  except
+    Result := True;
+  end;
 end;
 
 function TParametros.Editar(Programa, IdUsuario: Integer): Boolean;

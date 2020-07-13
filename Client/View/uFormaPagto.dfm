@@ -3,7 +3,6 @@ inherited frmFormaPagto: TfrmFormaPagto
   Caption = 'Formas de Pagamento'
   ClientHeight = 416
   OnDestroy = FormDestroy
-  ExplicitTop = -33
   ExplicitWidth = 666
   ExplicitHeight = 445
   PixelsPerInch = 96
@@ -11,13 +10,15 @@ inherited frmFormaPagto: TfrmFormaPagto
   inherited pgControl: TPageControl
     Height = 416
     ActivePage = tsEdicao
+    ExplicitHeight = 416
     inherited tsPesquisa: TTabSheet
       ExplicitLeft = 4
       ExplicitTop = 25
       ExplicitWidth = 652
-      ExplicitHeight = 337
+      ExplicitHeight = 387
       inherited Panel1: TPanel
         Height = 346
+        ExplicitHeight = 346
         inherited dbDados: TDBGrid
           Height = 288
           DataSource = dsPesquisa
@@ -44,15 +45,17 @@ inherited frmFormaPagto: TfrmFormaPagto
       end
       inherited Panel2: TPanel
         Top = 346
+        ExplicitTop = 346
       end
     end
     inherited tsEdicao: TTabSheet
       ExplicitLeft = 4
       ExplicitTop = 25
       ExplicitWidth = 652
-      ExplicitHeight = 337
+      ExplicitHeight = 387
       inherited Panel3: TPanel
         Height = 346
+        ExplicitHeight = 346
         object Label4: TLabel
           Left = 24
           Top = 24
@@ -128,30 +131,35 @@ inherited frmFormaPagto: TfrmFormaPagto
       end
       inherited Panel4: TPanel
         Top = 346
+        ExplicitTop = 346
       end
     end
     inherited tsFiltro: TTabSheet
       ExplicitLeft = 4
       ExplicitTop = 25
       ExplicitWidth = 652
-      ExplicitHeight = 337
+      ExplicitHeight = 387
       inherited Panel5: TPanel
         Height = 346
+        ExplicitHeight = 346
         inherited PageControl2: TPageControl
           Height = 344
+          ExplicitHeight = 344
           inherited tsGeral: TTabSheet
             ExplicitLeft = 4
             ExplicitTop = 25
             ExplicitWidth = 642
-            ExplicitHeight = 265
+            ExplicitHeight = 315
             inherited pnlGeral: TPanel
               Height = 315
+              ExplicitHeight = 315
             end
           end
         end
       end
       inherited Panel6: TPanel
         Top = 346
+        ExplicitTop = 346
         inherited btnImprimir: TBitBtn
           Left = 99
           Top = 7

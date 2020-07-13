@@ -83,9 +83,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -101,9 +101,9 @@ begin
   try
     Negocio.Excluir(CObservacao, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -118,6 +118,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CObservacao, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -133,9 +134,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CObservacao, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -153,9 +154,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarObservacaoPrograma(ACampo, ATexto, AAtivo, iEnum, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -168,9 +169,9 @@ begin
   try
     Negocio.Relatorio(CObservacao, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -184,9 +185,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CObservacao, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -203,10 +204,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.ObservacaoEmailPadrao(iEnum);
     FModel.CDSCadastro.Open;
-
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -220,9 +220,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CObservacao, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -239,10 +239,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.ObservacaoPadrao(iEnum);
     FModel.CDSCadastro.Open;
-
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -262,9 +261,9 @@ begin
     FModel.CDSCadastroObs_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -292,9 +291,9 @@ begin
   try
     iCodigo := StrToInt(Negocio.ProximoCodigo(CObservacao).ToString);
     Result := iCodigo;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -308,9 +307,9 @@ begin
   try
     iCodigo := StrToInt(Negocio.ProximoId(CObservacao).ToString);
     Result := iCodigo;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -332,17 +331,16 @@ begin
       Result := StrToIntDef(Negocio.ObservacaoSalvar(oObjetoJSON).ToString(),0);
       Post;
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(ObjVO);
-    DM.Desconectar;
   end;
 end;
 

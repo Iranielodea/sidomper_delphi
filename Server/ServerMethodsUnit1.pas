@@ -1033,6 +1033,7 @@ type
     procedure ParametrosExportarDadosBaseNova();
     procedure ParametrosImportarDadosBaseNova();
     function ListarParametros(): TJSONValue;
+    function ValidarSIDomperClient(ADataHora: string): Boolean;
 //------------------------------------------------------------------------------
 // transacoes
 //------------------------------------------------------------------------------
@@ -4032,6 +4033,19 @@ begin
     Result := obj.UsuarioADM(AIdUsuario);
   finally
     FreeAndNil(obj);
+  end;
+end;
+
+function TServerMethods1.ValidarSIDomperClient(ADataHora: string): Boolean;
+var
+  parametro: TParametros;
+begin
+  // parametro para validar a data hora do SIDomper.exe
+  parametro := TParametros.Create;
+  try
+    Result := parametro.ValidarSIDomperCliente(ADataHora);
+  finally
+    FreeAndNil(parametro);
   end;
 end;
 

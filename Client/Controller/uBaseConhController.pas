@@ -54,6 +54,7 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarCodigo(CBaseConhPrograma, ACodigo);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -62,7 +63,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -122,6 +122,7 @@ begin
       TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
       FOperacao := opEditar;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -130,7 +131,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -147,6 +147,7 @@ begin
     try
       Negocio.Excluir(CBaseConhPrograma, AIdUsuario, AId);
       FModel.CDSConsulta.Delete;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -155,7 +156,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -171,6 +171,7 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.Filtrar(APrograma, ACampo, ATexto,  Ativo, AContem);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -206,6 +207,7 @@ begin
       FModel.CDSConsulta.Close;
       Negocio.FiltrarBaseConh(oObjetoJSON, ACampo, ATexto, AIdUsuario, AContem);
       FModel.CDSConsulta.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -226,6 +228,7 @@ begin
   try
     try
       Negocio.Relatorio(CBaseConhPrograma, AIdUsuario);
+      dm.Desconectar;
 //    FModel.Rel.Print;
     except
       On E: Exception do
@@ -236,7 +239,6 @@ begin
 
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
   raise Exception.Create('Relatório não disponível no momento(a Desenvolver).');
 end;
@@ -252,6 +254,7 @@ begin
       FModel.CDSCadastro.Close;
       Negocio.LocalizarId(CBaseConhPrograma, AId);
       FModel.CDSCadastro.Open;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -260,7 +263,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -297,6 +299,7 @@ begin
       TipoUmRegistro();
 
       FOperacao := opIncluir;
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -306,7 +309,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Usuario);
-    dm.Desconectar;
   end;
 end;
 
@@ -346,6 +348,7 @@ begin
   try
     try
       Result := StrToInt(Negocio.ProximoId(CBaseConhPrograma).ToString);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -354,7 +357,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -405,6 +407,7 @@ begin
       Negocio.Commit;
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
@@ -415,7 +418,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

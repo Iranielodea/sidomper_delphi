@@ -87,9 +87,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -105,9 +105,9 @@ begin
   try
     Negocio.Excluir(CFormaPagto, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -122,6 +122,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CFormaPagto, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -137,9 +138,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CFormaPagto, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -152,9 +153,9 @@ begin
   try
     Negocio.Relatorio(CFormaPagto, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -168,9 +169,9 @@ begin
     FModel.CDSItens.Close;
     Negocio.FormaPagtoFiltroItem(AIdFormaPagto);
     FModel.CDSItens.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -184,9 +185,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CFormaPagto, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -200,9 +201,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CFormaPagto, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -226,9 +227,9 @@ begin
     FModel.CDSCadastroFpg_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -256,9 +257,9 @@ begin
   try
     iCodigo := StrToInt(Negocio.ProximoCodigo(CFormaPagto).ToString);
     Result := iCodigo;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -272,9 +273,9 @@ begin
   try
     iCodigo := StrToInt(Negocio.ProximoId(CFormaPagto).ToString);
     Result := iCodigo;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -302,18 +303,17 @@ begin
       Result := StrToIntDef(Negocio.FormaPagtoSalvar(oObjetoJSON).ToString(),0);
       Post;
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(ObjVO);
-    DM.Desconectar;
   end;
 end;
 

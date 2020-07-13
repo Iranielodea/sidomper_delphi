@@ -4,7 +4,6 @@ inherited frmCliente: TfrmCliente
   ClientHeight = 634
   ClientWidth = 1018
   OnDestroy = FormDestroy
-  ExplicitTop = -268
   ExplicitWidth = 1024
   ExplicitHeight = 663
   PixelsPerInch = 96
@@ -12,6 +11,7 @@ inherited frmCliente: TfrmCliente
   inherited pgControl: TPageControl
     Width = 1018
     Height = 634
+    ActivePage = tsEdicao
     ParentFont = False
     ExplicitWidth = 1018
     ExplicitHeight = 634
@@ -176,12 +176,16 @@ inherited frmCliente: TfrmCliente
           Top = 1
           Width = 1008
           Height = 562
-          ActivePage = tsPrincipal
+          ActivePage = tsEmail
           Align = alClient
           TabOrder = 0
           OnChange = PageControl1Change
           object tsPrincipal: TTabSheet
             Caption = '&Principal'
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
             object Panel7: TPanel
               Left = 0
               Top = 0
@@ -776,7 +780,6 @@ inherited frmCliente: TfrmCliente
                   item
                     Expanded = False
                     FieldName = 'Cont_Email'
-                    Width = 64
                     Visible = True
                   end>
               end
@@ -949,6 +952,10 @@ inherited frmCliente: TfrmCliente
             Caption = '&M'#243'dulos'
             ImageIndex = 3
             OnShow = tsModuloShow
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
             object Panel10: TPanel
               Left = 0
               Top = 0

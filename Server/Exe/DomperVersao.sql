@@ -3325,3 +3325,18 @@ INSERT INTO dbo.Parametros
 VALUES 
 	(52,125,'Tabela de Preço Vigente','0','ID da Tabela de Preços Padrão!');
 GO
+
+-------------------------------------------------------------------------------
+--VERSAO 1.000.47
+-------------------------------------------------------------------------------
+INSERT INTO dbo.Parametros
+(
+    Par_Codigo,
+    Par_Programa,
+    Par_Nome,
+    Par_Valor,
+    Par_Obs
+)
+VALUES 
+	(53,0,'Data e Hora do SIDomper Cliente','0','');
+GO

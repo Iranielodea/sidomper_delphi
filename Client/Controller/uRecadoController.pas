@@ -113,9 +113,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -159,9 +159,9 @@ begin
   try
     Negocio.Excluir(CRecadoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -178,6 +178,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.RecadoFiltrar(oJSON, ACampo, ATexto, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -193,9 +194,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.RecadoFiltrarId(AId);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -207,10 +208,10 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CRecadoPrograma, AIdUsuario);
+    dm.Desconectar;
 //    FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -224,9 +225,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CRecadoPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -253,9 +254,9 @@ begin
 
     FOperacao := opIncluir;
     FModoAbrEnc := 'A';
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -267,9 +268,9 @@ begin
   Negocio := TServerModule2Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.RecadoPermissaoUsuario(AIdUsuario, 'Acessar');
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -281,9 +282,9 @@ begin
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Result := Negocio.PermissaoRecadoQuadro(AIdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -303,6 +304,7 @@ begin
   try
     try
       Result := TConverte.JSONToObject<TListaRecadoQuadroViewModel>(Negocio.RecadoQuadroJSON(AIdUsuario, AIdRevenda));
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
@@ -311,7 +313,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -367,6 +368,7 @@ begin
       end;
       FModel.CDSQuadro.Next;
     end;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -465,6 +467,7 @@ begin
       Result := StrToIntDef(Negocio.RecadoSalvar(oObjetoJSON).ToString(), 0);
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
@@ -475,7 +478,6 @@ begin
   finally
     FreeAndNil(Negocio);
     FreeAndNil(ObjVO);
-    dm.Desconectar;
   end;
 end;
 

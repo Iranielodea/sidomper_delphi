@@ -79,6 +79,7 @@ type
     procedure btnStatusClick(Sender: TObject);
     procedure medtDataFiltroKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     FIdSolicitacao: Integer;
@@ -411,6 +412,11 @@ begin
     FController.SolicitacaoTempoExcluir(AId);
     CarregarGrid(0);
   end;
+end;
+
+procedure TfrmConferenciaTempo.FormCreate(Sender: TObject);
+begin
+  dm.ConexaoBanco;
 end;
 
 procedure TfrmConferenciaTempo.FormDestroy(Sender: TObject);

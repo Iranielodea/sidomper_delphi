@@ -54,7 +54,6 @@ object frmListaProblemaSolicitacao: TfrmListaProblemaSolicitacao
     PanelWidth = 1001
     TabOrder = 1
     RowCount = 5
-    ExplicitTop = 45
     object lblIdSolicitacao: TLabel
       Left = 12
       Top = 3
@@ -273,7 +272,6 @@ object frmListaProblemaSolicitacao: TfrmListaProblemaSolicitacao
     OnDblClick = dbredtRichOcoDblClick
   end
   object dsPesquisa: TDataSource
-    DataSet = DMSolicitacao.CDSListarProblemaSolucao
     Left = 584
     Top = 216
   end

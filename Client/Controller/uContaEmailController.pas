@@ -108,9 +108,9 @@ begin
     TFuncoes.HabilitarCampo(Formulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -172,9 +172,9 @@ begin
   try
     Negocio.Excluir(CContaEmailPrograma, IdUsuario, Id);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -189,6 +189,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CContaEmailPrograma, Campo, Texto, Ativo, Contem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -204,9 +205,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CContaEmailPrograma, Codigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -219,9 +220,9 @@ begin
   try
     Negocio.Relatorio(CContaEmailPrograma, IdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -235,9 +236,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CContaEmailPrograma, Codigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -251,9 +252,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CContaEmailPrograma, Id);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -273,9 +274,9 @@ begin
     FModel.CDSCadastroCtaEm_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -321,9 +322,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CContaEmailPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -335,9 +336,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CContaEmailPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -372,16 +373,15 @@ begin
 
       Negocio.Salvar(CContaEmailPrograma, IdUsuario);
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       on E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

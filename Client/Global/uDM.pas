@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, Data.DBXDataSnap, IPPeerClient,
   Data.DBXCommon, Data.DB, Data.SqlExpr, Datasnap.DBClient, Datasnap.DSConnect,
-  uConfig, Vcl.Controls, MidasLib, uRegras, Vcl.Dialogs, vcl.Forms, uEnumerador;
+  uConfig, Vcl.Controls, MidasLib, uRegras, Vcl.Dialogs, vcl.Forms;
 
 type
   TDM = class(TDataModule)
@@ -35,6 +35,7 @@ type
     procedure ConexaoBeforeConnect(Sender: TObject);
   private
     { Private declarations }
+    FOperacaoConcluida: Boolean;
     FIdSelecionado: integer;
     FIdUsuario: Integer;
     FIdCadastro: Integer;
@@ -42,11 +43,13 @@ type
     procedure CarregarIni;
     procedure SetTema(const Value: string);
     function GetTema: string;
-    procedure BuscarRamal();
+    procedure BuscarUsuario();
   public
     { Public declarations }
     procedure Conectar();
+    procedure ConexaoBanco();
     procedure Desconectar;
+    procedure ErroConexao(AErro: string);
     procedure StartTransacao;
     procedure Commit;
     procedure Roolback;
@@ -62,26 +65,21 @@ var
 
 implementation
 
-  uses uDMRamal;
+  uses uUsuarioController;
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
 
-procedure TDM.BuscarRamal;
+procedure TDM.BuscarUsuario;
 var
-  Negocio: TServerModule2Client;
-  FModel: TDMRamal;
+  controller: TUsuarioController;
 begin
-  FModel := TDMRamal.create(Self);
-  Negocio := TServerModule2Client.Create(DM.Conexao.DBXConnection);
+  controller := TUsuarioController.Create;
   try
-    FModel.CDSCadastro.Close;
-    Negocio.LocalizarId(CRamal, 0);
-    FModel.CDSCadastro.Open;
+    controller.UsuarioADM(0);
   finally
-    FreeAndNil(Negocio);
-    FreeAndNil(FModel);
+    FreeAndNil(controller);
   end;
 end;
 
@@ -118,10 +116,14 @@ var
 begin
   bErro := False;
   try
+    if FOperacaoConcluida = false then
+      Conexao.Connected := False;
+
     if not Conexao.Connected then
       Conexao.Connected := True;
 
-    BuscarRamal;
+    FOperacaoConcluida := False;
+    //BuscarUsuario();
   except
     On E: Exception do
     begin
@@ -129,7 +131,6 @@ begin
 
       try
         Conexao.Connected := True;
-//        BuscarRamal;
       except
         bErro := True;
       end;
@@ -144,11 +145,41 @@ begin
   CarregarIni();
 end;
 
+procedure TDM.ConexaoBanco;
+var
+  bErro: Boolean;
+begin
+
+  bErro := False;
+  try
+    if not Conexao.Connected then
+      Conexao.Connected := True;
+
+    BuscarUsuario();
+  except
+    On E: Exception do
+    begin
+      Conexao.Connected := False;
+
+      try
+        Conexao.Connected := True;
+      except
+        bErro := True;
+      end;
+      if bErro then
+        raise Exception.Create(E.Message);
+    end;
+  end;
+
+end;
+
 procedure TDM.DataModuleCreate(Sender: TObject);
 begin
   try
     if not Conexao.Connected then
       Conexao.Connected := True;
+
+    FOperacaoConcluida := True;
   except
     On E: Exception do
     begin
@@ -170,8 +201,19 @@ end;
 
 procedure TDM.Desconectar;
 begin
+  FOperacaoConcluida := True;
 //  if dm.Conexao.Connected then
 //    dm.Conexao.Connected := False;
+end;
+
+procedure TDM.ErroConexao(AErro: string);
+begin
+  if Pos('connection', LowerCase(AErro)) > 0 then
+  begin
+    FOperacaoConcluida := False;
+    AErro := AErro + sLineBreak + sLineBreak + 'Ouve um Erro de Conexão. ' + sLineBreak + 'Tente Novamente!!!';
+  end;
+  raise Exception.Create(AErro);
 end;
 
 function TDM.GetTema: string;

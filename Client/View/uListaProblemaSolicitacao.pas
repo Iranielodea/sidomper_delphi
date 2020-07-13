@@ -102,6 +102,7 @@ end;
 
 procedure TfrmListaProblemaSolicitacao.FormCreate(Sender: TObject);
 begin
+  dm.ConexaoBanco;
   FController := TSolicitacaoController.Create;
   dsPesquisa.DataSet := FController.Model.CDSListarProblemaSolucao;
 end;

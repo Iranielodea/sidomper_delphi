@@ -119,9 +119,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToIntDef(Negocio.DepartamentoDuplicar(AId).ToString(), 0);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -156,9 +156,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -174,9 +174,9 @@ begin
   try
     Negocio.Excluir(CDepartamentoPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -191,6 +191,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(CDepartamentoPrograma, ACampo, ATexto, AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -206,9 +207,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CDepartamentoPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -222,9 +223,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.DepartamentoFiltrarId(AId);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -232,9 +233,11 @@ function TDepartamentoController.IdAtual: Integer;
 var
   Negocio: TServerMethods1Client;
 begin
+  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornaIdAtual('Departamento');
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -249,9 +252,9 @@ begin
   try
     Negocio.Relatorio(CDepartamentoPrograma, AIdUsuario);
     FModel.Rel.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -265,9 +268,9 @@ begin
     FModel.CDSItens.Close;
     Negocio.LocalizarCodigo(CDepartamentoAcessoPrograma, AIdDepartamento);
     FModel.CDSItens.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -281,9 +284,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarCodigo(CDepartamentoPrograma, ACodigo);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -307,9 +310,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CDepartamentoPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -351,9 +354,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.DepartamentoMostrarAnexos(dm.IdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -466,9 +469,9 @@ begin
     FModel.CDSCadastroDep_Codigo.AsInteger := ProximoCodigo();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -494,9 +497,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoCodigo(CDepartamentoPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -509,9 +512,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CDepartamentoPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    DM.Desconectar;
   end;
 end;
 
@@ -635,18 +638,17 @@ begin
       oObjetoJSON := Marshal.Marshal(ObjVO);
       Result := StrToIntDef(Negocio.DepartamentoSalvar(oObjetoJSON).ToString(),0);
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
-        TFuncoes.MensagemErroBanco(E.Message);
-        Abort;
+        dm.ErroConexao(E.Message);
       end;
     end;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(Marshal);
     FreeAndNil(ObjVO);
-    DM.Desconectar;
   end;
 end;
 

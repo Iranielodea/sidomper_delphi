@@ -74,9 +74,9 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarCodigo(CVisitaPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -98,6 +98,7 @@ begin
       sResult := Negocio.VisitaAtualizacaoVersao(AIdCliente, AIdTipo, AVersao);
       if sResult <> '' then
         raise Exception.Create(sResult);
+      dm.Desconectar;
     except
       On E: Exception do
       begin
@@ -106,7 +107,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -146,9 +146,9 @@ begin
     TFuncoes.HabilitarCampo(AFormulario, Resultado);
 
     FOperacao := opEditar;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -164,9 +164,9 @@ begin
   try
     Negocio.Excluir(CVisitaPrograma, AIdUsuario, AId);
     FModel.CDSConsulta.Delete;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -181,6 +181,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.Filtrar(APrograma, ACampo, ATexto,  AAtivo, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -209,6 +210,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.FiltrarVisita(oObjetoJSON, ACampo, ATexto, AIdUsuario, AContem);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
@@ -222,10 +224,10 @@ begin
   Negocio := TServerMethods1Client.Create(dm.Conexao.DBXConnection);
   try
     Negocio.Relatorio(CVisitaPrograma, AIdUsuario);
+    dm.Desconectar;
 //    FModel.Rel.Print;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -239,9 +241,9 @@ begin
     FModel.CDSCadastro.Close;
     Negocio.LocalizarId(CVisitaPrograma, AId);
     FModel.CDSCadastro.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -298,9 +300,9 @@ begin
     TipoUmRegistro();
 
     FOperacao := opIncluir;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -339,9 +341,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := StrToInt(Negocio.ProximoId(CVisitaPrograma).ToString);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -390,10 +392,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, '');
     rel.lblPeriodoModelo1.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
     rel.RelVisitaModelo1.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -424,10 +426,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, AOrdem);
     rel.lblPeriodoModelo2.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
     rel.RelVisitaModelo2.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -458,10 +460,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, AOrdem);
     rel.lblPeriodoModelo3.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
     rel.RelVisitaModelo3.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -492,10 +494,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, AOrdem);
     rel.lblPeriodoModelo4.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
     rel.RelVisitaModelo4.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -554,10 +556,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, sOrdem);
     rel.lblRelatorioVisita5.Caption := 'Período de ' + sMesAnoInicial + ' Até ' + sMesAnoFinal;
     rel.RelVisitaModelo5.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -606,10 +608,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, sOrdem);
     rel.lblRelatorioVisita6.Caption := 'Período de ' + sMesAnoInicial + ' Até ' + sMesAnoFinal;
     rel.RelVisitaModelo6.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -666,10 +668,10 @@ begin
     Negocio.RelatorioVisita(AModelo, AIdUsuario, oObjetoJSON, AOrdem);
     rel.lblPeriodoModelo8.Caption := 'Período de ' + AFiltro.DataInicial + ' Até ' + AFiltro.DataFinal;
     rel.RelVisitaModelo8.Print;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
     FreeAndNil(rel);
-    dm.Desconectar;
   end;
 end;
 
@@ -682,9 +684,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornarVisitaEmails(AIdVisita, AIdUsuario, AIdStatus);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -696,9 +698,9 @@ begin
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     Result := Negocio.RetornarVisitaEmailCliente(AIdVisita, dm.IdUsuario);
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 
@@ -771,6 +773,7 @@ begin
 //      Negocio.Commit;
 
       FOperacao := opNavegar;
+      dm.Desconectar;
     except
       ON E: Exception do
       begin
@@ -781,7 +784,6 @@ begin
     end;
   finally
     FreeAndNil(Negocio);
-    dm.Desconectar;
   end;
 end;
 

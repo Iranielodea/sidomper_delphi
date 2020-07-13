@@ -62,6 +62,7 @@ begin
     FModel.CDSConsulta.Close;
     Negocio.LocalizarCodigo(CClienteEmailPrograma, ACodigo);
     FModel.CDSConsulta.Open;
+    dm.Desconectar;
   finally
     FreeAndNil(Negocio);
   end;
