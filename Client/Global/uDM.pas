@@ -211,7 +211,7 @@ begin
   if Pos('connection', LowerCase(AErro)) > 0 then
   begin
     FOperacaoConcluida := False;
-    AErro := AErro + sLineBreak + sLineBreak + 'Ouve um Erro de Conexão. ' + sLineBreak + 'Tente Novamente!!!';
+    AErro := AErro + sLineBreak + sLineBreak + 'Houve um Erro de Conexão. ' + sLineBreak + 'Tente Novamente!!!';
   end;
   raise Exception.Create(AErro);
 end;

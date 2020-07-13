@@ -379,6 +379,7 @@ var
   Item: TRecadoQuadroViewModel;
   Lista: TObjectList<TRecadoQuadroViewModel>;
 begin
+  dm.ConexaoBanco;
   Lista := BuscarQuadroJSON(AIdUsuario, AIdRevenda);
   try
     FModel.CDSLcto.First;

@@ -79,6 +79,7 @@ constructor TfrmChamadoDetalhes2.create(AIdChamado: integer;
   ATipo: TEnumChamadoAtividade);
 begin
   inherited create(nil);
+  dm.ConexaoBanco;
   FIdChamado := AIdChamado;
   FTipoMovimento := ATipo;
 

@@ -987,6 +987,7 @@ begin
   if tsAtividades.Showing then
   begin
     ExecutarTimer(False);
+    dm.ConexaoBanco;
 //    FControllerChamado.PreencherTodosQuadrosAtividades(dm.IdUsuario, FIdRevenda);
     FControllerChamado.PreencherTodosQuadrosAtividadesJSON(dm.IdUsuario, FIdRevenda);
 
@@ -1006,6 +1007,7 @@ begin
   if tsChamados.Showing then
   begin
     ExecutarTimer(False);
+    dm.ConexaoBanco;
     FControllerChamado.PreencherTodosQuadrosJSON(dm.IdUsuario, FIdRevenda);
 //    FControllerChamado.PreencherTodosQuadros(dm.IdUsuario, FIdRevenda);
 
@@ -1042,6 +1044,7 @@ begin
   if tsSolicitacao.Showing then
   begin
     ExecutarTimer(False);
+    dm.ConexaoBanco;
     if btnConfTempos.Visible = False then
     begin
       btnSolucaoSolicitacao.Left := btnConfTempos.Left;
@@ -1091,6 +1094,7 @@ begin
 
   IdCliente := ADataSet.FieldByName('IdCliente').AsInteger;
 
+  dm.ConexaoBanco;
   Agendamento := TAgendamentoController.Create;
   try
     iTipoPrograma := Agendamento.RetornaTipoPrograma(AIdAgenda);
@@ -1945,6 +1949,7 @@ begin
     Exit;
 
   ExecutarTimer(False);
+  dm.ConexaoBanco;
   try
     dDataInicial := StrToDate(edtDataInicial.Text);
     dDataFinal := StrToDate(edtDataFinal.Text);
@@ -2457,6 +2462,7 @@ begin
   AData := Copy(AData, 1, 10);
 
   ExecutarTimer(False);
+  dm.ConexaoBanco;
   Formulario := TfrmAgendamento.create(AData, False, True);
   try
     if Formulario.ShowModal = mrOk then
@@ -3171,6 +3177,7 @@ begin
     raise Exception.Create('Não há Registros para Editar!');
 
   ExecutarTimer(False);
+
   bGeral    := (ATipoSol = solOcorrGeral);
 
   bTecnica  := (ATipoSol = solOcorrTecnica);
@@ -3181,6 +3188,7 @@ begin
   iStatusId := AClientDataSet.FieldByName('Sol_StatusId').AsInteger;
   iIdSol := AClientDataSet.FieldByName('Sol_Id').AsInteger;
 
+  dm.ConexaoBanco;
   TFuncoes.CriarFormularioModal(TfrmSolicitacao.create(AClientDataSet.FieldByName('Sol_Id').AsInteger, True, bGeral, bTecnica, bAnalise, False, bRegra));
   AbrirQuadrosSolicitacao;
 
@@ -3734,6 +3742,7 @@ begin
 
   ExecutarTimer(False);
 
+  dm.ConexaoBanco;
   Formulario := TfrmSolicitacaoDetalhes2.Create(IdSolicitacao, TEnumSolicitacao.solOcorrGeral);
   try
     Formulario.ShowModal;
@@ -3770,6 +3779,7 @@ begin
 
   ExecutarTimer(False);
 
+  dm.ConexaoBanco;
   Formulario := TfrmSolicitacaoDetalhes2.Create(IdSolicitacao);
   try
     Formulario.ShowModal;
@@ -3853,6 +3863,7 @@ begin
   if id = 0 then
     raise Exception.Create('Não há agendamento para encerrar!');
 
+  dm.ConexaoBanco;
   AgendamentoController := TAgendamentoController.Create;
   try
     AgendamentoController.EncerrarWEB(Id);
@@ -3931,6 +3942,7 @@ begin
     raise Exception.Create('Não há Registros!');
 
   ExecutarTimer(False);
+  dm.ConexaoBanco;
   Formulario := TfrmAgendamentoMotivo.create(AId, ATipo);
   try
     if Formulario.ShowModal = mrOk then
@@ -3952,6 +3964,7 @@ begin
     raise Exception.Create('Não há Registros!');
 
   ExecutarTimer(False);
+  dm.ConexaoBanco;
   Formulario := TfrmAgendamentoMotivo.create(AId, ADetalhe);
   try
     Formulario.ShowModal;
@@ -4479,6 +4492,7 @@ var
   Perfil: Integer;
   bPermissao: Boolean;
 begin
+  dm.ConexaoBanco;
   if ATipo = caChamado then
   begin
     if not FControllerChamado.PermissaoChamadoOcorrencia(DM.IdUsuario) then
@@ -4534,6 +4548,7 @@ begin
 //  if FControllerSolicitacao.SolicitacaoAtualAberta(IdSolicitacao) then
 //    raise Exception.Create('Solicitação está Aberta, será Necessário Encerrá-la!');
 
+  dm.ConexaoBanco;
   Formulario := TfrmStatusTroca.Create(prSolicitacao);
   try
     IdStatus := 0;

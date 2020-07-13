@@ -201,6 +201,7 @@ var
   bRecado: Boolean;
   RecadoController: TRecadoController;
 begin
+  dm.ConexaoBanco;
   ChamadoController := TChamadoController.Create;
   SolicitacaoController := TSolicitacaoController.Create;
   RecadoController := TRecadoController.Create;

@@ -237,6 +237,7 @@ var
   ParametroController: TParametrosController;
 begin
   Result := True;
+  Exit;
   sArquivo := ExtractFileDir(Application.ExeName) + '\SIDomper.exe';
   if FileExists(sArquivo) then
   begin

@@ -3218,6 +3218,7 @@ object frmQuadro2: TfrmQuadro2
         Height = 33
         Align = alTop
         TabOrder = 0
+        ExplicitTop = -4
         DesignSize = (
           916
           33)
@@ -4167,6 +4168,8 @@ object frmQuadro2: TfrmQuadro2
           Font.Style = [fsBold]
           ParentFont = False
           TabOrder = 1
+          ExplicitLeft = 0
+          ExplicitTop = -5
           object chkVerTodosRecados: TCheckBox
             Left = 143
             Top = 17
