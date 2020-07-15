@@ -3340,3 +3340,15 @@ INSERT INTO dbo.Parametros
 VALUES 
 	(53,0,'Data e Hora do SIDomper Cliente','0','');
 GO
+
+INSERT INTO dbo.Parametros
+(
+    Par_Codigo,
+    Par_Programa,
+    Par_Nome,
+    Par_Valor,
+    Par_Obs
+)
+VALUES 
+	(54,0,'Código do usuário para uso do aplicativo SIDomper','1','');
+GO
