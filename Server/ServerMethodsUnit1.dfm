@@ -2990,8 +2990,9 @@ object ServerMethods1: TServerMethods1
       #9'Cha_Modulo,'
       #9'Cha_Produto,'
       #9'Cha_UsuarioAtendeAtual,'
-      '        Cha_HoraAtendeAtual,'
-      '        Cha_TipoMovimento,'
+      '  Cha_HoraAtendeAtual,'
+      '  Cha_TipoMovimento,'
+      '  Cha_Origem,'
       #9'Usu_Codigo,'
       #9'Usu_Nome,'
       #9'Cli_Codigo,'
@@ -3105,6 +3106,11 @@ object ServerMethods1: TServerMethods1
     object QChamadoCadCha_TipoMovimento: TIntegerField
       FieldName = 'Cha_TipoMovimento'
       Origin = 'Cha_TipoMovimento'
+      ProviderFlags = [pfInUpdate]
+    end
+    object QChamadoCadCha_Origem: TIntegerField
+      FieldName = 'Cha_Origem'
+      Origin = 'Cha_Origem'
       ProviderFlags = [pfInUpdate]
     end
     object QChamadoCadUsu_Codigo: TIntegerField

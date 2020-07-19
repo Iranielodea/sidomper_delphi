@@ -618,6 +618,7 @@ type
     CDSAtividade4Cli_Perfil: TStringField;
     CDSAtividade5Cli_Perfil: TStringField;
     CDSAtividade6Cli_Perfil: TStringField;
+    CDSCadastroCha_Origem: TIntegerField;
     procedure CDSCadastroBeforePost(DataSet: TDataSet);
     procedure CDSCadastroCha_DataAberturaSetText(Sender: TField; const Text:
         string);
@@ -881,6 +882,7 @@ begin
   CDSCadastroCha_HoraAbertura.AsDateTime := Time;
   CDSCadastroCha_HoraAtendeAtual.AsDateTime := Time;
   CDSCadastroCha_Nivel.AsInteger := 2;
+  CDSCadastroCha_Origem.AsInteger := 1;
 end;
 
 procedure TDMChamado.CDSCadastroReconcileError(DataSet: TCustomClientDataSet;

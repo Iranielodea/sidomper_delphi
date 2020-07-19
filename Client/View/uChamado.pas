@@ -137,6 +137,9 @@ type
     lbl1: TLabel;
     Label19: TLabel;
     edtPerfil: TEdit;
+    dbrgrpCha_Origem: TDBRadioGroup;
+    Label17: TLabel;
+    cbbOrigem: TComboBox;
     procedure btnAnexarClick(Sender: TObject);
     procedure btnCancelarOcorrenciaClick(Sender: TObject);
     procedure btnClienteClick(Sender: TObject);
@@ -337,8 +340,10 @@ begin
   PermissaoEdicaoOcorrencia;
 
   UsuarioAdministrador();
+
   LimparEdits();
   inherited;
+
 
   DadosCliente();
   if edtNome.Enabled then
@@ -470,6 +475,8 @@ begin
   HabilitarBotoesOcorrencia();
   BuscarClienteAgendamento();
   BuscarTextoAgendamento();
+
+  dbrgrpCha_Origem.Enabled := True;
 
   edtNome.SetFocus;
 end;
@@ -2294,6 +2301,7 @@ begin
   AFiltro.Cliente.Perfil := edtPerfil.Text;
   AFiltro.TipoMovimento := integer(FTipoMovimento);
   AFiltro.Id := StrToIntDef(edtIdFiltro.Text, 0);
+  AFiltro.Origem := cbbOrigem.ItemIndex;
 end;
 
 procedure TfrmChamado.RelatorioModelo_01;
@@ -2678,6 +2686,15 @@ begin
       bAdm := Usuario.PermissaoChamadoOcorrenciaDataHora(dm.IdUsuario, Id, bMesmoUsuario)
     else
       bAdm := Usuario.PermissaoAtividadeOcorrenciaDataHora(dm.IdUsuario, Id, bMesmoUsuario);
+
+    if bAdm then
+      dbrgrpCha_Origem.Enabled := True
+    else begin
+      if edtCodCliente.Enabled = False then
+        dbrgrpCha_Origem.Enabled := False
+      else
+        dbrgrpCha_Origem.Enabled := (FController.Model.CDSCadastroCha_Origem.AsInteger < 4);
+    end;
 
     if edtCodCliente.Enabled = False then
       bAdm := True;

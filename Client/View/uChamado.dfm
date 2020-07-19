@@ -4,7 +4,6 @@
   ClientHeight = 671
   ClientWidth = 1018
   OnDestroy = FormDestroy
-  ExplicitTop = -305
   ExplicitWidth = 1024
   ExplicitHeight = 700
   PixelsPerInch = 96
@@ -12,6 +11,7 @@
   inherited pgControl: TPageControl
     Width = 1018
     Height = 671
+    ActivePage = tsEdicao
     ExplicitWidth = 1018
     ExplicitHeight = 671
     inherited tsPesquisa: TTabSheet
@@ -194,7 +194,7 @@
           Top = 1
           Width = 1008
           Height = 599
-          ActivePage = tsChamadoOcorrencia
+          ActivePage = tsPrincipal
           Align = alClient
           TabOrder = 0
           OnChange = PageControl1Change
@@ -411,7 +411,7 @@
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 13
+                TabOrder = 14
                 OnExit = edtCodTipoExit
                 OnKeyDown = edtCodClienteKeyDown
               end
@@ -425,7 +425,7 @@
                 DataField = 'Tip_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 14
+                TabOrder = 15
               end
               object edtCodStatus: TDBEdit
                 Left = 23
@@ -441,7 +441,7 @@
                 ParentShowHint = False
                 ReadOnly = True
                 ShowHint = True
-                TabOrder = 15
+                TabOrder = 16
               end
               object DBEdit12: TDBEdit
                 Left = 100
@@ -453,7 +453,7 @@
                 DataField = 'Sta_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 16
+                TabOrder = 17
               end
               object DBMemo1: TDBMemo
                 Left = 548
@@ -464,7 +464,7 @@
                 DataSource = dsCad
                 MaxLength = 1000
                 ScrollBars = ssVertical
-                TabOrder = 18
+                TabOrder = 19
                 OnEnter = DBMemo1Enter
                 OnExit = DBMemo1Exit
                 OnKeyDown = DBMemo1KeyDown
@@ -472,7 +472,7 @@
               object DBRadioGroup1: TDBRadioGroup
                 Left = 24
                 Top = 193
-                Width = 488
+                Width = 336
                 Height = 56
                 Caption = 'Nivel:'
                 Columns = 4
@@ -501,7 +501,7 @@
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 9
+                TabOrder = 10
                 OnExit = edtCodModuloExit
                 OnKeyDown = edtCodClienteKeyDown
               end
@@ -515,7 +515,7 @@
                 DataField = 'Mod_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 10
+                TabOrder = 11
               end
               object edtCodProduto: TDBEdit
                 Left = 23
@@ -530,7 +530,7 @@
                 ParentShowHint = False
                 ReadOnly = True
                 ShowHint = True
-                TabOrder = 11
+                TabOrder = 12
               end
               object DBEdit11: TDBEdit
                 Left = 100
@@ -542,12 +542,12 @@
                 DataField = 'Prod_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 12
+                TabOrder = 13
               end
               object DBEdit1: TDBEdit
                 Left = 24
                 Top = 165
-                Width = 489
+                Width = 393
                 Height = 22
                 CharCase = ecUpperCase
                 DataField = 'Cha_Contato'
@@ -569,7 +569,29 @@
                 ParentFont = False
                 ReadOnly = True
                 ScrollBars = ssVertical
-                TabOrder = 17
+                TabOrder = 18
+              end
+              object dbrgrpCha_Origem: TDBRadioGroup
+                Left = 423
+                Top = 145
+                Width = 112
+                Height = 126
+                Caption = 'Origem:'
+                DataField = 'Cha_Origem'
+                DataSource = dsCad
+                Items.Strings = (
+                  'Telefone'
+                  'WhatsApp'
+                  'Chat'
+                  'Aplicativo'
+                  'ERP')
+                TabOrder = 9
+                Values.Strings = (
+                  '1'
+                  '2'
+                  '3'
+                  '4'
+                  '5')
               end
             end
           end
@@ -1152,10 +1174,17 @@
                 Height = 14
                 Caption = 'Perfil'
               end
+              object Label17: TLabel [5]
+                Left = 128
+                Top = 112
+                Width = 45
+                Height = 14
+                Caption = 'Origem'
+              end
               inherited cbbSituacao: TComboBox
                 Left = 318
                 Top = 84
-                TabOrder = 4
+                TabOrder = 5
                 Visible = False
                 ExplicitLeft = 318
                 ExplicitTop = 84
@@ -1186,7 +1215,7 @@
                 Width = 978
                 Height = 337
                 Caption = 'Relat'#243'rios:'
-                TabOrder = 5
+                TabOrder = 6
                 object Label23: TLabel
                   Left = 13
                   Top = 32
@@ -1246,6 +1275,23 @@
                 Width = 89
                 Height = 22
                 TabOrder = 3
+              end
+              object cbbOrigem: TComboBox
+                Left = 128
+                Top = 132
+                Width = 145
+                Height = 22
+                Style = csDropDownList
+                ItemIndex = 0
+                TabOrder = 4
+                Text = 'Todos'
+                Items.Strings = (
+                  'Todos'
+                  'Telefone'
+                  'Whats'
+                  'Chat'
+                  'Aplictivo'
+                  'ERP')
               end
             end
           end
@@ -1690,6 +1736,7 @@
     Top = 249
   end
   inherited dsCad: TDataSource
+    DataSet = DMChamado.CDSCadastro
     Left = 752
     Top = 240
   end
@@ -1704,8 +1751,8 @@
   object dsOcorrencia: TDataSource
     AutoEdit = False
     OnStateChange = dsOcorrenciaStateChange
-    Left = 425
-    Top = 75
+    Left = 289
+    Top = 139
   end
   object OpenDialog1: TOpenDialog
     Left = 833

@@ -77,6 +77,7 @@ object DMChamado: TDMChamado
     Aggregates = <>
     Params = <>
     ProviderName = 'dspChamadoCad'
+    RemoteServer = DM.DSPConexao
     BeforePost = CDSCadastroBeforePost
     OnNewRecord = CDSCadastroNewRecord
     OnReconcileError = CDSCadastroReconcileError
@@ -256,6 +257,9 @@ object DMChamado: TDMChamado
       ProviderFlags = []
       Required = True
       Size = 100
+    end
+    object CDSCadastroCha_Origem: TIntegerField
+      FieldName = 'Cha_Origem'
     end
   end
   object dbConsulta: TppDBPipeline

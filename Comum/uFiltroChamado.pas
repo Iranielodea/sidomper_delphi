@@ -18,6 +18,7 @@ type
     FCliente: TFiltroCliente;
     FTipoMovimento: Integer;
     FId: Integer;
+    FOrigem: Integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -32,6 +33,7 @@ type
     property Cliente: TFiltroCliente read FCliente write FCliente;
     property TipoMovimento: Integer read FTipoMovimento write FTipoMovimento;
     property Id: Integer read FId write FId;
+    property Origem: Integer read FOrigem write FOrigem;
   end;
 
 implementation

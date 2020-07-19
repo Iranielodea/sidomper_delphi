@@ -7,7 +7,7 @@ uses
   Data.DB, System.Variants,
   FireDAC.Comp.Client, uEnumerador, Vcl.Dialogs, uCadastroInterface, uChamadoStatusVO,
   uDMChamado, uChamadoVO, System.Generics.Collections, uChamadoStatus, uChamadoColaboradorVO,
-  uFireDAC, System.DateUtils, uChamadoQuadroViewModel;
+  uFireDAC, System.DateUtils, uChamadoQuadroViewModel, uGenericDAO;
 
   const CConsulta: string =
   ' SELECT'
@@ -433,6 +433,8 @@ begin
   if AFiltro.Cliente.Perfil.Trim() <> '' then
     sConsulta := sConsulta + ' AND Cli_Perfil = ' + QuotedStr(AFiltro.Cliente.Perfil);
 
+  if AFiltro.Origem > 0 then
+    sConsulta := sConsulta + ' AND Cha_Origem = ' +  AFiltro.Origem.ToString;
   Result := sConsulta;
 end;
 
@@ -515,6 +517,8 @@ begin
   if AFiltro.Id > 0 then
     sConsulta := sConsulta + ' AND Cha_Id = ' + AFiltro.Id.ToString();
 
+  if AFiltro.Origem > 0 then
+    sConsulta := sConsulta + ' AND Cha_Origem = ' + AFiltro.Origem.ToString();
 
   Result := sConsulta;
 end;
@@ -1532,48 +1536,9 @@ begin
   dm.StartTransacao;
   try
     sHora := FormatDateTime('hh:mm', AChamadoVO.HoraAbertura);
-
     AChamadoVO.ChamadoStatusVO.IdStatus := RetornarStatus(AChamadoVO.Id);
 
-    AspChamado.Close;
-    AspChamado.ParamByName('@IU').AsString := sIU;
-    AspChamado.ParamByName('@Id').AsInteger := AChamadoVO.Id;
-    AspChamado.ParamByName('@DataAbertura').AsDate := AChamadoVO.DataAbertura;
-    AspChamado.ParamByName('@HoraAbertura').AsTime := StrToTime(sHora); // AChamadoVO.HoraAbertura;
-    AspChamado.ParamByName('@IdCliente').AsInteger := AChamadoVO.IdCliente;
-    AspChamado.ParamByName('@IdUsuarioAbertura').AsInteger := AChamadoVO.IdUsuarioAbertura;
-    AspChamado.ParamByName('@Contato').AsString := AChamadoVO.Contato;
-    AspChamado.ParamByName('@Nivel').AsInteger  := AChamadoVO.Nivel;
-    AspChamado.ParamByName('@IdTipo').AsInteger := AChamadoVO.IdTipo;
-    AspChamado.ParamByName('@IdStatus').AsInteger := AChamadoVO.IdStatus;
-    AspChamado.ParamByName('@Descricao').AsString := AChamadoVO.Descricao;
-
-    if AChamadoVO.IdModulo = 0 then
-      AspChamado.ParamByName('@IdModulo').Value := null
-    else
-      AspChamado.ParamByName('@IdModulo').AsInteger := AChamadoVO.IdModulo;
-
-    if AChamadoVO.IdProduto = 0 then
-      AspChamado.ParamByName('@IdProduto').Value := null
-    else
-      AspChamado.ParamByName('@IdProduto').AsInteger := AChamadoVO.IdProduto;
-
-    if AChamadoVO.IdUsuarioAtendeAtual = 0 then
-      AspChamado.ParamByName('@IdUsuarioAtendeAtual').Value := null
-    else
-      AspChamado.ParamByName('@IdUsuarioAtendeAtual').AsInteger := AChamadoVO.IdUsuarioAtendeAtual;
-
-    if AChamadoVO.HoraAtendeAtual = 0 then
-      AspChamado.ParamByName('@HoraAtendeAtual').Value := null
-    else begin
-      sHora := FormatDateTime('hh:mm', AChamadoVO.HoraAtendeAtual);
-      AspChamado.ParamByName('@HoraAtendeAtual').AsTime := StrToTime(sHora); //AChamadoVO.HoraAtendeAtual
-    end;
-
-    AspChamado.ParamByName('@TipoMovimento').AsInteger := AChamadoVO.TipoMovimento;
-    AspChamado.ExecProc();
-
-    id := AspChamado.ParamByName('@RetornoId').AsInteger;
+    Id := TGenericDAO.Save<TChamadoVO>(AChamadoVO);
 
     SalvarOcorrencia(Id, AChamadoVO, AspChamadoOcorrencia);
 
@@ -1582,6 +1547,55 @@ begin
 
     dm.Commit();
     Result := id;
+
+// NAO SERÁ MAI UTILIZADO AS LINHAS ABAIXO PARA SALVAR O CHAMADO
+//    AspChamado.Close;
+//    AspChamado.ParamByName('@IU').AsString := sIU;
+//    AspChamado.ParamByName('@Id').AsInteger := AChamadoVO.Id;
+//    AspChamado.ParamByName('@DataAbertura').AsDate := AChamadoVO.DataAbertura;
+//    AspChamado.ParamByName('@HoraAbertura').AsTime := StrToTime(sHora); // AChamadoVO.HoraAbertura;
+//    AspChamado.ParamByName('@IdCliente').AsInteger := AChamadoVO.IdCliente;
+//    AspChamado.ParamByName('@IdUsuarioAbertura').AsInteger := AChamadoVO.IdUsuarioAbertura;
+//    AspChamado.ParamByName('@Contato').AsString := AChamadoVO.Contato;
+//    AspChamado.ParamByName('@Nivel').AsInteger  := AChamadoVO.Nivel;
+//    AspChamado.ParamByName('@IdTipo').AsInteger := AChamadoVO.IdTipo;
+//    AspChamado.ParamByName('@IdStatus').AsInteger := AChamadoVO.IdStatus;
+//    AspChamado.ParamByName('@Descricao').AsString := AChamadoVO.Descricao;
+//
+//    if AChamadoVO.IdModulo = 0 then
+//      AspChamado.ParamByName('@IdModulo').Value := null
+//    else
+//      AspChamado.ParamByName('@IdModulo').AsInteger := AChamadoVO.IdModulo;
+//
+//    if AChamadoVO.IdProduto = 0 then
+//      AspChamado.ParamByName('@IdProduto').Value := null
+//    else
+//      AspChamado.ParamByName('@IdProduto').AsInteger := AChamadoVO.IdProduto;
+//
+//    if AChamadoVO.IdUsuarioAtendeAtual = 0 then
+//      AspChamado.ParamByName('@IdUsuarioAtendeAtual').Value := null
+//    else
+//      AspChamado.ParamByName('@IdUsuarioAtendeAtual').AsInteger := AChamadoVO.IdUsuarioAtendeAtual;
+//
+//    if AChamadoVO.HoraAtendeAtual = 0 then
+//      AspChamado.ParamByName('@HoraAtendeAtual').Value := null
+//    else begin
+//      sHora := FormatDateTime('hh:mm', AChamadoVO.HoraAtendeAtual);
+//      AspChamado.ParamByName('@HoraAtendeAtual').AsTime := StrToTime(sHora); //AChamadoVO.HoraAtendeAtual
+//    end;
+//
+//    AspChamado.ParamByName('@TipoMovimento').AsInteger := AChamadoVO.TipoMovimento;
+//    AspChamado.ExecProc();
+//
+//    id := AspChamado.ParamByName('@RetornoId').AsInteger;
+//
+//    SalvarOcorrencia(Id, AChamadoVO, AspChamadoOcorrencia);
+//
+//    AChamadoVO.ChamadoStatusVO.IdChamado := Id;
+//    SalvarStatus(AChamadoVO.IdUsuarioAbertura, AChamadoVO);
+//
+//    dm.Commit();
+//    Result := id;
   except
     On E: Exception do
     begin

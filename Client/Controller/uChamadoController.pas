@@ -2545,6 +2545,7 @@ begin
   ChamadoVO.IdUsuarioAtendeAtual  := FModel.CDSCadastroCha_UsuarioAtendeAtual.AsInteger;
   ChamadoVO.HoraAtendeAtual       := hora; // FModel.CDSCadastroCha_HoraAtendeAtual.AsDateTime;
   ChamadoVO.TipoMovimento         := FModel.CDSCadastroCha_TipoMovimento.AsInteger;
+  ChamadoVO.Origem                := FModel.CDSCadastroCha_Origem.AsInteger;
 
   GravarOcorrencia(ChamadoVO);
   GravarOcorrenciaColaborador(ChamadoVO);

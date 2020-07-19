@@ -4,9 +4,10 @@ interface
 
 uses
   System.SysUtils, uChamadoStatusVO, System.Generics.Collections, uChamadoOcorrenciaVO,
-  uChamadoColaboradorVO;
+  uChamadoColaboradorVO, uKeyField, uTableName;
 
 type
+  [TableName('Chamado')]
   TChamadoVO = class
   private
     FIdStatus: Integer;
@@ -29,6 +30,7 @@ type
     FListaChamadoOcorrencia: TObjectList<TChamadoOcorrenciaVO>;
     FChamadoStatusVO: TChamadoStatusVO;
     FListaChamadoColaborador: TObjectList<TChamadoColaboradorVO>;
+    FOrigem: Integer;
     procedure SetContato(const Value: string);
     procedure SetDataAbertura(const Value: TDate);
     procedure SetDescricao(const Value: string);
@@ -50,22 +52,40 @@ type
     procedure SetChamadoStatusVO(const Value: TChamadoStatusVO);
     procedure SetListaChamadoColaborador(
       const Value: TObjectList<TChamadoColaboradorVO>);
+    procedure SetOrigem(const Value: Integer);
   public
+    [KeyField('Cha_Id')]
     property Id: Integer read FId write SetId;
+    [FieldDate('Cha_DataAbertura')]
     property DataAbertura: TDate read FDataAbertura write SetDataAbertura;
+    [FieldTime('Cha_HoraAbertura')]
     property HoraAbertura: TTime read FHoraAbertura write SetHoraAbertura;
+    [FieldName('Cha_Cliente')]
     property IdCliente: Integer read FIdCliente write SetIdCliente;
+    [FieldName('Cha_UsuarioAbertura')]
     property IdUsuarioAbertura: Integer read FIdUsuarioAbertura write SetIdUsuarioAbertura;
+    [FieldName('Cha_Contato')]
     property Contato: string read FContato write SetContato;
+    [FieldName('Cha_Nivel')]
     property Nivel: Integer read FNivel write SetNivel;
+    [FieldNull('Cha_Tipo')]
     property IdTipo: Integer read FIdTipo write SetIdTipo;
+    [FieldNull('Cha_Status')]
     property IdStatus: Integer read FIdStatus write SetIdStatus;
+    [FieldName('Cha_Descricao')]
     property Descricao: string read FDescricao write SetDescricao;
+    [FieldNull('Cha_Modulo')]
     property IdModulo: Integer read FIdModulo write SetIdModulo;
+    [FieldNull('Cha_Produto')]
     property IdProduto: Integer read FIdProduto write SetIdProduto;
+    [FieldNull('Cha_UsuarioAtendeAtual')]
     property IdUsuarioAtendeAtual: Integer read FIdUsuarioAtendeAtual write SetIdUsuarioAtendeAtual;
+    [FieldTime('Cha_HoraAtendeAtual')]
     property HoraAtendeAtual: TTime read FHoraAtendeAtual write SetHoraAtendeAtual;
+    [FieldNull('Cha_TipoMovimento')]
     property TipoMovimento: Integer read FTipoMovimento write SetTipoMovimento;
+    [FieldName('Cha_Origem')]
+    property Origem: Integer read FOrigem write SetOrigem;
 
     property ListaStatus: TObjectList<TChamadoStatusVO> read FListaStatus write SetListaStatus;
     property ListaChamadoOcorrencia: TObjectList<TChamadoOcorrenciaVO> read FListaChamadoOcorrencia write SetListaChamadoOcorrencia;
@@ -219,6 +239,11 @@ end;
 procedure TChamadoVO.SetNivel(const Value: Integer);
 begin
   FNivel := Value;
+end;
+
+procedure TChamadoVO.SetOrigem(const Value: Integer);
+begin
+  FOrigem := Value;
 end;
 
 procedure TChamadoVO.SetTipoMovimento(const Value: Integer);

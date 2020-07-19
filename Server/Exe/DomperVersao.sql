@@ -3352,3 +3352,7 @@ INSERT INTO dbo.Parametros
 VALUES 
 	(54,0,'Código do usuário para uso do aplicativo SIDomper','1','');
 GO
+ALTER TABLE Chamado ADD Cha_Origem int
+GO
+UPDATE Chamado SET Cha_Origem = 1 WHERE Cha_Origem is null
+GO

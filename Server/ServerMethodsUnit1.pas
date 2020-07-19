@@ -727,6 +727,7 @@ type
     QSolicitacaoProblemaSolucaoSOcor_Classificacao: TIntegerField;
     QSolicitacaoProblemaSolucaoDataOco: TDateField;
     QSolicitacaoProblemaSolucaoHoraOco: TTimeField;
+    QChamadoCadCha_Origem: TIntegerField;
     procedure dspRevendaCadUpdateError(Sender: TObject;
       DataSet: TCustomClientDataSet; E: EUpdateError; UpdateKind: TUpdateKind;
       var Response: TResolverResponse);
