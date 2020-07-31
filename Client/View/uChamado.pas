@@ -499,9 +499,6 @@ begin
 //  FController.Model.CDSCadastroCha_Origem.AsString := Copy(cbbOrigemChamado.Text, 1, 1);
   bInclusao := (FController.Model.CDSCadastro.State = dsInsert);
 
-
-  BuscarModulosAoSalvar();
-
   Id := FController.Salvar(dm.IdUsuario, FTipoMovimento);
 
   if bInclusao then
@@ -1662,6 +1659,27 @@ begin
   bOk := False;
   form := TfrmStatusTroca.Create(prTipo, FController.Model.CDSCadastroCha_Tipo.AsInteger);
   try
+    if prTipo = prChamado then
+    begin
+      form.edtIdCliente.Text := FController.Model.CDSCadastroCha_Cliente.AsString;
+      if FController.Model.CDSCadastroCha_Modulo.AsInteger > 0 then
+      begin
+        form.edtIdModulo.Text := FController.Model.CDSCadastroCha_Modulo.AsString;
+        form.edtCodModulo.Text := FormatFloat('0000', FController.Model.CDSCadastroMod_Codigo.AsInteger);
+        form.edtNomeModulo.Text := FController.Model.CDSCadastroMod_Nome.AsString;
+
+        if FController.Model.CDSCadastroCha_Produto.AsInteger > 0 then
+        begin
+          form.edtIdProduto.Text := FController.Model.CDSCadastroCha_Produto.AsString;
+          form.edtCodProduto.Text := FormatFloat('0000', FController.Model.CDSCadastroProd_Codigo.AsInteger);
+          form.edtNomeProduto.Text := FController.Model.CDSCadastroProd_Nome.AsString;
+        end;
+      end;
+    end
+    else begin
+      form.pnlModulo.Visible := False;
+    end;
+
     if form.ShowModal = mrOk then
     begin
       FController.ModoEdicaoInsercao();
@@ -1675,6 +1693,15 @@ begin
         FController.Model.CDSCadastroTip_Codigo.AsString := form.edtCodTipo.Text;
         FController.Model.CDSCadastroTip_Nome.AsString := form.edtNomeTipo.Text;
       end;
+
+      FController.ModoEdicaoInsercao();
+      FController.Model.CDSCadastroCha_Modulo.AsString := form.edtIdModulo.Text;
+      FController.Model.CDSCadastroMod_Codigo.AsString := form.edtCodModulo.Text;
+      FController.Model.CDSCadastroMod_Nome.AsString := form.edtNome.Text;
+
+      FController.Model.CDSCadastroCha_Produto.AsString := form.edtIdProduto.Text;
+      FController.Model.CDSCadastroProd_Codigo.AsString := form.edtCodProduto.Text;
+      FController.Model.CDSCadastroProd_Nome.AsString := form.edtNomeProduto.Text;
 
       bOk := True;
     end;

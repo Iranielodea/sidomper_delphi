@@ -5,24 +5,36 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls,
-  uEnumerador, uTipoController, uTipo;
+  uEnumerador, uTipoController, uTipo, uModulo, uModuloController, uClienteModuloController;
 
 type
   TfrmStatusTroca = class(TForm)
     Panel4: TPanel;
     btnConfirmar: TBitBtn;
     btnCancelar: TBitBtn;
-    Label1: TLabel;
-    edtCodStatus: TEdit;
-    edtIdStatus: TEdit;
-    edtNome: TEdit;
-    btnStatus: TSpeedButton;
     pnlTipo: TPanel;
     Label2: TLabel;
     edtCodTipo: TEdit;
     edtNomeTipo: TEdit;
     btnTipo: TSpeedButton;
     edtIdTipo: TEdit;
+    pnlModulo: TPanel;
+    Label3: TLabel;
+    edtCodModulo: TEdit;
+    edtNomeModulo: TEdit;
+    pnlStatus: TPanel;
+    Label1: TLabel;
+    edtCodStatus: TEdit;
+    edtNome: TEdit;
+    btnStatus: TSpeedButton;
+    edtIdStatus: TEdit;
+    btnModulo: TSpeedButton;
+    edtCodProduto: TEdit;
+    edtNomeProduto: TEdit;
+    Label4: TLabel;
+    edtIdModulo: TEdit;
+    edtIdProduto: TEdit;
+    edtIdCliente: TEdit;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure edtCodStatusExit(Sender: TObject);
@@ -34,11 +46,16 @@ type
       Shift: TShiftState);
     procedure edtCodTipoExit(Sender: TObject);
     procedure btnTipoClick(Sender: TObject);
+    procedure btnModuloClick(Sender: TObject);
+    procedure edtCodModuloExit(Sender: TObject);
+    procedure edtCodModuloKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
     FTipoPrograma: TEnumPrograma;
     procedure BuscarStatus(Id, Codigo: Integer);
     procedure BuscarTipo(Id, Codigo: Integer);
+    procedure BuscarModulo(AId, ACodigo: Integer);
   public
     { Public declarations }
     constructor Create(TipoPrograma: TEnumPrograma; AIdTipo: Integer = 0);
@@ -78,6 +95,13 @@ begin
   ModalResult := mrOk;
 end;
 
+procedure TfrmStatusTroca.btnModuloClick(Sender: TObject);
+begin
+  TFuncoes.CriarFormularioModal(TfrmModulo.create(StrToIntDef(edtIdCliente.Text, 0), true, True));
+  if dm.IdSelecionado > 0 then
+    BuscarModulo(dm.IdSelecionado, 0);
+end;
+
 procedure TfrmStatusTroca.btnStatusClick(Sender: TObject);
 begin
   TFuncoes.CriarFormularioModal(TfrmStatus.create(FTipoPrograma, True));
@@ -90,6 +114,59 @@ begin
   TFuncoes.CriarFormularioModal(TfrmTipo.create(FTipoPrograma, True));
   if dm.IdSelecionado > 0 then
     BuscarTipo(dm.IdSelecionado, 0);
+end;
+
+procedure TfrmStatusTroca.BuscarModulo(AId, ACodigo: Integer);
+var
+  obj: TModuloController;
+  ClienteModulo: TClienteModuloController;
+begin
+  obj := TModuloController.Create;
+  try
+    try
+      obj.Pesquisar(AId, ACodigo, StrToIntDef(edtIdCliente.Text, 0));
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        edtCodModulo.SetFocus;
+      end;
+    end;
+  finally
+    edtIdModulo.Text := obj.Model.CDSCadastroMod_Id.AsString;
+    edtCodModulo.Text := FormatFloat('0000', obj.Model.CDSCadastroMod_Codigo.AsInteger);
+    edtNomeModulo.Text := obj.Model.CDSCadastroMod_Nome.AsString;
+    if edtIdModulo.Text = '' then
+      edtCodModulo.Clear;
+
+    FreeAndNil(obj);
+  end;
+
+  // buscar produto
+  if StrToIntDef(edtCodModulo.Text, 0) > 0 then
+  begin
+    ClienteModulo := TClienteModuloController.Create;
+    try
+      ClienteModulo.LocalizarModuloProduto(StrToIntDef(edtIdCliente.Text, 0),
+        StrToIntDef(edtIdModulo.Text, 0));
+
+      edtIdProduto.Text := ClienteModulo.Model.CDSCadastroCliMod_Produto.AsString;
+      edtCodProduto.Text := FormatFloat('0000', ClienteModulo.Model.CDSCadastroProd_Codigo.AsInteger);
+      if edtIdProduto.Text = '' then
+        edtCodProduto.Clear;
+      edtNomeProduto.Text := ClienteModulo.Model.CDSCadastroProd_Nome.AsString;
+    finally
+      FreeAndNil(ClienteModulo);
+    end;
+  end
+  else begin
+    edtIdProduto.Clear;
+    edtCodProduto.Clear;
+    edtNomeProduto.Clear;
+  end;
+
+  edtCodModulo.Modified := False;
+  edtCodProduto.Modified := False;
 end;
 
 procedure TfrmStatusTroca.BuscarStatus(Id, Codigo: Integer);
@@ -151,6 +228,25 @@ begin
 
   if AIdTipo > 0 then
     BuscarTipo(AIdTipo, 0);
+
+  if TipoPrograma <> prChamado then
+  begin
+    pnlModulo.Visible := False;
+    Self.Height := Self.Height - pnlModulo.Height;
+  end;
+end;
+
+procedure TfrmStatusTroca.edtCodModuloExit(Sender: TObject);
+begin
+  if edtCodModulo.Modified then
+    BuscarModulo(0, StrToIntDef(edtCodModulo.Text, 0));
+end;
+
+procedure TfrmStatusTroca.edtCodModuloKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_F9 then
+    btnModuloClick(Self);
 end;
 
 procedure TfrmStatusTroca.edtCodStatusExit(Sender: TObject);
@@ -193,6 +289,7 @@ begin
   end;
 end;
 
+
 procedure TfrmStatusTroca.FormShow(Sender: TObject);
 var
   img: TfrmImagens;
@@ -203,15 +300,22 @@ begin
     btnCancelar.Glyph := img.btnCancelar.Glyph;
     btnStatus.Glyph := img.btnProcurar.Glyph;
     btnTipo.Glyph := img.btnProcurar.Glyph;
+    btnModulo.Glyph := img.btnProcurar.Glyph;
   finally
     FreeAndNil(img);
   end;
 
   try
-    if edtCodTipo.Visible then
-      edtCodTipo.SetFocus
-    else
-      edtCodStatus.SetFocus;
+    if (pnlModulo.Visible) and (edtCodModulo.Text = '') then
+    begin
+      edtCodModulo.SetFocus
+    end
+    else begin
+      if edtCodTipo.Visible then
+        edtCodTipo.SetFocus
+      else
+        edtCodStatus.SetFocus;
+    end;
   except
     edtCodStatus.SetFocus;
   end;

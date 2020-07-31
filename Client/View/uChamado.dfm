@@ -4,6 +4,7 @@
   ClientHeight = 671
   ClientWidth = 1018
   OnDestroy = FormDestroy
+  ExplicitTop = -305
   ExplicitWidth = 1024
   ExplicitHeight = 700
   PixelsPerInch = 96
@@ -194,7 +195,7 @@
           Top = 1
           Width = 1008
           Height = 599
-          ActivePage = tsChamadoOcorrencia
+          ActivePage = tsPrincipal
           Align = alClient
           TabOrder = 0
           OnChange = PageControl1Change
@@ -208,8 +209,6 @@
               Align = alClient
               BevelOuter = bvLowered
               TabOrder = 0
-              ExplicitLeft = 3
-              ExplicitTop = -1
               object Label4: TLabel
                 Left = 24
                 Top = 5
@@ -556,7 +555,7 @@
               object DBEdit1: TDBEdit
                 Left = 24
                 Top = 165
-                Width = 393
+                Width = 489
                 Height = 22
                 CharCase = ecUpperCase
                 DataField = 'Cha_Contato'
@@ -1054,7 +1053,9 @@
         ExplicitTop = 601
         ExplicitWidth = 1010
         inherited btnSalvar: TBitBtn
+          Left = 1
           TabOrder = 1
+          ExplicitLeft = 1
         end
         inherited btnCancelar: TBitBtn
           TabOrder = 2
