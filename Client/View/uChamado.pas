@@ -137,9 +137,10 @@ type
     lbl1: TLabel;
     Label19: TLabel;
     edtPerfil: TEdit;
-    dbrgrpCha_Origem: TDBRadioGroup;
     Label17: TLabel;
     cbbOrigem: TComboBox;
+    Label18: TLabel;
+    cbbOrigemChamado: TComboBox;
     procedure btnAnexarClick(Sender: TObject);
     procedure btnCancelarOcorrenciaClick(Sender: TObject);
     procedure btnClienteClick(Sender: TObject);
@@ -218,6 +219,7 @@ type
     procedure edtIdFiltroExit(Sender: TObject);
     procedure btnFiltrarClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure cbbOrigemChamadoClick(Sender: TObject);
   private
     { Private declarations }
     FController: TChamadoController;
@@ -301,6 +303,7 @@ type
     procedure BuscarTextoAgendamento;
     procedure CaminhoAnexo;
     procedure MostrarAnexo();
+    procedure BuscarModulosAoSalvar();
   public
     { Public declarations }
     constructor create(APesquisar: Boolean = False; AQuadro: Boolean = False;
@@ -344,6 +347,7 @@ begin
   LimparEdits();
   inherited;
 
+  cbbOrigemChamado.ItemIndex := FController.Model.CDSCadastroCha_Origem.AsInteger -1;
 
   DadosCliente();
   if edtNome.Enabled then
@@ -476,7 +480,7 @@ begin
   BuscarClienteAgendamento();
   BuscarTextoAgendamento();
 
-  dbrgrpCha_Origem.Enabled := True;
+  cbbOrigemChamado.Enabled := True;
 
   edtNome.SetFocus;
 end;
@@ -492,7 +496,11 @@ begin
   if dsOcorrencia.State in [dsEdit, dsInsert] then
     raise Exception.Create('Ocorrência está em Modo de Edição, Salve ou Cancele!');
 
+//  FController.Model.CDSCadastroCha_Origem.AsString := Copy(cbbOrigemChamado.Text, 1, 1);
   bInclusao := (FController.Model.CDSCadastro.State = dsInsert);
+
+
+  BuscarModulosAoSalvar();
 
   Id := FController.Salvar(dm.IdUsuario, FTipoMovimento);
 
@@ -637,6 +645,21 @@ begin
 
   edtCodModulo.Modified := False;
   edtCodProduto.Modified := False;
+end;
+
+procedure TfrmChamado.BuscarModulosAoSalvar;
+var
+  sOrigem: string;
+begin
+  sOrigem := FController.Model.CDSCadastroCha_Origem.AsString;
+  if (sOrigem = '4') or (sOrigem = '5')  then
+    begin
+    if edtCodCliente.Text <> '' then
+    begin
+      if edtCodModulo.Text = '' then
+        ChamarModulo();
+    end;
+  end;
 end;
 
 procedure TfrmChamado.BuscarObservacao(ATipo: Integer);
@@ -1133,6 +1156,13 @@ begin
   end;
 end;
 
+procedure TfrmChamado.cbbOrigemChamadoClick(Sender: TObject);
+begin
+  inherited;
+  FController.ModoEdicaoInsercao;
+  FController.Model.CDSCadastroCha_Origem.AsInteger := cbbOrigemChamado.ItemIndex +1;
+end;
+
 procedure TfrmChamado.ChamarModulo;
 begin
   TFuncoes.CriarFormularioModal(TfrmModulo.create(FController.Model.CDSCadastroCha_Cliente.AsInteger, true, True));
@@ -1203,6 +1233,7 @@ begin
   cbbModelo.Items.Add('06 - Resumo de Horas por Tipo Mês');
   cbbModelo.Items.Add('07 - Resumo de Ocorrências por Usuário Mês');
   cbbModelo.ItemIndex := 0;
+  cbbOrigemChamado.Visible := False;
 end;
 
 procedure TfrmChamado.DadosChamado;
@@ -2567,6 +2598,7 @@ begin
         FController.ModoEdicaoInsercao;
         if (FQuadro) and (FOcorrencia) then
         begin
+          BuscarModulosAoSalvar();
           FController.Salvar(dm.IdUsuario, FTipoMovimento);
 
           if bInclusao then
@@ -2688,12 +2720,12 @@ begin
       bAdm := Usuario.PermissaoAtividadeOcorrenciaDataHora(dm.IdUsuario, Id, bMesmoUsuario);
 
     if bAdm then
-      dbrgrpCha_Origem.Enabled := True
+      cbbOrigemChamado.Enabled := True
     else begin
       if edtCodCliente.Enabled = False then
-        dbrgrpCha_Origem.Enabled := False
+        cbbOrigemChamado.Enabled := False
       else
-        dbrgrpCha_Origem.Enabled := (FController.Model.CDSCadastroCha_Origem.AsInteger < 4);
+        cbbOrigemChamado.Enabled := (FController.Model.CDSCadastroCha_Origem.AsInteger < 4);
     end;
 
     if edtCodCliente.Enabled = False then

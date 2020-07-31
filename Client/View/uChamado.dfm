@@ -194,7 +194,7 @@
           Top = 1
           Width = 1008
           Height = 599
-          ActivePage = tsPrincipal
+          ActivePage = tsChamadoOcorrencia
           Align = alClient
           TabOrder = 0
           OnChange = PageControl1Change
@@ -208,6 +208,8 @@
               Align = alClient
               BevelOuter = bvLowered
               TabOrder = 0
+              ExplicitLeft = 3
+              ExplicitTop = -1
               object Label4: TLabel
                 Left = 24
                 Top = 5
@@ -313,6 +315,13 @@
                 Height = 14
                 Caption = 'Dados do Cliente'
               end
+              object Label18: TLabel
+                Left = 314
+                Top = 5
+                Width = 45
+                Height = 14
+                Caption = 'Origem'
+              end
               object edtCodigo: TDBEdit
                 Left = 24
                 Top = 25
@@ -354,7 +363,7 @@
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 5
+                TabOrder = 6
                 OnExit = edtCodClienteExit
                 OnKeyDown = edtCodClienteKeyDown
               end
@@ -368,7 +377,7 @@
                 DataField = 'Cli_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 6
+                TabOrder = 7
               end
               object edtCodUsuario: TDBEdit
                 Left = 24
@@ -384,7 +393,7 @@
                 ParentShowHint = False
                 ReadOnly = True
                 ShowHint = True
-                TabOrder = 3
+                TabOrder = 4
                 OnExit = edtCodUsuarioExit
                 OnKeyDown = edtCodClienteKeyDown
               end
@@ -398,7 +407,7 @@
                 DataField = 'Usu_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 4
+                TabOrder = 5
               end
               object edtCodTipo: TDBEdit
                 Left = 23
@@ -483,7 +492,7 @@
                   '2-Normal'
                   '3-Alto'
                   '4-Cr'#237'tico')
-                TabOrder = 8
+                TabOrder = 9
                 Values.Strings = (
                   '1'
                   '2'
@@ -552,7 +561,7 @@
                 CharCase = ecUpperCase
                 DataField = 'Cha_Contato'
                 DataSource = dsCad
-                TabOrder = 7
+                TabOrder = 8
               end
               object mmoCliente2: TMemo
                 Left = 23
@@ -571,27 +580,22 @@
                 ScrollBars = ssVertical
                 TabOrder = 18
               end
-              object dbrgrpCha_Origem: TDBRadioGroup
-                Left = 423
-                Top = 145
-                Width = 112
-                Height = 126
-                Caption = 'Origem:'
-                DataField = 'Cha_Origem'
-                DataSource = dsCad
+              object cbbOrigemChamado: TComboBox
+                Left = 313
+                Top = 25
+                Width = 198
+                Height = 22
+                Style = csDropDownList
+                ItemIndex = 0
+                TabOrder = 3
+                Text = 'Telefone'
+                OnClick = cbbOrigemChamadoClick
                 Items.Strings = (
                   'Telefone'
                   'WhatsApp'
                   'Chat'
                   'Aplicativo'
                   'ERP')
-                TabOrder = 9
-                Values.Strings = (
-                  '1'
-                  '2'
-                  '3'
-                  '4'
-                  '5')
               end
             end
           end
@@ -1736,7 +1740,6 @@
     Top = 249
   end
   inherited dsCad: TDataSource
-    DataSet = DMChamado.CDSCadastro
     Left = 752
     Top = 240
   end
