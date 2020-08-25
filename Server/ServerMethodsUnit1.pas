@@ -854,7 +854,6 @@ type
     procedure ChamadoAnexos(AIdChamado: Integer);
     procedure ChamadoQuadro(AIdUsuario, AIdRevenda: Integer);
     function ChamadoBuscarTotalHorasDoChamado(AIdChamado: Integer): Double;
-
     function ChamadoQuadroJSON(AIdUsuario, AIdRevenda: Integer): TJSONValue;
 //------------------------------------------------------------------------------
 // Atividades
@@ -970,6 +969,7 @@ type
     procedure FiltrarStatusPrograma(Campo, Texto, Ativo: string; StatusPrograma: Integer; Contem: Boolean = True);
     procedure LocalizarCodigoStatusPrograma(StatusPrograma, Codigo: integer);
     function ConferenciaFiltrarPorData(AData: string; AIdUsuario: Integer): TJSONValue;
+    function VerificarQuadroTarefasEmAberto(AIdUsuario, APrograma: Integer): Boolean;
 //------------------------------------------------------------------------------
 // tipo
     procedure FiltrarTipoPrograma(Campo, Texto, Ativo: string; TipoPrograma: Integer; Contem: Boolean = True);
@@ -4086,6 +4086,48 @@ begin
     bPermissao := ChamadoUsuarioMesmoCadastro(AId, AIdusuario, 2);
 
   Result := bPermissao;
+end;
+
+function TServerMethods1.VerificarQuadroTarefasEmAberto(AIdUsuario, APrograma: Integer): Boolean;
+var
+  bResult: Boolean;
+  obj: TChamado;
+begin
+  bResult := False;
+  obj := TChamado.Create;
+  try
+    try
+      if APrograma = CChamadoPrograma then // chamado 1
+      begin
+        bResult := obj.VerificarAtividadeAberto(AIdUsuario);
+        if bResult = False then
+          bResult := obj.VerificarSolicitacaoAberto(AIdUsuario);
+        bResult := False;
+      end;
+
+      if APrograma = CAtividadePrograma then // Atividade 111
+      begin
+        bResult := obj.VerificarChamadoAberto(AIdUsuario);
+        if bResult = False then
+          bResult := obj.VerificarSolicitacaoAberto(AIdUsuario);
+      end;
+
+      if APrograma = CSolicitacaoPrograma then // Solicitacao 3
+      begin
+        bResult := obj.VerificarChamadoAberto(AIdUsuario);
+        if bResult = False then
+          bResult := obj.VerificarAtividadeAberto(AIdUsuario);
+      end;
+      Result := bResult;
+    except
+      On E: Exception do
+      begin
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(obj);
+  end;
 end;
 
 function TServerMethods1.VersaoBuscarStatusDesenvolvimento: Integer;

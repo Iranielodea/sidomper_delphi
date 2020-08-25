@@ -85,6 +85,9 @@ type
     function RetornarChamadoQuadro(AIdUsuario, AIdRevenda: Integer): string;
     function RetornarAtividadeQuadro(AIdUsuario, AIdRevenda: Integer): string;
     function ListarQuadro(AQuery: TFDQuery): TObjectList<TChamadoQuadroViewModel>;
+    function VerificarChamadoAberto(AIdUsuario: Integer): Boolean;
+    function VerificarAtividadeAberto(AIdUsuario: Integer): Boolean;
+    function VerificarSolicitacaoAberto(AIdUsuario: Integer): Boolean;
 //------------------------------------------------------------------------------
 // Ocorrencias
 //------------------------------------------------------------------------------
@@ -392,6 +395,9 @@ begin
       sConsulta := CConsulta + ' WHERE ' + ACampo + ' LIKE ' + sTexto
     else
       sConsulta := CConsulta + ' WHERE Cha_Id > 0';
+
+    if AFiltro.Id > 0 then
+      sConsulta := sConsulta + ' AND Cha_Id = ' + AFiltro.Id.ToString;
 
     if ATipo = caChamado then
       sConsulta := sConsulta + ' AND Cha_TipoMovimento = 1'
@@ -1863,6 +1869,76 @@ begin
     finally
       FreeAndNil(obj);
     end;
+  end;
+end;
+
+function TChamado.VerificarAtividadeAberto(AIdUsuario: Integer): Boolean;
+var
+  obj: TFireDAC;
+  sb: TStringBuilder;
+  bResult: Boolean;
+begin
+  obj := TFireDAC.create;
+  sb := TStringBuilder.Create;
+  try
+      sb.AppendLine('SELECT COUNT(Cha_Id) FROM CHAMADO');
+      sb.AppendLine(' LEFT JOIN Chamado_Ocorrencia ON Cha_Id = ChOco_Chamado');
+      sb.AppendLine(' WHERE Cha_Status = 28');
+      sb.AppendLine(' AND Cha_TipoMovimento = 2');
+      sb.AppendLine(' AND ((cha_UsuarioAbertura = ' + IntToStr(AIdUsuario) + ')');
+      sb.AppendLine(' OR (ChOco_Usuario = ' + IntToStr(AIdUsuario) + '))');
+
+    obj.OpenSQL(sb.ToString());
+    bResult := (obj.Model.Fields[0].AsInteger > 0);
+    Result := bResult;
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(sb);
+  end;
+end;
+
+function TChamado.VerificarChamadoAberto(AIdUsuario: Integer): Boolean;
+var
+  obj: TFireDAC;
+  sb: TStringBuilder;
+begin
+  obj := TFireDAC.create;
+  sb := TStringBuilder.Create;
+  try
+      sb.AppendLine('SELECT COUNT(Cha_Id) FROM CHAMADO');
+      sb.AppendLine(' LEFT JOIN Chamado_Ocorrencia ON Cha_Id = ChOco_Chamado');
+      sb.AppendLine(' WHERE Cha_Status = 2');
+      sb.AppendLine(' AND Cha_TipoMovimento = 1');
+      sb.AppendLine(' AND ((cha_UsuarioAbertura = ' + IntToStr(AIdUsuario) + ')');
+      sb.AppendLine(' OR (ChOco_Usuario = ' + IntToStr(AIdUsuario) + '))');
+
+    obj.OpenSQL(sb.ToString());
+    Result := (obj.Model.Fields[0].AsInteger > 0);
+  finally
+    FreeAndNil(obj);
+    FreeAndNil(sb);
+  end;
+end;
+
+function TChamado.VerificarSolicitacaoAberto(AIdUsuario: Integer): Boolean;
+var
+  obj: TFireDAC;
+begin
+  obj := TFireDAC.create;
+  try
+    obj.Lista.Add(' SELECT TOP(1)');
+    obj.Lista.Add('   STemp_Solicitacao');
+    obj.Lista.Add(' FROM Solicitacao_Tempo');
+    obj.Lista.Add('   INNER JOIN Solicitacao_Ocorrencia ON STemp_Solicitacao = SOcor_Solicitacao');
+    obj.Lista.Add('   INNER JOIN Solicitacao ON SOcor_Solicitacao = Sol_Id');
+    obj.Lista.Add(' WHERE STemp_UsuarioOperacional = ' + IntToStr(AIdUsuario));
+    obj.Lista.Add(' AND Sol_Status IN (14,16,18)');
+    obj.Lista.Add(' AND STemp_HoraFim IS NULL');
+    obj.OpenSQL();
+
+    Result := (obj.Model.Fields[0].AsInteger > 0);
+  finally
+    FreeAndNil(obj);
   end;
 end;
 

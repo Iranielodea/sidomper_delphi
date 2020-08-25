@@ -46,7 +46,10 @@ begin
   InstrucaoSQL := InstrucaoSQL + '	Mod_Nome,';
   InstrucaoSQL := InstrucaoSQL + '	Prod_Id,';
   InstrucaoSQL := InstrucaoSQL + '	Prod_Codigo,';
-  InstrucaoSQL := InstrucaoSQL + '	Sol_DescricaoLiberacao ';
+  InstrucaoSQL := InstrucaoSQL + '	Sol_DescricaoLiberacao, ';
+  InstrucaoSQL := InstrucaoSQL + '	(SELECT SUM(STemp_TotalHoras) FROM Solicitacao_Tempo ';
+  InstrucaoSQL := InstrucaoSQL + '			WHERE STemp_Solicitacao = sol_id ';
+  InstrucaoSQL := InstrucaoSQL + '		) as TotalHoras';
   InstrucaoSQL := InstrucaoSQL + ' FROM Versao ';
   InstrucaoSQL := InstrucaoSQL + '	LEFT JOIN Solicitacao On Ver_Id = Sol_VersaoId ';
   InstrucaoSQL := InstrucaoSQL + '	LEFT JOIN Produto On Ver_Produto = Prod_Id ';
