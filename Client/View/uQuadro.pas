@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.Grids,
   Vcl.DBGrids, Vcl.ExtCtrls, Vcl.ComCtrls, uParametrosController, uEnumerador,
   Data.DB, uDMChamado, uDMSolicitacao, uChamadoController, uSolicitacaoController, uDM,
-  Vcl.Menus, Datasnap.DBClient, Vcl.Mask, uAgendamentoController;
+  Vcl.Menus, Datasnap.DBClient, Vcl.Mask, uAgendamentoController, uQuadroController;
 
 type
   TfrmQuadro = class(TForm)
@@ -2201,6 +2201,7 @@ procedure TfrmQuadro.dbQuadro1DblClick(Sender: TObject);
 begin
   ExecutarTimer(False);
   try
+
     if Sender = dbQuadro1 then
       ValidarChamado(dbQuadro1, FControllerChamado.Model.CDSChamadoQuadro1, edtChaCodigo1.Text)
     else if Sender = dbQuadro2 then
@@ -2215,8 +2216,8 @@ begin
       ValidarChamado(dbQuadro6, FControllerChamado.Model.CDSChamadoQuadro6, edtChaCodigo6.Text);
   finally
     AbrirQuadrosChamados;
+    ExecutarTimer(True);
   end;
-  ExecutarTimer(True);
 end;
 
 procedure TfrmQuadro.dbQuadro1DrawColumnCell(Sender: TObject; const Rect: TRect;
@@ -2902,5 +2903,6 @@ begin
 //  else
 //    raise Exception.Create('Usuário sem Permissão!');
 end;
+
 
 end.

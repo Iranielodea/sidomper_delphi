@@ -266,7 +266,8 @@ uses
   uTabelaPrecoVO in '..\Comum\uTabelaPrecoVO.pas',
   uDMTabPreco in 'Model\uDMTabPreco.pas' {DMTabPreco: TDataModule},
   uProduto in 'View\uProduto.pas' {frmProduto},
-  uListaProblemaSolicitacao in 'View\uListaProblemaSolicitacao.pas' {frmListaProblemaSolicitacao};
+  uListaProblemaSolicitacao in 'View\uListaProblemaSolicitacao.pas' {frmListaProblemaSolicitacao},
+  uQuadroController in 'Controller\uQuadroController.pas';
 
 {$R *.res}
 

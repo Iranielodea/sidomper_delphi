@@ -1,7 +1,7 @@
 object DMRelVersao: TDMRelVersao
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 175
+  Height = 206
   Width = 400
   object CDSRelVersao: TClientDataSet
     Aggregates = <>
@@ -50,7 +50,7 @@ object DMRelVersao: TDMRelVersao
     UserName = 'dbRelVersao'
     Left = 192
     Top = 24
-    object dbRelVersaoppField1: TppField
+    object pfldRelVersaoppField1: TppField
       FieldAlias = 'Ver_Id'
       FieldName = 'Ver_Id'
       FieldLength = 0
@@ -60,7 +60,7 @@ object DMRelVersao: TDMRelVersao
       Searchable = False
       Sortable = False
     end
-    object dbRelVersaoppField2: TppField
+    object pfldRelVersaoppField2: TppField
       FieldAlias = 'Ver_Versao'
       FieldName = 'Ver_Versao'
       FieldLength = 0
@@ -70,7 +70,7 @@ object DMRelVersao: TDMRelVersao
       Searchable = False
       Sortable = False
     end
-    object dbRelVersaoppField3: TppField
+    object pfldRelVersaoppField3: TppField
       FieldAlias = 'Sol_Tipo'
       FieldName = 'Sol_Tipo'
       FieldLength = 0
@@ -80,7 +80,7 @@ object DMRelVersao: TDMRelVersao
       Searchable = False
       Sortable = False
     end
-    object dbRelVersaoppField4: TppField
+    object pfldRelVersaoppField4: TppField
       FieldAlias = 'Tip_Nome'
       FieldName = 'Tip_Nome'
       FieldLength = 0
@@ -90,7 +90,7 @@ object DMRelVersao: TDMRelVersao
       Searchable = False
       Sortable = False
     end
-    object dbRelVersaoppField5: TppField
+    object pfldRelVersaoppField5: TppField
       FieldAlias = 'Quantidade'
       FieldName = 'Quantidade'
       FieldLength = 0
@@ -100,7 +100,7 @@ object DMRelVersao: TDMRelVersao
       Searchable = False
       Sortable = False
     end
-    object dbRelVersaoppField6: TppField
+    object pfldRelVersaoppField6: TppField
       FieldAlias = 'Percentual'
       FieldName = 'Percentual'
       FieldLength = 0
@@ -497,9 +497,12 @@ object DMRelVersao: TDMRelVersao
     end
   end
   object CDSRelVersaoDoc: TClientDataSet
+    Active = True
     Aggregates = <>
     Params = <>
     ProviderName = 'dspVersaoDocumento'
+    RemoteServer = DM.DSPConexao
+    OnCalcFields = CDSRelVersaoDocCalcFields
     Left = 32
     Top = 72
     object CDSRelVersaoDocVer_Id: TAutoIncField
@@ -543,6 +546,15 @@ object DMRelVersao: TDMRelVersao
       ProviderFlags = [pfInWhere]
       ReadOnly = True
     end
+    object CDSRelVersaoDocTotalHoras: TFloatField
+      FieldName = 'TotalHoras'
+      Origin = 'TotalHoras'
+      ReadOnly = True
+    end
+    object CDSRelVersaoDocC_TotalHoras: TStringField
+      FieldKind = fkInternalCalc
+      FieldName = 'C_TotalHoras'
+    end
   end
   object dsRelVersaoDoc: TDataSource
     DataSet = CDSRelVersaoDoc
@@ -554,85 +566,88 @@ object DMRelVersao: TDMRelVersao
     UserName = 'dbRelVersaoDoc'
     Left = 192
     Top = 72
-    object dbRelVersaoDocppField1: TppField
+    object pfldRelVersaoDocppField1: TppField
+      Alignment = taRightJustify
       FieldAlias = 'Ver_Id'
       FieldName = 'Ver_Id'
       FieldLength = 0
-      DataType = dtNotKnown
+      DataType = dtLongint
       DisplayWidth = 0
       Position = 0
-      Searchable = False
-      Sortable = False
     end
-    object dbRelVersaoDocppField2: TppField
+    object pfldRelVersaoDocppField2: TppField
       FieldAlias = 'Ver_Versao'
       FieldName = 'Ver_Versao'
-      FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      FieldLength = 25
+      DisplayWidth = 25
       Position = 1
-      Searchable = False
-      Sortable = False
     end
-    object dbRelVersaoDocppField3: TppField
+    object pfldRelVersaoDocppField3: TppField
+      Alignment = taRightJustify
       FieldAlias = 'Sol_Tipo'
       FieldName = 'Sol_Tipo'
       FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      DataType = dtInteger
+      DisplayWidth = 10
       Position = 2
-      Searchable = False
-      Sortable = False
     end
-    object dbRelVersaoDocppField4: TppField
+    object pfldRelVersaoDocppField4: TppField
       FieldAlias = 'Prod_Nome'
       FieldName = 'Prod_Nome'
-      FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      FieldLength = 100
+      DisplayWidth = 100
       Position = 3
-      Searchable = False
-      Sortable = False
     end
-    object dbRelVersaoDocppField5: TppField
+    object pfldRelVersaoDocppField5: TppField
       FieldAlias = 'Mod_Nome'
       FieldName = 'Mod_Nome'
-      FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      FieldLength = 100
+      DisplayWidth = 100
       Position = 4
-      Searchable = False
-      Sortable = False
     end
-    object dbRelVersaoDocppField6: TppField
+    object pfldRelVersaoDocppField6: TppField
       FieldAlias = 'Sol_DescricaoLiberacao'
       FieldName = 'Sol_DescricaoLiberacao'
-      FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      FieldLength = 2147483647
+      DataType = dtMemo
+      DisplayWidth = 10
       Position = 5
       Searchable = False
       Sortable = False
     end
-    object dbRelVersaoDocppField7: TppField
+    object pfldRelVersaoDocppField7: TppField
+      Alignment = taRightJustify
       FieldAlias = 'Prod_Codigo'
       FieldName = 'Prod_Codigo'
       FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      DataType = dtInteger
+      DisplayWidth = 10
       Position = 6
-      Searchable = False
-      Sortable = False
     end
-    object dbRelVersaoDocppField8: TppField
+    object pfldRelVersaoDocppField8: TppField
+      Alignment = taRightJustify
       FieldAlias = 'Prod_Id'
       FieldName = 'Prod_Id'
       FieldLength = 0
-      DataType = dtNotKnown
-      DisplayWidth = 0
+      DataType = dtLongint
+      DisplayWidth = 10
       Position = 7
-      Searchable = False
-      Sortable = False
+    end
+    object pfldRelVersaoDocppField9: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'TotalHoras'
+      FieldName = 'TotalHoras'
+      FieldLength = 0
+      DataType = dtDouble
+      DisplayWidth = 10
+      Position = 8
+    end
+    object pfldRelVersaoDocppField10: TppField
+      FieldAlias = 'C_TotalHoras'
+      FieldName = 'C_TotalHoras'
+      FieldLength = 20
+      DisplayWidth = 20
+      Position = 9
     end
   end
   object relVersaoDoc: TppReport
@@ -1362,9 +1377,271 @@ object DMRelVersao: TDMRelVersao
     end
     object ppSummaryBand2: TppSummaryBand
       Background.Brush.Style = bsClear
+      PrintHeight = phDynamic
       mmBottomOffset = 0
-      mmHeight = 0
+      mmHeight = 5027
       mmPrintPosition = 0
+      object ppSubReport1: TppSubReport
+        UserName = 'SubReport1'
+        ExpandAll = False
+        NewPrintJob = False
+        OutlineSettings.CreateNode = True
+        TraverseAllData = False
+        DataPipelineName = 'dbRelVersao'
+        mmHeight = 5027
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 197300
+        BandType = 7
+        LayerName = Foreground1
+        mmBottomOffset = 0
+        mmOverFlowOffset = 0
+        mmStopPosition = 0
+        mmMinHeight = 0
+        object ppChildReport1: TppChildReport
+          AutoStop = False
+          DataPipeline = dbRelVersao
+          PrinterSetup.BinName = 'Default'
+          PrinterSetup.DocumentName = 'Report'
+          PrinterSetup.PaperName = 'A4'
+          PrinterSetup.PrinterName = 'Default'
+          PrinterSetup.SaveDeviceSettings = False
+          PrinterSetup.mmMarginBottom = 6350
+          PrinterSetup.mmMarginLeft = 6350
+          PrinterSetup.mmMarginRight = 6350
+          PrinterSetup.mmMarginTop = 6350
+          PrinterSetup.mmPaperHeight = 297000
+          PrinterSetup.mmPaperWidth = 210000
+          PrinterSetup.PaperSize = 9
+          Units = utMillimeters
+          Version = '15.03'
+          mmColumnWidth = 0
+          DataPipelineName = 'dbRelVersao'
+          object ppTitleBand1: TppTitleBand
+            Background.Brush.Style = bsClear
+            mmBottomOffset = 0
+            mmHeight = 13229
+            mmPrintPosition = 0
+            object ppLine7: TppLine
+              UserName = 'Line7'
+              Position = lpBottom
+              Weight = 0.750000000000000000
+              mmHeight = 1852
+              mmLeft = 0
+              mmTop = 11377
+              mmWidth = 197380
+              BandType = 1
+              LayerName = Foreground2
+            end
+            object ppLabel13: TppLabel
+              UserName = 'Label13'
+              Caption = 'Tipo'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              Transparent = True
+              mmHeight = 4233
+              mmLeft = 0
+              mmTop = 7408
+              mmWidth = 7408
+              BandType = 1
+              LayerName = Foreground2
+            end
+            object ppLabel14: TppLabel
+              UserName = 'Label14'
+              Caption = 'Quantidade'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              Transparent = True
+              mmHeight = 4233
+              mmLeft = 24871
+              mmTop = 7408
+              mmWidth = 18521
+              BandType = 1
+              LayerName = Foreground2
+            end
+            object ppLabel15: TppLabel
+              UserName = 'Label15'
+              Caption = '%'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              Transparent = True
+              mmHeight = 4233
+              mmLeft = 68792
+              mmTop = 7408
+              mmWidth = 1852
+              BandType = 1
+              LayerName = Foreground2
+            end
+            object ppLabel17: TppLabel
+              UserName = 'Label17'
+              Caption = 'ESTAT'#205'STICAS VERS'#213'ES'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              Transparent = True
+              mmHeight = 4233
+              mmLeft = 78317
+              mmTop = 2910
+              mmWidth = 37042
+              BandType = 1
+              LayerName = Foreground2
+            end
+          end
+          object ppDetailBand3: TppDetailBand
+            Background1.Brush.Style = bsClear
+            Background2.Brush.Style = bsClear
+            mmBottomOffset = 0
+            mmHeight = 5292
+            mmPrintPosition = 0
+            object ppDBText12: TppDBText
+              UserName = 'DBText12'
+              DataField = 'Tip_Nome'
+              DataPipeline = dbRelVersao
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = []
+              Transparent = True
+              DataPipelineName = 'dbRelVersao'
+              mmHeight = 4498
+              mmLeft = 0
+              mmTop = 794
+              mmWidth = 17198
+              BandType = 4
+              LayerName = Foreground2
+            end
+            object ppDBText13: TppDBText
+              UserName = 'DBText13'
+              DataField = 'Quantidade'
+              DataPipeline = dbRelVersao
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = []
+              TextAlignment = taRightJustified
+              Transparent = True
+              DataPipelineName = 'dbRelVersao'
+              mmHeight = 4498
+              mmLeft = 24871
+              mmTop = 0
+              mmWidth = 17198
+              BandType = 4
+              LayerName = Foreground2
+            end
+            object ppDBText14: TppDBText
+              UserName = 'DBText14'
+              DataField = 'Percentual'
+              DataPipeline = dbRelVersao
+              DisplayFormat = ',#0.00'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = []
+              TextAlignment = taRightJustified
+              Transparent = True
+              DataPipelineName = 'dbRelVersao'
+              mmHeight = 4498
+              mmLeft = 53446
+              mmTop = 0
+              mmWidth = 17198
+              BandType = 4
+              LayerName = Foreground2
+            end
+          end
+          object ppSummaryBand3: TppSummaryBand
+            Background.Brush.Style = bsClear
+            mmBottomOffset = 0
+            mmHeight = 11906
+            mmPrintPosition = 0
+            object ppLine9: TppLine
+              UserName = 'Line9'
+              Weight = 0.750000000000000000
+              mmHeight = 1588
+              mmLeft = 0
+              mmTop = 1058
+              mmWidth = 197380
+              BandType = 7
+              LayerName = Foreground2
+            end
+            object ppLabel16: TppLabel
+              UserName = 'Label16'
+              Caption = 'Total:'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              Transparent = True
+              mmHeight = 4233
+              mmLeft = 0
+              mmTop = 3440
+              mmWidth = 11113
+              BandType = 7
+              LayerName = Foreground2
+            end
+            object ppDBCalc2: TppDBCalc
+              UserName = 'DBCalc2'
+              DataField = 'Quantidade'
+              DataPipeline = dbRelVersao
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              TextAlignment = taRightJustified
+              Transparent = True
+              DataPipelineName = 'dbRelVersao'
+              mmHeight = 4498
+              mmLeft = 24871
+              mmTop = 3440
+              mmWidth = 17198
+              BandType = 7
+              LayerName = Foreground2
+            end
+            object ppDBCalc3: TppDBCalc
+              UserName = 'DBCalc3'
+              DataField = 'Percentual'
+              DataPipeline = dbRelVersao
+              DisplayFormat = ',##0.00'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Name = 'Courier New'
+              Font.Size = 9
+              Font.Style = [fsBold]
+              TextAlignment = taRightJustified
+              Transparent = True
+              DataPipelineName = 'dbRelVersao'
+              mmHeight = 4498
+              mmLeft = 53446
+              mmTop = 3440
+              mmWidth = 17198
+              BandType = 7
+              LayerName = Foreground2
+            end
+          end
+          object ppDesignLayers3: TppDesignLayers
+            object ppDesignLayer3: TppDesignLayer
+              UserName = 'Foreground2'
+              LayerType = ltBanded
+              Index = 0
+            end
+          end
+        end
+      end
     end
     object ppGroup2: TppGroup
       BreakName = 'Prod_Id'
@@ -1612,7 +1889,7 @@ object DMRelVersao: TDMRelVersao
           mmHeight = 4498
           mmLeft = 3969
           mmTop = 1852
-          mmWidth = 141817
+          mmWidth = 115094
           BandType = 3
           GroupNo = 2
           LayerName = Foreground1
@@ -1630,6 +1907,42 @@ object DMRelVersao: TDMRelVersao
           mmLeft = 529
           mmTop = 1852
           mmWidth = 1588
+          BandType = 3
+          GroupNo = 2
+          LayerName = Foreground1
+        end
+        object ppLabel11: TppLabel
+          UserName = 'Label11'
+          Caption = 'Tempo:'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Arial'
+          Font.Size = 10
+          Font.Style = [fsBold]
+          Transparent = True
+          mmHeight = 4233
+          mmLeft = 153988
+          mmTop = 794
+          mmWidth = 12700
+          BandType = 3
+          GroupNo = 2
+          LayerName = Foreground1
+        end
+        object ppDBText11: TppDBText
+          UserName = 'DBText11'
+          DataField = 'C_TotalHoras'
+          DataPipeline = dbRelVersaoDoc
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Name = 'Arial'
+          Font.Size = 10
+          Font.Style = [fsBold]
+          Transparent = True
+          DataPipelineName = 'dbRelVersaoDoc'
+          mmHeight = 4498
+          mmLeft = 171450
+          mmTop = 794
+          mmWidth = 21960
           BandType = 3
           GroupNo = 2
           LayerName = Foreground1

@@ -10,7 +10,7 @@ uses
   Vcl.Menus, Datasnap.DBClient, Vcl.Mask, uAgendamentoController, System.DateUtils,
   uDMRecado, uRecadoController, uRecado, System.Generics.Collections,
   uSolicitacaoTempoVO, uConferenciaTempo, uConferenciaTempoGeral, uRevenda, uAgendamentoVO,
-  uPermissaoSolicitacaoVO, uListaProblemaSolicitacao;
+  uPermissaoSolicitacaoVO, uListaProblemaSolicitacao, uQuadroController;
 
 type
   TfrmQuadro2 = class(TForm)
@@ -958,6 +958,7 @@ type
     procedure TituloJanela(AIdRevenda: Integer);
     procedure EncerrarWEB(Id: Integer);
     procedure OrdenarGrids(AClientDataSet: TClientDataSet; ACampo: string);
+    function VerificarTarefas(APrograma: Integer): Boolean;
   public
     { Public declarations }
     constructor Create();
@@ -1287,32 +1288,46 @@ end;
 procedure TfrmQuadro2.btnAbrirAtividadeClick(Sender: TObject);
 begin
   ExecutarTimer(False);
-  if not (TFuncoes.FormularioEstaCriado(TfrmChamado)) then
-    TFuncoes.CriarFormularioModal(TfrmChamado.create(True, true, caAtividade));
-  AbrirQuadrosAtividades;
+  try
+    if VerificarTarefas(CAtividadePrograma) then
+      Exit;
 
-  ExecutarTimer(True);
+    if not (TFuncoes.FormularioEstaCriado(TfrmChamado)) then
+      TFuncoes.CriarFormularioModal(TfrmChamado.create(True, true, caAtividade));
+    AbrirQuadrosAtividades;
+  finally
+    ExecutarTimer(True);
+  end;
 end;
 
 procedure TfrmQuadro2.btnAbrirChamadoClick(Sender: TObject);
 begin
   ExecutarTimer(False);
-  if not (TFuncoes.FormularioEstaCriado(TfrmChamado)) then
-    TFuncoes.CriarFormularioModal(TfrmChamado.create(True, true, caChamado));
-  AbrirQuadrosChamados;
+  try
+    if VerificarTarefas(CChamadoPrograma) then
+      Exit;
 
-  ExecutarTimer(True);
+    if not (TFuncoes.FormularioEstaCriado(TfrmChamado)) then
+      TFuncoes.CriarFormularioModal(TfrmChamado.create(True, true, caChamado));
+    AbrirQuadrosChamados;
+  finally
+    ExecutarTimer(True);
+  end;
 end;
 
 procedure TfrmQuadro2.btnAbrirSolicitacaoClick(Sender: TObject);
 begin
   ExecutarTimer(False);
+  try
+    if VerificarTarefas(CSolicitacaoPrograma) then
+        Exit;
 
-  if not (TFuncoes.FormularioEstaCriado(TfrmSolicitacao)) then
-    TFuncoes.CriarFormularioModal(TfrmSolicitacao.create(True, true));
-  AbrirQuadrosSolicitacao;
-  ExecutarTimer(True);
-
+    if not (TFuncoes.FormularioEstaCriado(TfrmSolicitacao)) then
+      TFuncoes.CriarFormularioModal(TfrmSolicitacao.create(True, true));
+    AbrirQuadrosSolicitacao;
+  finally
+    ExecutarTimer(True);
+  end;
 end;
 
 procedure TfrmQuadro2.btnAgendamentoClick(Sender: TObject);
@@ -1794,6 +1809,8 @@ begin
   if not FileExists('ControleTempo.exe') then
     raise Exception.Create('É necessário ter o arquivo ControleTempo.exe na mesma pasta do executável deste sistema.');
 
+  if VerificarTarefas(CChamadoPrograma) then
+    Exit;
 
   sLinha := 'ControleTempo.exe ' + AIdSolicitacao.ToString() + ' ' + IntToStr(dm.IdUsuario);
   sComando := PansiChar(sLinha);
@@ -3176,6 +3193,9 @@ begin
   if AClientDataSet.IsEmpty then
     raise Exception.Create('Não há Registros para Editar!');
 
+  if VerificarTarefas(CChamadoPrograma) then
+    Exit;
+
   ExecutarTimer(False);
 
   bGeral    := (ATipoSol = solOcorrGeral);
@@ -3330,6 +3350,9 @@ procedure TfrmQuadro2.dbAtivQuadro1DblClick(Sender: TObject);
 begin
   ExecutarTimer(False);
   try
+    if VerificarTarefas(CAtividadePrograma) then
+      Exit;
+
     if Sender = dbAtivQuadro1 then
       ValidarChamado(dbAtivQuadro1, FControllerChamado.Model.CDSAtividade1, edtAtivCodigo1.Text, caAtividade)
     else if Sender = dbAtivQuadro2 then
@@ -3344,8 +3367,8 @@ begin
       ValidarChamado(dbAtivQuadro6, FControllerChamado.Model.CDSAtividade6, edtAtivCodigo6.Text, caAtividade);
   finally
     AbrirQuadrosAtividades();
+    ExecutarTimer(True);
   end;
-  ExecutarTimer(True);
 end;
 
 procedure TfrmQuadro2.dbAtivQuadro1DrawColumnCell(Sender: TObject;
@@ -3400,6 +3423,9 @@ begin
 
   ExecutarTimer(False);
   try
+    if VerificarTarefas(CChamadoPrograma) then
+      Exit;
+
     if Sender = dbQuadro1 then
       ValidarChamado(dbQuadro1, FControllerChamado.Model.CDSQuadro1, edtChaCodigo1.Text)
     else if Sender = dbQuadro2 then
@@ -3414,8 +3440,8 @@ begin
       ValidarChamado(dbQuadro6, FControllerChamado.Model.CDSQuadro6, edtChaCodigo6.Text);
   finally
     AbrirQuadrosChamados;
+    ExecutarTimer(True);
   end;
-  ExecutarTimer(True);
 end;
 
 procedure TfrmQuadro2.dbQuadro1DrawColumnCell(Sender: TObject; const Rect: TRect;
@@ -4573,6 +4599,28 @@ begin
       FreeAndNil(obj);
     end;
   end;
+end;
+
+function TfrmQuadro2.VerificarTarefas(APrograma: Integer): Boolean;
+var
+  QuadroController: TQuadroController;
+begin
+  Result := False;
+
+//  QuadroController := TQuadroController.Create;
+//  try
+//    try
+//      QuadroController.VerificarTarefaEmAberto(dm.IdUsuario, APrograma);
+//    except
+//      On E: Exception do
+//      begin
+//        ShowMessage(E.Message);
+//        Result := True;
+//      end;
+//    end;
+//  finally
+//    FreeAndNil(QuadroController);
+//  end;
 end;
 
 procedure TfrmQuadro2.WMSysCommand(var Msg: TWMSysCommand);

@@ -1,6 +1,6 @@
 //
 // Created by the DataSnap proxy generator.
-// 09/07/2020 13:49:22
+// 25/08/2020 09:37:41
 //
 
 unit uRegras;
@@ -124,6 +124,7 @@ type
     FFiltrarStatusProgramaCommand: TDBXCommand;
     FLocalizarCodigoStatusProgramaCommand: TDBXCommand;
     FConferenciaFiltrarPorDataCommand: TDBXCommand;
+    FVerificarQuadroTarefasEmAbertoCommand: TDBXCommand;
     FFiltrarTipoProgramaCommand: TDBXCommand;
     FLocalizarCodigoTipoProgramaCommand: TDBXCommand;
     FTipoRetornoUmRegistroCommand: TDBXCommand;
@@ -335,6 +336,7 @@ type
     procedure FiltrarStatusPrograma(Campo: string; Texto: string; Ativo: string; StatusPrograma: Integer; Contem: Boolean);
     procedure LocalizarCodigoStatusPrograma(StatusPrograma: Integer; Codigo: Integer);
     function ConferenciaFiltrarPorData(AData: string; AIdUsuario: Integer): TJSONValue;
+    function VerificarQuadroTarefasEmAberto(AIdUsuario: Integer; APrograma: Integer): Boolean;
     procedure FiltrarTipoPrograma(Campo: string; Texto: string; Ativo: string; TipoPrograma: Integer; Contem: Boolean);
     procedure LocalizarCodigoTipoPrograma(TipoPrograma: Integer; Codigo: Integer);
     function TipoRetornoUmRegistro(APrograma: Integer): TJSONValue;
@@ -2237,6 +2239,21 @@ begin
   Result := TJSONValue(FConferenciaFiltrarPorDataCommand.Parameters[2].Value.GetJSONValue(FInstanceOwner));
 end;
 
+function TServerMethods1Client.VerificarQuadroTarefasEmAberto(AIdUsuario: Integer; APrograma: Integer): Boolean;
+begin
+  if FVerificarQuadroTarefasEmAbertoCommand = nil then
+  begin
+    FVerificarQuadroTarefasEmAbertoCommand := FDBXConnection.CreateCommand;
+    FVerificarQuadroTarefasEmAbertoCommand.CommandType := TDBXCommandTypes.DSServerMethod;
+    FVerificarQuadroTarefasEmAbertoCommand.Text := 'TServerMethods1.VerificarQuadroTarefasEmAberto';
+    FVerificarQuadroTarefasEmAbertoCommand.Prepare;
+  end;
+  FVerificarQuadroTarefasEmAbertoCommand.Parameters[0].Value.SetInt32(AIdUsuario);
+  FVerificarQuadroTarefasEmAbertoCommand.Parameters[1].Value.SetInt32(APrograma);
+  FVerificarQuadroTarefasEmAbertoCommand.ExecuteUpdate;
+  Result := FVerificarQuadroTarefasEmAbertoCommand.Parameters[2].Value.GetBoolean;
+end;
+
 procedure TServerMethods1Client.FiltrarTipoPrograma(Campo: string; Texto: string; Ativo: string; TipoPrograma: Integer; Contem: Boolean);
 begin
   if FFiltrarTipoProgramaCommand = nil then
@@ -3723,6 +3740,7 @@ begin
   FFiltrarStatusProgramaCommand.DisposeOf;
   FLocalizarCodigoStatusProgramaCommand.DisposeOf;
   FConferenciaFiltrarPorDataCommand.DisposeOf;
+  FVerificarQuadroTarefasEmAbertoCommand.DisposeOf;
   FFiltrarTipoProgramaCommand.DisposeOf;
   FLocalizarCodigoTipoProgramaCommand.DisposeOf;
   FTipoRetornoUmRegistroCommand.DisposeOf;

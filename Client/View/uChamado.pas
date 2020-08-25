@@ -2625,7 +2625,7 @@ begin
         FController.ModoEdicaoInsercao;
         if (FQuadro) and (FOcorrencia) then
         begin
-          BuscarModulosAoSalvar();
+//          BuscarModulosAoSalvar();
           FController.Salvar(dm.IdUsuario, FTipoMovimento);
 
           if bInclusao then

@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Classes, uDM, Data.DB, Datasnap.DBClient, ppProd,
   ppClass, ppReport, ppComm, ppRelatv, ppDB, ppDBPipe, ppCtrls, ppBands,
   ppPrnabl, ppCache, ppDesignLayer, ppParameter, ppVar, ppStrtch, ppRichTx,
-  ppMemo, Vcl.Imaging.jpeg;
+  ppMemo, Vcl.Imaging.jpeg, uFuncoesSIDomper, ppSubRpt;
 
 type
   TDMRelVersao = class(TDataModule)
@@ -90,14 +90,39 @@ type
     ppGroupHeaderBand3: TppGroupHeaderBand;
     ppGroupFooterBand3: TppGroupFooterBand;
     lblPeriodoVersao: TppLabel;
+    CDSRelVersaoDocTotalHoras: TFloatField;
+    CDSRelVersaoDocC_TotalHoras: TStringField;
+    ppLabel11: TppLabel;
+    ppDBText11: TppDBText;
+    ppSubReport1: TppSubReport;
+    ppChildReport1: TppChildReport;
+    ppDesignLayers3: TppDesignLayers;
+    ppDesignLayer3: TppDesignLayer;
+    ppTitleBand1: TppTitleBand;
+    ppDetailBand3: TppDetailBand;
+    ppSummaryBand3: TppSummaryBand;
+    ppDBText12: TppDBText;
+    ppDBText13: TppDBText;
+    ppDBText14: TppDBText;
+    ppLine7: TppLine;
+    ppLabel13: TppLabel;
+    ppLabel14: TppLabel;
+    ppLabel15: TppLabel;
+    ppLine9: TppLine;
+    ppLabel16: TppLabel;
+    ppDBCalc2: TppDBCalc;
+    ppDBCalc3: TppDBCalc;
+    ppLabel17: TppLabel;
     procedure DataModuleCreate(Sender: TObject);
     procedure CDSRelVersaoCalcFields(DataSet: TDataSet);
+    procedure CDSRelVersaoDocCalcFields(DataSet: TDataSet);
   private
     { Private declarations }
     FQtdeTotal: Integer;
   public
     { Public declarations }
     procedure ImpressaoRelatorio1(AQtdeTotal: Integer);
+    procedure ImpressaoRelatorioEstatistica(AQtdeTotal: Integer);
     procedure ImpressaoRelatorio2;
     procedure ImpressaoRelatorio3(APeriodo: string);
   end;
@@ -124,6 +149,11 @@ begin
     end;
     CDSRelVersaoPercentual.AsFloat := percentual;
   end;
+end;
+
+procedure TDMRelVersao.CDSRelVersaoDocCalcFields(DataSet: TDataSet);
+begin
+  CDSRelVersaoDocC_TotalHoras.AsString := TFuncoes.DecimalToHora(CDSRelVersaoDocTotalHoras.AsFloat);
 end;
 
 procedure TDMRelVersao.DataModuleCreate(Sender: TObject);
@@ -159,6 +189,13 @@ begin
   lblPeriodoVersao.Caption := APeriodo;
   relVersaoDoc.Print;
   CDSRelVersaoDoc.Close;
+end;
+
+procedure TDMRelVersao.ImpressaoRelatorioEstatistica(AQtdeTotal: Integer);
+begin
+  FQtdeTotal    := AQtdeTotal;
+  CDSRelVersao.Close;
+  CDSRelVersao.Open;
 end;
 
 end.

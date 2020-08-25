@@ -357,6 +357,7 @@ var
   Negocio: TServerMethods1Client;
   Relatorio: TDMRelVersao;
   QtdeTotal: Integer;
+  QtdeTotal2: Integer;
   objJson: TJSONValue;
 begin
   Relatorio := TDMRelVersao.Create(nil);
@@ -370,7 +371,9 @@ begin
   try
     try
       objJson := TConverte.ObjectToJSON(AFiltro);
+      Negocio.RelatorioVersao(1, AIdVersao, QtdeTotal2, nil);
       Negocio.RelatorioVersao(2, AIdVersao, QtdeTotal, objJson);
+      Relatorio.ImpressaoRelatorioEstatistica(QtdeTotal2);
       Relatorio.ImpressaoRelatorio2();
       dm.Desconectar;
     except

@@ -4,7 +4,7 @@
   ClientHeight = 671
   ClientWidth = 1018
   OnDestroy = FormDestroy
-  ExplicitTop = -305
+  ExplicitTop = -329
   ExplicitWidth = 1024
   ExplicitHeight = 700
   PixelsPerInch = 96
@@ -195,7 +195,7 @@
           Top = 1
           Width = 1008
           Height = 599
-          ActivePage = tsPrincipal
+          ActivePage = tsChamadoOcorrencia
           Align = alClient
           TabOrder = 0
           OnChange = PageControl1Change
