@@ -93,7 +93,6 @@ type
     CDSRelVersaoDocTotalHoras: TFloatField;
     CDSRelVersaoDocC_TotalHoras: TStringField;
     ppLabel11: TppLabel;
-    ppDBText11: TppDBText;
     ppSubReport1: TppSubReport;
     ppChildReport1: TppChildReport;
     ppDesignLayers3: TppDesignLayers;
@@ -113,9 +112,14 @@ type
     ppDBCalc2: TppDBCalc;
     ppDBCalc3: TppDBCalc;
     ppLabel17: TppLabel;
+    ppDBText15: TppDBText;
+    lblTotalHoras: TppLabel;
+    dbCalcHoras: TppDBCalc;
+    ppLabel18: TppLabel;
     procedure DataModuleCreate(Sender: TObject);
     procedure CDSRelVersaoCalcFields(DataSet: TDataSet);
     procedure CDSRelVersaoDocCalcFields(DataSet: TDataSet);
+    procedure ppGroupFooterBand3BeforePrint(Sender: TObject);
   private
     { Private declarations }
     FQtdeTotal: Integer;
@@ -196,6 +200,11 @@ begin
   FQtdeTotal    := AQtdeTotal;
   CDSRelVersao.Close;
   CDSRelVersao.Open;
+end;
+
+procedure TDMRelVersao.ppGroupFooterBand3BeforePrint(Sender: TObject);
+begin
+  lblTotalHoras.Caption := TFuncoes.DecimalToHora(dbCalcHoras.Value);
 end;
 
 end.

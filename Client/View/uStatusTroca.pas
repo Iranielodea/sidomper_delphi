@@ -305,6 +305,12 @@ begin
     FreeAndNil(img);
   end;
 
+  if (pnlModulo.Visible = False) and (pnlTipo.Visible = False) then
+  begin
+    pnlStatus.Align := alNone;
+    pnlStatus.Top := 50;
+  end;
+
   try
     if (pnlModulo.Visible) and (edtCodModulo.Text = '') then
     begin

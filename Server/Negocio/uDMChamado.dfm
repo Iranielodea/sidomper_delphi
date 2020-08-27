@@ -1,6 +1,6 @@
 object DMChamado: TDMChamado
   OldCreateOrder = False
-  Height = 351
+  Height = 358
   Width = 296
   object QRelChamadoModelo01: TFDQuery
     Connection = DM.Conexao
@@ -51,8 +51,8 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Tipo ON Cha_Tipo = Tip_Id'#9
       #9'INNER JOIN Usuario ON ChOco_Usuario = Usu_Id'#9#9
       #9'INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
-    Left = 56
-    Top = 64
+    Left = 184
+    Top = 16
   end
   object QRelChamadoModelo03: TFDQuery
     Connection = DM.Conexao
@@ -71,7 +71,7 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Tipo ON Cha_Tipo = Tip_Id'#9
       #9'INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
     Left = 56
-    Top = 120
+    Top = 72
   end
   object QRelChamadoModelo04: TFDQuery
     Connection = DM.Conexao
@@ -91,7 +91,7 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Usuario ON ChOco_Usuario = Usu_Id'#9#9
       #9'INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
     Left = 56
-    Top = 168
+    Top = 128
   end
   object QRelChamadoModelo03A: TFDQuery
     Connection = DM.Conexao
@@ -115,7 +115,7 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Tipo ON Cha_Tipo = Tip_Id'#9
       #9'INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
     Left = 168
-    Top = 120
+    Top = 72
   end
   object QRelChamadoModelo05: TFDQuery
     Connection = DM.Conexao
@@ -131,8 +131,8 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Cliente ON Cha_Cliente = Cli_Id'
       '        INNER JOIN Usuario ON Cha_UsuarioAbertura = Usu_Id'
       '        INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
-    Left = 56
-    Top = 216
+    Left = 168
+    Top = 128
   end
   object QRelChamadoModelo08: TFDQuery
     Connection = DM.Conexao
@@ -150,7 +150,7 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Tipo ON Cha_Tipo = Tip_Id'#9
       #9'INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
     Left = 56
-    Top = 264
+    Top = 184
   end
   object QRelChamadoModelo08A: TFDQuery
     Connection = DM.Conexao
@@ -173,6 +173,24 @@ object DMChamado: TDMChamado
       #9'INNER JOIN Tipo ON Cha_Tipo = Tip_Id'#9
       #9'INNER JOIN Revenda ON Cli_Revenda = Rev_Id')
     Left = 168
-    Top = 264
+    Top = 184
+  end
+  object QRelChamadoModelo09: TFDQuery
+    Connection = DM.Conexao
+    SQL.Strings = (
+      'SELECT'
+      'CASE Cha_Origem'
+      #9'WHEN 1 THEN '#39'Telefone'#39
+      #9'WHEN 2 THEN '#39'WhatsApp'#39
+      #9'WHEN 3 THEN '#39'Chat'#39
+      #9'WHEN 4 THEN '#39'Aplicativo'#39
+      #9'WHEN 5 THEN '#39'ERP'#39
+      'END ORIGEM,'
+      'COUNT(Cha_Id) AS Qtde'
+      'FROM Chamado'
+      'INNER JOIN Cliente ON Cha_Cliente = Cli_Id'
+      'LEFT JOIN Revenda ON Cli_Revenda = Rev_Id')
+    Left = 56
+    Top = 240
   end
 end

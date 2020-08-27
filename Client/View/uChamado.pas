@@ -257,6 +257,7 @@ type
     procedure RelatorioModelo_06;
     procedure RelatorioModelo_07;
     procedure RelatorioModelo_08;
+    procedure RelatorioModelo_09;
     procedure RelatorioFiltro(AFiltro: TFiltroChamado);
 
     procedure OrdemRelatorioModelo02;
@@ -264,6 +265,7 @@ type
     procedure OrdemRelatorioModelo04;
     procedure OrdemRelatorioModelo05;
     procedure OrdemRelatorioModelo08;
+    procedure OrdemRelatorioModelo09;
 
     function EntrarTelaStatus: Boolean;
 
@@ -1145,6 +1147,7 @@ begin
       4: OrdemRelatorioModelo04;
       5: OrdemRelatorioModelo05;
       8: OrdemRelatorioModelo08;
+      9: OrdemRelatorioModelo09;
     end;
   end
   else begin
@@ -1245,6 +1248,7 @@ begin
   cbbModelo.Items.Add('06 - Resumo de Horas por Tipo Mês');
   cbbModelo.Items.Add('07 - Resumo de Ocorrências por Usuário Mês');
   cbbModelo.Items.Add('08 - Resumo de Ocorrências por Perfil de Cliente');
+  cbbModelo.Items.Add('09 - Chamados por Origem');
   cbbModelo.ItemIndex := 0;
 end;
 
@@ -2304,6 +2308,16 @@ begin
   end;
 end;
 
+procedure TfrmChamado.OrdemRelatorioModelo09;
+begin
+  if cbbModelo.ItemIndex = 8 then
+  begin
+    cbbOrdemRelatorio.Clear;
+    cbbOrdemRelatorio.Items.Add('Por Origem');
+    cbbOrdemRelatorio.ItemIndex := 0;
+  end;
+end;
+
 procedure TfrmChamado.PageControl1Change(Sender: TObject);
 begin
   inherited;
@@ -2548,6 +2562,24 @@ begin
   end;
 end;
 
+procedure TfrmChamado.RelatorioModelo_09;
+var
+  Filtro: TFiltroChamado;
+  sOrdem: string;
+begin
+  Screen.Cursor := crHourGlass;
+  Filtro := TFiltroChamado.Create;
+  try
+    RelatorioFiltro(Filtro);
+
+    FController.Relatorio(Filtro, 09, dm.IdUsuario, 'Cha_Origem');
+  finally
+    FreeAndNil(Filtro);
+    Screen.Cursor := crDefault;
+  end;
+
+end;
+
 procedure TfrmChamado.RelatoriosAtividades;
 var
   iOpcao: integer;
@@ -2578,6 +2610,7 @@ begin
     6: RelatorioModelo_06;
     7: RelatorioModelo_07;
     8: RelatorioModelo_08;
+    9: RelatorioModelo_09;
   end;
 end;
 

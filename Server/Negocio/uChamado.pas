@@ -111,6 +111,8 @@ type
       ATipo: TEnumChamadoAtividade);
     function RelatorioModelo_08(AFiltro: TFiltroChamado; AIdUsuario: integer; Ordem:
         string; ATipo: TEnumChamadoAtividade): string;
+    function RelatorioModelo_09(AFiltro: TFiltroChamado; AIdUsuario: integer; Ordem:
+        string; ATipo: TEnumChamadoAtividade): string;
   end;
 
 implementation
@@ -1331,6 +1333,25 @@ begin
   end;
 end;
 
+function TChamado.RelatorioModelo_09(AFiltro: TFiltroChamado;
+  AIdUsuario: integer; Ordem: string; ATipo: TEnumChamadoAtividade): string;
+var
+  sConsulta: string;
+  sConsulta2: string;
+  lChamado: TDMChamado;
+begin
+  sConsulta := FiltrarRelatorios(AFiltro, AIdUsuario, 'CAB', ATipo);
+  sConsulta := sConsulta + ' GROUP BY	Cha_Origem';
+
+  lChamado := TDMChamado.Create(nil);
+  try
+    Result := lChamado.QRelChamadoModelo09.SQL.Text +
+      sConsulta + ' ORDER BY ' + Ordem;
+  finally
+    FreeAndNil(lChamado);
+  end;
+end;
+
 function TChamado.RetornarAtividadeQuadro(AIdUsuario,
   AIdRevenda: Integer): string;
 var
@@ -1882,11 +1903,9 @@ begin
   sb := TStringBuilder.Create;
   try
       sb.AppendLine('SELECT COUNT(Cha_Id) FROM CHAMADO');
-      sb.AppendLine(' LEFT JOIN Chamado_Ocorrencia ON Cha_Id = ChOco_Chamado');
       sb.AppendLine(' WHERE Cha_Status = 28');
       sb.AppendLine(' AND Cha_TipoMovimento = 2');
-      sb.AppendLine(' AND ((cha_UsuarioAbertura = ' + IntToStr(AIdUsuario) + ')');
-      sb.AppendLine(' OR (ChOco_Usuario = ' + IntToStr(AIdUsuario) + '))');
+      sb.AppendLine(' AND cha_UsuarioAtendeAtual = ' + IntToStr(AIdUsuario));
 
     obj.OpenSQL(sb.ToString());
     bResult := (obj.Model.Fields[0].AsInteger > 0);
@@ -1906,11 +1925,9 @@ begin
   sb := TStringBuilder.Create;
   try
       sb.AppendLine('SELECT COUNT(Cha_Id) FROM CHAMADO');
-      sb.AppendLine(' LEFT JOIN Chamado_Ocorrencia ON Cha_Id = ChOco_Chamado');
       sb.AppendLine(' WHERE Cha_Status = 2');
       sb.AppendLine(' AND Cha_TipoMovimento = 1');
-      sb.AppendLine(' AND ((cha_UsuarioAbertura = ' + IntToStr(AIdUsuario) + ')');
-      sb.AppendLine(' OR (ChOco_Usuario = ' + IntToStr(AIdUsuario) + '))');
+      sb.AppendLine(' AND cha_UsuarioAtendeAtual = ' + IntToStr(AIdUsuario));
 
     obj.OpenSQL(sb.ToString());
     Result := (obj.Model.Fields[0].AsInteger > 0);

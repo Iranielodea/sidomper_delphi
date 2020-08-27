@@ -959,6 +959,9 @@ type
     procedure EncerrarWEB(Id: Integer);
     procedure OrdenarGrids(AClientDataSet: TClientDataSet; ACampo: string);
     function VerificarTarefas(APrograma: Integer): Boolean;
+    function VerificarTarefasSolicitacao(): Boolean;
+    function VerificarTarefasChamado(): Boolean;
+    function VerificarTarefasAtividade(): Boolean;
   public
     { Public declarations }
     constructor Create();
@@ -1289,9 +1292,6 @@ procedure TfrmQuadro2.btnAbrirAtividadeClick(Sender: TObject);
 begin
   ExecutarTimer(False);
   try
-    if VerificarTarefas(CAtividadePrograma) then
-      Exit;
-
     if not (TFuncoes.FormularioEstaCriado(TfrmChamado)) then
       TFuncoes.CriarFormularioModal(TfrmChamado.create(True, true, caAtividade));
     AbrirQuadrosAtividades;
@@ -1304,9 +1304,6 @@ procedure TfrmQuadro2.btnAbrirChamadoClick(Sender: TObject);
 begin
   ExecutarTimer(False);
   try
-    if VerificarTarefas(CChamadoPrograma) then
-      Exit;
-
     if not (TFuncoes.FormularioEstaCriado(TfrmChamado)) then
       TFuncoes.CriarFormularioModal(TfrmChamado.create(True, true, caChamado));
     AbrirQuadrosChamados;
@@ -1319,9 +1316,6 @@ procedure TfrmQuadro2.btnAbrirSolicitacaoClick(Sender: TObject);
 begin
   ExecutarTimer(False);
   try
-    if VerificarTarefas(CSolicitacaoPrograma) then
-        Exit;
-
     if not (TFuncoes.FormularioEstaCriado(TfrmSolicitacao)) then
       TFuncoes.CriarFormularioModal(TfrmSolicitacao.create(True, true));
     AbrirQuadrosSolicitacao;
@@ -1809,7 +1803,7 @@ begin
   if not FileExists('ControleTempo.exe') then
     raise Exception.Create('É necessário ter o arquivo ControleTempo.exe na mesma pasta do executável deste sistema.');
 
-  if VerificarTarefas(CChamadoPrograma) then
+  if VerificarTarefasSolicitacao() then
     Exit;
 
   sLinha := 'ControleTempo.exe ' + AIdSolicitacao.ToString() + ' ' + IntToStr(dm.IdUsuario);
@@ -3193,7 +3187,7 @@ begin
   if AClientDataSet.IsEmpty then
     raise Exception.Create('Não há Registros para Editar!');
 
-  if VerificarTarefas(CChamadoPrograma) then
+  if VerificarTarefasSolicitacao() then
     Exit;
 
   ExecutarTimer(False);
@@ -3350,7 +3344,7 @@ procedure TfrmQuadro2.dbAtivQuadro1DblClick(Sender: TObject);
 begin
   ExecutarTimer(False);
   try
-    if VerificarTarefas(CAtividadePrograma) then
+    if VerificarTarefasAtividade() then
       Exit;
 
     if Sender = dbAtivQuadro1 then
@@ -3423,7 +3417,7 @@ begin
 
   ExecutarTimer(False);
   try
-    if VerificarTarefas(CChamadoPrograma) then
+    if VerificarTarefasChamado() then
       Exit;
 
     if Sender = dbQuadro1 then
@@ -4176,9 +4170,15 @@ begin
     PermissaoSolicitacao();
     AlturaGrid();
     ControleTituloTempo();
-    AbrirQuadrosChamados();
+
+    // se tiver recados mostrar a Aba dos recados
+    if tsRecados.TabVisible then
+      AbrirAbaRecados();
+
+    if not (tsRecados.Showing) then
+      AbrirQuadrosChamados();
+
     ExecutarTimer(True);
-//    AbrirAbaRecados();
   finally
   end;
 
@@ -4571,6 +4571,9 @@ begin
 
   IdSolicitacao := AGrade.Columns[0].Field.AsInteger;
 
+  if VerificarTarefasSolicitacao() then
+    Exit;
+
 //  if FControllerSolicitacao.SolicitacaoAtualAberta(IdSolicitacao) then
 //    raise Exception.Create('Solicitação está Aberta, será Necessário Encerrá-la!');
 
@@ -4607,20 +4610,35 @@ var
 begin
   Result := False;
 
-//  QuadroController := TQuadroController.Create;
-//  try
-//    try
-//      QuadroController.VerificarTarefaEmAberto(dm.IdUsuario, APrograma);
-//    except
-//      On E: Exception do
-//      begin
-//        ShowMessage(E.Message);
-//        Result := True;
-//      end;
-//    end;
-//  finally
-//    FreeAndNil(QuadroController);
-//  end;
+  QuadroController := TQuadroController.Create;
+  try
+    try
+      QuadroController.VerificarTarefaEmAberto(dm.IdUsuario, APrograma);
+    except
+      On E: Exception do
+      begin
+        ShowMessage(E.Message);
+        Result := True;
+      end;
+    end;
+  finally
+    FreeAndNil(QuadroController);
+  end;
+end;
+
+function TfrmQuadro2.VerificarTarefasAtividade: Boolean;
+begin
+  Result := VerificarTarefas(CAtividadePrograma);
+end;
+
+function TfrmQuadro2.VerificarTarefasChamado: Boolean;
+begin
+  Result := VerificarTarefas(CChamadoPrograma);
+end;
+
+function TfrmQuadro2.VerificarTarefasSolicitacao: Boolean;
+begin
+  Result := VerificarTarefas(CSolicitacaoPrograma);
 end;
 
 procedure TfrmQuadro2.WMSysCommand(var Msg: TWMSysCommand);

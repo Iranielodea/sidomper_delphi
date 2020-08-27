@@ -912,6 +912,36 @@ type
     CDSRelChamadoModelo8Sum_TotalHoras: TAggregateField;
     ppLabel97: TppLabel;
     lblPerc8: TppLabel;
+    RelChamadoModelo9: TppReport;
+    ppParameterList10: TppParameterList;
+    ppDesignLayers11: TppDesignLayers;
+    ppDesignLayer11: TppDesignLayer;
+    ppHeaderBand10: TppHeaderBand;
+    ppDetailBand11: TppDetailBand;
+    ppLabel99: TppLabel;
+    ppLabel100: TppLabel;
+    ppLabel102: TppLabel;
+    ppLabel103: TppLabel;
+    lblPeriodoModelo9: TppLabel;
+    ppSystemVariable28: TppSystemVariable;
+    ppSystemVariable29: TppSystemVariable;
+    ppSystemVariable30: TppSystemVariable;
+    ppLine73: TppLine;
+    ppSummaryBand11: TppSummaryBand;
+    ppLine74: TppLine;
+    cdsRelChamadoModelo9: TClientDataSet;
+    cdsRelChamadoModelo9ORIGEM: TStringField;
+    cdsRelChamadoModelo9Qtde: TIntegerField;
+    dsRelChamadoModelo9: TDataSource;
+    dbRelChamadoModelo9: TppDBPipeline;
+    ppDBText88: TppDBText;
+    ppDBText105: TppDBText;
+    ppLabel112: TppLabel;
+    ppDBCalc61: TppDBCalc;
+    cdsRelChamadoModelo9C_QtdeTotal: TAggregateField;
+    cdsRelChamadoModelo9C_Percentual: TFloatField;
+    ppDBText106: TppDBText;
+    ppDBCalc62: TppDBCalc;
     procedure DataModuleCreate(Sender: TObject);
     procedure ppDetailBand3BeforePrint(Sender: TObject);
     procedure ppDetailBand4BeforePrint(Sender: TObject);
@@ -931,12 +961,14 @@ type
     procedure ppSummaryBand7BeforePrint(Sender: TObject);
     procedure ppDetailBand10BeforePrint(Sender: TObject);
     procedure ppSummaryBand10BeforePrint(Sender: TObject);
+    procedure cdsRelChamadoModelo9CalcFields(DataSet: TDataSet);
   private
     { Private declarations }
   public
     { Public declarations }
     procedure ImpressaoModelo3(ADataInicial, ADataFinal, AOrdem: string);
     procedure ImpressaoModelo8(ADataInicial, ADataFinal, AOrdem: string);
+    procedure ImpressaoModelo9(ADataInicial, ADataFinal, AOrdem: string);
   end;
 
 var
@@ -965,6 +997,18 @@ begin
   CDSRelChamadoModelo6CTotalHoras11.AsString := TFuncoes.DecimalToHora(CDSRelChamadoModelo6Horas11.AsFloat);
   CDSRelChamadoModelo6CTotalHoras12.AsString := TFuncoes.DecimalToHora(CDSRelChamadoModelo6Horas12.AsFloat);
 
+end;
+
+procedure TDMRelChamado.cdsRelChamadoModelo9CalcFields(DataSet: TDataSet);
+var
+  iTotalQtde: Integer;
+begin
+    try
+      iTotalQtde := StrToInt(cdsRelChamadoModelo9C_QtdeTotal.Value);
+      cdsRelChamadoModelo9C_Percentual.AsCurrency := (cdsRelChamadoModelo9Qtde.AsInteger / iTotalQtde) * 100;
+    except
+      cdsRelChamadoModelo9C_Percentual.AsCurrency := 0;
+    end;
 end;
 
 procedure TDMRelChamado.DataModuleCreate(Sender: TObject);
@@ -1036,6 +1080,13 @@ begin
   lblPeriodoModelo8.Caption := 'Período de ' + ADataInicial + ' Até ' + ADataFinal;
   RelChamadoModelo8.Print;
 
+end;
+
+procedure TDMRelChamado.ImpressaoModelo9(ADataInicial, ADataFinal,
+  AOrdem: string);
+begin
+  lblPeriodoModelo9.Caption := 'Período de ' + ADataInicial + ' Até ' + ADataFinal;
+  RelChamadoModelo9.Print;
 end;
 
 procedure TDMRelChamado.ppDetailBand10BeforePrint(Sender: TObject);

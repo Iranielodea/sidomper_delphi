@@ -1,7 +1,7 @@
 object DMRelChamado: TDMRelChamado
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 449
+  Height = 489
   Width = 759
   object CDSRelChamadoDetModelo1: TClientDataSet
     Aggregates = <>
@@ -12701,7 +12701,6 @@ object DMRelChamado: TDMRelChamado
     AggregatesActive = True
     Params = <>
     ProviderName = 'dspRelChamadoModelo8'
-    RemoteServer = DM.DSPConexao
     Left = 48
     Top = 384
     object CDSRelChamadoModelo8Cli_Perfil: TStringField
@@ -12755,7 +12754,7 @@ object DMRelChamado: TDMRelChamado
     UserName = 'dbRelChamadoModelo8'
     Left = 320
     Top = 384
-    object dbRelChamadoModelo8ppField1: TppField
+    object pfldRelChamadoModelo8ppField1: TppField
       FieldAlias = 'Cli_Perfil'
       FieldName = 'Cli_Perfil'
       FieldLength = 0
@@ -12765,7 +12764,7 @@ object DMRelChamado: TDMRelChamado
       Searchable = False
       Sortable = False
     end
-    object dbRelChamadoModelo8ppField2: TppField
+    object pfldRelChamadoModelo8ppField2: TppField
       FieldAlias = 'QtdeChamados'
       FieldName = 'QtdeChamados'
       FieldLength = 0
@@ -12775,7 +12774,7 @@ object DMRelChamado: TDMRelChamado
       Searchable = False
       Sortable = False
     end
-    object dbRelChamadoModelo8ppField3: TppField
+    object pfldRelChamadoModelo8ppField3: TppField
       FieldAlias = 'TotalHoras'
       FieldName = 'TotalHoras'
       FieldLength = 0
@@ -12785,7 +12784,7 @@ object DMRelChamado: TDMRelChamado
       Searchable = False
       Sortable = False
     end
-    object dbRelChamadoModelo8ppField4: TppField
+    object pfldRelChamadoModelo8ppField4: TppField
       FieldAlias = 'TotalHorasDetalhes'
       FieldName = 'TotalHorasDetalhes'
       FieldLength = 0
@@ -13327,6 +13326,428 @@ object DMRelChamado: TDMRelChamado
       end
     end
     object ppParameterList9: TppParameterList
+    end
+  end
+  object RelChamadoModelo9: TppReport
+    AutoStop = False
+    DataPipeline = dbRelChamadoModelo9
+    PassSetting = psTwoPass
+    PrinterSetup.BinName = 'Default'
+    PrinterSetup.DocumentName = 'Report'
+    PrinterSetup.PaperName = 'Carta'
+    PrinterSetup.PrinterName = 'Default'
+    PrinterSetup.SaveDeviceSettings = False
+    PrinterSetup.mmMarginBottom = 6350
+    PrinterSetup.mmMarginLeft = 6350
+    PrinterSetup.mmMarginRight = 6350
+    PrinterSetup.mmMarginTop = 6350
+    PrinterSetup.mmPaperHeight = 279400
+    PrinterSetup.mmPaperWidth = 215900
+    PrinterSetup.PaperSize = 1
+    AllowPrintToFile = True
+    ArchiveFileName = '($MyDocuments)\ReportArchive.raf'
+    DeviceType = 'Screen'
+    DefaultFileDeviceType = 'PDF'
+    EmailSettings.ReportFormat = 'PDF'
+    LanguageID = 'Default'
+    OpenFile = False
+    OutlineSettings.CreateNode = True
+    OutlineSettings.CreatePageNodes = True
+    OutlineSettings.Enabled = True
+    OutlineSettings.Visible = True
+    ThumbnailSettings.Enabled = True
+    ThumbnailSettings.Visible = True
+    ThumbnailSettings.DeadSpace = 30
+    PDFSettings.EmbedFontOptions = [efUseSubset]
+    PDFSettings.EncryptSettings.AllowCopy = True
+    PDFSettings.EncryptSettings.AllowInteract = True
+    PDFSettings.EncryptSettings.AllowModify = True
+    PDFSettings.EncryptSettings.AllowPrint = True
+    PDFSettings.EncryptSettings.Enabled = False
+    PDFSettings.EncryptSettings.KeyLength = kl40Bit
+    PDFSettings.FontEncoding = feAnsi
+    PDFSettings.ImageCompressionLevel = 25
+    PreviewFormSettings.WindowState = wsMaximized
+    PreviewFormSettings.ZoomSetting = zs100Percent
+    RTFSettings.DefaultFont.Charset = DEFAULT_CHARSET
+    RTFSettings.DefaultFont.Color = clWindowText
+    RTFSettings.DefaultFont.Height = -13
+    RTFSettings.DefaultFont.Name = 'Arial'
+    RTFSettings.DefaultFont.Style = []
+    TextFileName = '($MyDocuments)\Report.pdf'
+    TextSearchSettings.DefaultString = '<Texto a localizar>'
+    TextSearchSettings.Enabled = True
+    XLSSettings.AppName = 'ReportBuilder'
+    XLSSettings.Author = 'ReportBuilder'
+    XLSSettings.Subject = 'Report'
+    XLSSettings.Title = 'Report'
+    Left = 272
+    Top = 440
+    Version = '15.03'
+    mmColumnWidth = 0
+    DataPipelineName = 'dbRelChamadoModelo9'
+    object ppHeaderBand10: TppHeaderBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 22225
+      mmPrintPosition = 0
+      object ppLabel99: TppLabel
+        UserName = 'Label99'
+        Caption = 'Origem'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 794
+        mmTop = 16669
+        mmWidth = 11113
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppLabel100: TppLabel
+        UserName = 'Label100'
+        Caption = 'Qtde Chamados'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 36248
+        mmTop = 16669
+        mmWidth = 24077
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppLabel102: TppLabel
+        UserName = 'Label102'
+        Caption = 'Percentual'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 65881
+        mmTop = 16669
+        mmWidth = 18521
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppLabel103: TppLabel
+        UserName = 'Label103'
+        Caption = 'Chamados - Relat'#243'rio por Origem'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 14
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 5821
+        mmLeft = 60590
+        mmTop = 0
+        mmWidth = 81756
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object lblPeriodoModelo9: TppLabel
+        UserName = 'lblPeriodoModelo9'
+        AutoSize = False
+        Caption = 'lblPeriodoModelo9'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 60590
+        mmTop = 6085
+        mmWidth = 86254
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppSystemVariable28: TppSystemVariable
+        UserName = 'SystemVariable28'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 794
+        mmTop = 0
+        mmWidth = 18521
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppSystemVariable29: TppSystemVariable
+        UserName = 'SystemVariable29'
+        VarType = vtTime
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3968
+        mmLeft = 794
+        mmTop = 4763
+        mmWidth = 14816
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppSystemVariable30: TppSystemVariable
+        UserName = 'SystemVariable30'
+        VarType = vtPageSet
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3969
+        mmLeft = 183886
+        mmTop = 0
+        mmWidth = 11113
+        BandType = 0
+        LayerName = Foreground6
+      end
+      object ppLine73: TppLine
+        UserName = 'Line73'
+        Position = lpBottom
+        Weight = 0.750000000000000000
+        mmHeight = 2381
+        mmLeft = 794
+        mmTop = 19844
+        mmWidth = 201877
+        BandType = 0
+        LayerName = Foreground6
+      end
+    end
+    object ppDetailBand11: TppDetailBand
+      Background1.Brush.Style = bsClear
+      Background2.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 4498
+      mmPrintPosition = 0
+      object ppDBText88: TppDBText
+        UserName = 'DBText88'
+        DataField = 'ORIGEM'
+        DataPipeline = dbRelChamadoModelo9
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'dbRelChamadoModelo9'
+        mmHeight = 4498
+        mmLeft = 794
+        mmTop = 0
+        mmWidth = 37835
+        BandType = 4
+        LayerName = Foreground6
+      end
+      object ppDBText105: TppDBText
+        UserName = 'DBText105'
+        DataField = 'Qtde'
+        DataPipeline = dbRelChamadoModelo9
+        DisplayFormat = ',##0'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'dbRelChamadoModelo9'
+        mmHeight = 4498
+        mmLeft = 43127
+        mmTop = 0
+        mmWidth = 17198
+        BandType = 4
+        LayerName = Foreground6
+      end
+      object ppDBText106: TppDBText
+        UserName = 'DBText106'
+        DataField = 'C_Percentual'
+        DataPipeline = dbRelChamadoModelo9
+        DisplayFormat = ',#0.00%'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'dbRelChamadoModelo9'
+        mmHeight = 4498
+        mmLeft = 67204
+        mmTop = 0
+        mmWidth = 17198
+        BandType = 4
+        LayerName = Foreground6
+      end
+    end
+    object ppSummaryBand11: TppSummaryBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 13229
+      mmPrintPosition = 0
+      object ppLine74: TppLine
+        UserName = 'Line74'
+        Weight = 0.750000000000000000
+        mmHeight = 2910
+        mmLeft = 794
+        mmTop = 0
+        mmWidth = 201877
+        BandType = 7
+        LayerName = Foreground6
+      end
+      object ppLabel112: TppLabel
+        UserName = 'Label112'
+        Caption = 'Total:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 794
+        mmTop = 3440
+        mmWidth = 11112
+        BandType = 7
+        LayerName = Foreground6
+      end
+      object ppDBCalc61: TppDBCalc
+        UserName = 'DBCalc61'
+        DataField = 'Qtde'
+        DataPipeline = dbRelChamadoModelo9
+        DisplayFormat = ',##0'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'dbRelChamadoModelo9'
+        mmHeight = 4498
+        mmLeft = 43127
+        mmTop = 3440
+        mmWidth = 17198
+        BandType = 7
+        LayerName = Foreground6
+      end
+      object ppDBCalc62: TppDBCalc
+        UserName = 'DBCalc62'
+        DataField = 'C_Percentual'
+        DataPipeline = dbRelChamadoModelo9
+        DisplayFormat = ',#0.00%'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Courier New'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'dbRelChamadoModelo9'
+        mmHeight = 4498
+        mmLeft = 67204
+        mmTop = 3440
+        mmWidth = 17198
+        BandType = 7
+        LayerName = Foreground6
+      end
+    end
+    object ppDesignLayers11: TppDesignLayers
+      object ppDesignLayer11: TppDesignLayer
+        UserName = 'Foreground6'
+        LayerType = ltBanded
+        Index = 0
+      end
+    end
+    object ppParameterList10: TppParameterList
+    end
+  end
+  object cdsRelChamadoModelo9: TClientDataSet
+    Aggregates = <>
+    AggregatesActive = True
+    Params = <>
+    ProviderName = 'dspRelChamadoModelo9'
+    OnCalcFields = cdsRelChamadoModelo9CalcFields
+    Left = 48
+    Top = 440
+    object cdsRelChamadoModelo9ORIGEM: TStringField
+      FieldName = 'ORIGEM'
+      Origin = 'ORIGEM'
+      ReadOnly = True
+      Size = 10
+    end
+    object cdsRelChamadoModelo9Qtde: TIntegerField
+      FieldName = 'Qtde'
+      Origin = 'Qtde'
+      ReadOnly = True
+    end
+    object cdsRelChamadoModelo9C_Percentual: TFloatField
+      FieldKind = fkInternalCalc
+      FieldName = 'C_Percentual'
+    end
+    object cdsRelChamadoModelo9C_QtdeTotal: TAggregateField
+      FieldName = 'C_QtdeTotal'
+      Active = True
+      DisplayName = ''
+      Expression = 'sum(Qtde)'
+    end
+  end
+  object dsRelChamadoModelo9: TDataSource
+    DataSet = cdsRelChamadoModelo9
+    Left = 128
+    Top = 440
+  end
+  object dbRelChamadoModelo9: TppDBPipeline
+    DataSource = dsRelChamadoModelo9
+    UserName = 'dbRelChamadoModelo9'
+    Left = 200
+    Top = 440
+    object pfldRelChamadoModelo9ppField1: TppField
+      FieldAlias = 'ORIGEM'
+      FieldName = 'ORIGEM'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 0
+      Searchable = False
+      Sortable = False
+    end
+    object pfldRelChamadoModelo9ppField2: TppField
+      FieldAlias = 'Qtde'
+      FieldName = 'Qtde'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 1
+      Searchable = False
+      Sortable = False
+    end
+    object pfldRelChamadoModelo9ppField3: TppField
+      FieldAlias = 'C_Percentual'
+      FieldName = 'C_Percentual'
+      FieldLength = 0
+      DataType = dtNotKnown
+      DisplayWidth = 0
+      Position = 2
+      Searchable = False
+      Sortable = False
     end
   end
 end

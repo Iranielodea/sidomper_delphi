@@ -6894,8 +6894,8 @@ object ServerMethods1: TServerMethods1
       #9'AND Usu_Id = :IdUsuario)'
       'AND ((Cli_Revenda = :IdRevenda) OR (:IdRevenda = 0))'
       'ORDER BY 6 DESC, 7 DESC')
-    Left = 448
-    Top = 568
+    Left = 440
+    Top = 608
     ParamData = <
       item
         Name = 'IDUSUARIO'
@@ -6910,8 +6910,8 @@ object ServerMethods1: TServerMethods1
   end
   object dspAtividadeQuadro: TDataSetProvider
     DataSet = QAtividadeQuadro
-    Left = 488
-    Top = 568
+    Left = 480
+    Top = 608
   end
   object QSolicitacaoRelatorio1: TFDQuery
     Connection = DM.Conexao
@@ -7682,5 +7682,29 @@ object ServerMethods1: TServerMethods1
     DataSet = QSolicitacaoProblemaSolucao
     Left = 280
     Top = 728
+  end
+  object QRelChamadoModelo9: TFDQuery
+    Connection = DM.Conexao
+    SQL.Strings = (
+      'SELECT'
+      'CASE Cha_Origem'
+      #9'WHEN 1 THEN '#39'Telefone'#39
+      #9'WHEN 2 THEN '#39'WhatsApp'#39
+      #9'WHEN 3 THEN '#39'Chat'#39
+      #9'WHEN 4 THEN '#39'Aplicativo'#39
+      #9'WHEN 5 THEN '#39'ERP'#39
+      'END ORIGEM,'
+      'COUNT(Cha_Id) AS Qtde'
+      'FROM Chamado'
+      'INNER JOIN Cliente ON Cha_Cliente = Cli_Id'
+      'LEFT JOIN Revenda ON Cli_Revenda = Rev_Id'
+      'GROUP BY Cha_Origem')
+    Left = 416
+    Top = 552
+  end
+  object dspRelChamadoModelo9: TDataSetProvider
+    DataSet = QRelChamadoModelo9
+    Left = 448
+    Top = 552
   end
 end

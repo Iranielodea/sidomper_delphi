@@ -4,7 +4,7 @@
   ClientHeight = 671
   ClientWidth = 1018
   OnDestroy = FormDestroy
-  ExplicitTop = -329
+  ExplicitTop = -133
   ExplicitWidth = 1024
   ExplicitHeight = 700
   PixelsPerInch = 96
@@ -1252,7 +1252,8 @@
                     '05 - Estat'#237'sticas'
                     '06 - Resumo por Tipo M'#234's'
                     '07 - Resumo de Ocorr'#234'ncias por Usu'#225'rio M'#234's'
-                    '08 - Resumo de Ocorr'#234'ncias por Perfil de Cliente')
+                    '08 - Resumo de Ocorr'#234'ncias por Perfil de Cliente'
+                    '09 - Chamados por Origem')
                 end
                 object cbbOrdemRelatorio: TComboBox
                   Left = 13

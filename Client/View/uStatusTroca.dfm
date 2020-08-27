@@ -29,7 +29,6 @@ object frmStatusTroca: TfrmStatusTroca
     Color = clWhite
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 173
     object btnConfirmar: TBitBtn
       Left = 177
       Top = 6
@@ -63,7 +62,6 @@ object frmStatusTroca: TfrmStatusTroca
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitTop = 115
     object Label2: TLabel
       Left = 48
       Top = 0
@@ -210,7 +208,7 @@ object frmStatusTroca: TfrmStatusTroca
     Left = 0
     Top = 168
     Width = 582
-    Height = 73
+    Height = 41
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2

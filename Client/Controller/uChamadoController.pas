@@ -34,6 +34,8 @@ type
         AOrdem: string);
     procedure Relatorio08(AFiltro: TFiltroChamado; AModelo, AIdUsuario: Integer;
         AOrdem: string);
+    procedure Relatorio09(AFiltro: TFiltroChamado; AModelo, AIdUsuario: Integer;
+        AOrdem: string);
 
 
     procedure RelatorioAtividade01(AFiltro: TFiltroChamado; AModelo, AIdUsuario: Integer);
@@ -1772,6 +1774,7 @@ begin
     6: Relatorio06(AFiltro, AModelo, AIdUsuario, AOrdem);
     7: Relatorio07(AFiltro, AModelo, AIdUsuario, AOrdem);
     8: Relatorio08(AFiltro, AModelo, AIdUsuario, AOrdem);
+    9: Relatorio09(AFiltro, AModelo, AIdUsuario, AOrdem);
   end;
 end;
 
@@ -2159,6 +2162,48 @@ begin
       rel.CDSRelChamadoModelo8.Open;
 
       rel.ImpressaoModelo8(AFiltro.DataInicial, AFiltro.DataFinal, AOrdem);
+      dm.Desconectar;
+    except
+      On E: Exception do
+      begin
+        dm.ErroConexao(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Negocio);
+    FreeAndNil(rel);
+  end;
+end;
+
+procedure TChamadoController.Relatorio09(AFiltro: TFiltroChamado; AModelo,
+  AIdUsuario: Integer; AOrdem: string);
+var
+  Negocio: TServerMethods1Client;
+  Marshal : TJSONMarshal;
+  oObjetoJSON : TJSONValue;
+  rel: TDMRelChamado;
+begin
+  TFuncoes.ValidaIntervaloDatas(AFiltro.DataInicial, AFiltro.DataFinal);
+
+// serializa o objeto
+  Marshal := TJSONMarshal.Create;
+  try
+    oObjetoJSON := Marshal.Marshal(AFiltro);
+  finally
+    FreeAndNil(Marshal);
+  end;
+
+  dm.Conectar;
+  rel := TDMRelChamado.Create(nil);
+
+  Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
+  try
+    try
+      rel.CDSRelChamadoModelo9.Close;
+      Negocio.RelatorioChamado(AModelo, AIdUsuario, oObjetoJSON, AOrdem, Integer(caChamado));
+      rel.CDSRelChamadoModelo9.Open;
+
+      rel.ImpressaoModelo9(AFiltro.DataInicial, AFiltro.DataFinal, AOrdem);
       dm.Desconectar;
     except
       On E: Exception do

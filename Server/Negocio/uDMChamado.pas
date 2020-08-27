@@ -18,6 +18,7 @@ type
     QRelChamadoModelo05: TFDQuery;
     QRelChamadoModelo08: TFDQuery;
     QRelChamadoModelo08A: TFDQuery;
+    QRelChamadoModelo09: TFDQuery;
   private
     { Private declarations }
   public

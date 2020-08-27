@@ -728,6 +728,8 @@ type
     QSolicitacaoProblemaSolucaoDataOco: TDateField;
     QSolicitacaoProblemaSolucaoHoraOco: TTimeField;
     QChamadoCadCha_Origem: TIntegerField;
+    QRelChamadoModelo9: TFDQuery;
+    dspRelChamadoModelo9: TDataSetProvider;
     procedure dspRevendaCadUpdateError(Sender: TObject;
       DataSet: TCustomClientDataSet; E: EUpdateError; UpdateKind: TUpdateKind;
       var Response: TResolverResponse);
@@ -4102,7 +4104,7 @@ begin
         bResult := obj.VerificarAtividadeAberto(AIdUsuario);
         if bResult = False then
           bResult := obj.VerificarSolicitacaoAberto(AIdUsuario);
-        bResult := False;
+//        bResult := False;
       end;
 
       if APrograma = CAtividadePrograma then // Atividade 111
@@ -5058,6 +5060,12 @@ begin
         QRelChamadoModelo8.Close;
         QRelChamadoModelo8.SQL.Text := obj.RelatorioModelo_08(oFiltro, IdUsuario, Ordem, eTipo);
       end;
+      9:
+      begin
+        QRelChamadoModelo9.Close;
+        QRelChamadoModelo9.SQL.Text := obj.RelatorioModelo_09(oFiltro, IdUsuario, Ordem, eTipo);
+      end;
+
     end;
   finally
     FreeAndNil(UnMarshal);

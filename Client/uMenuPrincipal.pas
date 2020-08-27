@@ -336,42 +336,36 @@ begin
 end;
 
 procedure TfrmMenuPrincipal.EnviarEmail;
-//var
+var
 //  OrcamentoController: TOrcamentoController;
-//  ParametroController: TParametrosController;
-//  sData: string;
+  ParametroController: TParametrosController;
+  sData: string;
 begin
 
-//  if TFuncoes.ModoDesenvolvimento() then
-//    Exit;
+if TFuncoes.ModoDesenvolvimento() then
+    Exit;
 
-//  ParametroController := TParametrosController.Create;
-//  try
-//    sData := ParametroController.OrcamentoBuscarDataUltimoEmail();
-//  finally
-//    FreeAndNil(ParametroController);
-//  end;
-//
-//  ParametroController := TParametrosController.Create;
+  ParametroController := TParametrosController.Create;
 //  OrcamentoController := TOrcamentoController.Create;
-//  try
-//    try
-//      if StrToDate(sData) <> Date then
-//      begin
-//        ParametroController.OrcamentoGravarDataUltimoEmail();
-//        EnviarEmailRecados();
-//        OrcamentoController.EnviarEmailSeteDiasParaSupervisor();
-//      end;
-//    except
-//      on E: Exception do
-//      begin
-//        ShowMessage(E.Message);
-//      end;
-//    end;
-//  finally
-//    FreeAndNil(OrcamentoController);
-//    FreeAndNil(ParametroController);
-//  end;
+  try
+    try
+      sData := ParametroController.OrcamentoBuscarDataUltimoEmail();
+      if StrToDate(sData) <> Date then
+      begin
+        ParametroController.OrcamentoGravarDataUltimoEmail();
+        EnviarEmailRecados();
+        //OrcamentoController.EnviarEmailSeteDiasParaSupervisor();
+      end;
+    except
+      on E: Exception do
+      begin
+        ShowMessage(E.Message);
+      end;
+    end;
+  finally
+    //FreeAndNil(OrcamentoController);
+    FreeAndNil(ParametroController);
+  end;
 end;
 
 procedure TfrmMenuPrincipal.EnviarEmailRecados;
