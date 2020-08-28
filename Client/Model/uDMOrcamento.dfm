@@ -2518,6 +2518,7 @@ inherited DMOrcamento: TDMOrcamento
                     mmTop = 24871
                     mmWidth = 188384
                     BandType = 7
+                    LayerName = BandLayer43
                     mmBottomOffset = 0
                     mmOverFlowOffset = 0
                     mmStopPosition = 0
@@ -3084,6 +3085,7 @@ inherited DMOrcamento: TDMOrcamento
                     mmTop = 0
                     mmWidth = 109802
                     BandType = 7
+                    LayerName = BandLayer43
                   end
                   object ppSubReport4: TppSubReport
                     UserName = 'SRPagina3'
@@ -3096,6 +3098,7 @@ inherited DMOrcamento: TDMOrcamento
                     mmTop = 0
                     mmWidth = 197300
                     BandType = 7
+                    LayerName = BandLayer43
                     mmBottomOffset = 0
                     mmOverFlowOffset = 0
                     mmStopPosition = 0
@@ -3697,6 +3700,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 0
                           mmWidth = 109802
                           BandType = 7
+                          LayerName = BandLayer42
                         end
                         object ppRichText2: TppRichText
                           UserName = 'RichText2'
@@ -3732,6 +3736,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 34660
                           mmWidth = 193940
                           BandType = 7
+                          LayerName = BandLayer42
                           mmBottomOffset = 0
                           mmOverFlowOffset = 0
                           mmStopPosition = 0
@@ -3751,6 +3756,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 175419
                           mmWidth = 15610
                           BandType = 7
+                          LayerName = BandLayer42
                         end
                         object ppRichText3: TppRichText
                           UserName = 'RichText3'
@@ -3772,6 +3778,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 186267
                           mmWidth = 75936
                           BandType = 7
+                          LayerName = BandLayer42
                           mmBottomOffset = 0
                           mmOverFlowOffset = 0
                           mmStopPosition = 0
@@ -3788,6 +3795,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 0
                           mmWidth = 197300
                           BandType = 7
+                          LayerName = BandLayer42
                           mmBottomOffset = 0
                           mmOverFlowOffset = 0
                           mmStopPosition = 0
@@ -3842,6 +3850,7 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 25400
                                 mmWidth = 34396
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppLabel10: TppLabel
                                 UserName = 'Label40'
@@ -3857,10 +3866,11 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 37835
                                 mmWidth = 31221
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppLabel11: TppLabel
                                 UserName = 'Label41'
-                                Caption = 'Apresenta'#231#227'o, Implanta'#231#227'o e Treinamento, Aprova'#231#227'o, Contrata'#231#227'o;'
+                                Caption = 'Apresenta'#231#227'o, Aprova'#231#227'o e Contrata'#231#227'o;'
                                 Font.Charset = DEFAULT_CHARSET
                                 Font.Color = clBlack
                                 Font.Name = 'Book Antiqua'
@@ -3870,8 +3880,9 @@ inherited DMOrcamento: TDMOrcamento
                                 mmHeight = 4498
                                 mmLeft = 10054
                                 mmTop = 43921
-                                mmWidth = 104511
+                                mmWidth = 62442
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppLabel12: TppLabel
                                 UserName = 'Label42'
@@ -3889,6 +3900,7 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 49742
                                 mmWidth = 112448
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppLabel13: TppLabel
                                 UserName = 'Label43'
@@ -3904,6 +3916,7 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 56356
                                 mmWidth = 36248
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppLabel14: TppLabel
                                 UserName = 'Label44'
@@ -3919,6 +3932,7 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 62177
                                 mmWidth = 89694
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppImage7: TppImage
                                 UserName = 'Image4'
@@ -4481,6 +4495,7 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 0
                                 mmWidth = 109802
                                 BandType = 7
+                                LayerName = BandLayer38
                               end
                               object ppSubReport14: TppSubReport
                                 UserName = 'SRPagina5'
@@ -4493,6 +4508,7 @@ inherited DMOrcamento: TDMOrcamento
                                 mmTop = 0
                                 mmWidth = 197300
                                 BandType = 7
+                                LayerName = BandLayer38
                                 mmBottomOffset = 0
                                 mmOverFlowOffset = 0
                                 mmStopPosition = 0
@@ -7658,6 +7674,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 24342
                           mmWidth = 188648
                           BandType = 7
+                          LayerName = BandLayer42
                         end
                         object ppDBText75: TppDBText
                           UserName = 'DBText23'
@@ -7676,6 +7693,7 @@ inherited DMOrcamento: TDMOrcamento
                           mmTop = 170657
                           mmWidth = 144727
                           BandType = 7
+                          LayerName = BandLayer42
                         end
                       end
                       object ppDesignLayers26: TppDesignLayers
@@ -8488,7 +8506,7 @@ inherited DMOrcamento: TDMOrcamento
       Background.Brush.Style = bsClear
       PrintOnFirstPage = False
       mmBottomOffset = 0
-      mmHeight = 18785
+      mmHeight = 23019
       mmPrintPosition = 0
       object ppLine26: TppLine
         UserName = 'Line4'
@@ -8503,13 +8521,12 @@ inherited DMOrcamento: TDMOrcamento
       object ppLabel44: TppLabel
         UserName = 'Label33'
         AutoSize = False
-        Caption = 'Domper Consultoria e Sistemas Ltda.'
+        Caption = 'Domper Consultoria e Sistemas Ltda. '
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Name = 'Book Antiqua'
         Font.Size = 10
         Font.Style = []
-        TextAlignment = taCentered
         Transparent = True
         mmHeight = 4498
         mmLeft = 794
@@ -8521,13 +8538,14 @@ inherited DMOrcamento: TDMOrcamento
       object ppLabel45: TppLabel
         UserName = 'Label34'
         AutoSize = False
-        Caption = 'Av. Ant'#244'nio Ribeiro Branco, n'#176' 540 - Vacaria/RS'
+        Caption = 
+          'Av. Ant'#244'nio Ribeiro Branco, n'#186' 540. Parque dos Rodeios. Vacaria/' +
+          'RS. Fone: (54) 3232-8484'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Name = 'Book Antiqua'
         Font.Size = 10
         Font.Style = []
-        TextAlignment = taCentered
         Transparent = True
         mmHeight = 4498
         mmLeft = 794
@@ -8539,17 +8557,35 @@ inherited DMOrcamento: TDMOrcamento
       object ppLabel46: TppLabel
         UserName = 'Label35'
         AutoSize = False
-        Caption = 'Fone: (54) 3232-8484 - www.domper.com.br'
+        Caption = 
+          'Rua Terezinha Pauletti Sanvitto, n'#186' 208, Sala 413. Floresta. Cax' +
+          'ias do Sul/RS. Fone: (54) 3536-0183'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Name = 'Book Antiqua'
         Font.Size = 10
         Font.Style = []
-        TextAlignment = taCentered
         Transparent = True
         mmHeight = 4498
         mmLeft = 794
         mmTop = 10054
+        mmWidth = 196321
+        BandType = 8
+        LayerName = BandLayer44
+      end
+      object ppLabel42: TppLabel
+        UserName = 'Label2'
+        AutoSize = False
+        Caption = 'www.domper.com.br'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Book Antiqua'
+        Font.Size = 10
+        Font.Style = []
+        Transparent = True
+        mmHeight = 4498
+        mmLeft = 794
+        mmTop = 14022
         mmWidth = 196321
         BandType = 8
         LayerName = BandLayer44
@@ -20183,7 +20219,7 @@ inherited DMOrcamento: TDMOrcamento
         Weight = 0.750000000000000000
         mmHeight = 1852
         mmLeft = 794
-        mmTop = 15875
+        mmTop = 11377
         mmWidth = 196321
         BandType = 8
         LayerName = Foreground3
@@ -20191,7 +20227,7 @@ inherited DMOrcamento: TDMOrcamento
       object plbl14: TppLabel
         UserName = 'Label1'
         AutoSize = False
-        Caption = 'Domper Consultoria e Sistemas Ltda.'
+        Caption = 'Domper Consultoria e Sistemas Ltda. '
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Name = 'Book Antiqua'
@@ -20201,7 +20237,7 @@ inherited DMOrcamento: TDMOrcamento
         Transparent = True
         mmHeight = 4498
         mmLeft = 794
-        mmTop = 17198
+        mmTop = 12700
         mmWidth = 196321
         BandType = 8
         LayerName = Foreground3
@@ -20209,7 +20245,9 @@ inherited DMOrcamento: TDMOrcamento
       object plbl15: TppLabel
         UserName = 'Label2'
         AutoSize = False
-        Caption = 'Av. Ant'#244'nio Ribeiro Branco, n'#176' 540 - Vacaria/RS'
+        Caption = 
+          'Av. Ant'#244'nio Ribeiro Branco, n'#186' 540. Parque dos Rodeios. Vacaria/' +
+          'RS. Fone: (54) 3232-8484'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Name = 'Book Antiqua'
@@ -20219,7 +20257,7 @@ inherited DMOrcamento: TDMOrcamento
         Transparent = True
         mmHeight = 4498
         mmLeft = 794
-        mmTop = 21431
+        mmTop = 16933
         mmWidth = 196321
         BandType = 8
         LayerName = Foreground3
@@ -20227,7 +20265,9 @@ inherited DMOrcamento: TDMOrcamento
       object plbl16: TppLabel
         UserName = 'Label7'
         AutoSize = False
-        Caption = 'Fone: (54) 3232-8484 - www.domper.com.br'
+        Caption = 
+          'Rua Terezinha Pauletti Sanvitto, n'#186' 208, Sala 413. Floresta. Cax' +
+          'ias do Sul/RS. Fone: (54) 3536-0183'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Name = 'Book Antiqua'
@@ -20237,8 +20277,26 @@ inherited DMOrcamento: TDMOrcamento
         Transparent = True
         mmHeight = 4498
         mmLeft = 794
-        mmTop = 25400
+        mmTop = 20902
         mmWidth = 196321
+        BandType = 8
+        LayerName = Foreground3
+      end
+      object ppLabel47: TppLabel
+        UserName = 'Label3'
+        AutoSize = False
+        Caption = 'www.domper.com.br'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Book Antiqua'
+        Font.Size = 10
+        Font.Style = []
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 4498
+        mmLeft = 794
+        mmTop = 25399
+        mmWidth = 196057
         BandType = 8
         LayerName = Foreground3
       end

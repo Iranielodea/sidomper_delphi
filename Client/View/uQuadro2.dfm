@@ -26,7 +26,7 @@ object frmQuadro2: TfrmQuadro2
     Top = 0
     Width = 924
     Height = 573
-    ActivePage = tsChamados
+    ActivePage = tsSolicitacao
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText

@@ -11,6 +11,7 @@ inherited frmDepartamento: TfrmDepartamento
   inherited pgControl: TPageControl
     Width = 724
     Height = 581
+    ActivePage = tsEdicao
     ExplicitWidth = 724
     ExplicitHeight = 581
     inherited tsPesquisa: TTabSheet
@@ -81,10 +82,6 @@ inherited frmDepartamento: TfrmDepartamento
           OnChange = PageControl1Change
           object tsPrincipal: TTabSheet
             Caption = 'Principal'
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Panel7: TPanel
               Left = 0
               Top = 0
@@ -186,6 +183,7 @@ inherited frmDepartamento: TfrmDepartamento
                       Expanded = False
                       FieldName = 'CIncluir'
                       Title.Alignment = taCenter
+                      Width = 64
                       Visible = True
                     end
                     item
@@ -193,6 +191,7 @@ inherited frmDepartamento: TfrmDepartamento
                       Expanded = False
                       FieldName = 'CEditar'
                       Title.Alignment = taCenter
+                      Width = 64
                       Visible = True
                     end
                     item
@@ -200,6 +199,7 @@ inherited frmDepartamento: TfrmDepartamento
                       Expanded = False
                       FieldName = 'CExcluir'
                       Title.Alignment = taCenter
+                      Width = 64
                       Visible = True
                     end
                     item
@@ -208,6 +208,7 @@ inherited frmDepartamento: TfrmDepartamento
                       FieldName = 'CRelatorio'
                       Title.Alignment = taCenter
                       Title.Caption = 'Relatorio'
+                      Width = 64
                       Visible = True
                     end>
                 end
@@ -217,14 +218,10 @@ inherited frmDepartamento: TfrmDepartamento
                 Top = 348
                 Width = 630
                 Height = 103
-                ActivePage = tsSolicitacao
+                ActivePage = tsAtividade
                 TabOrder = 4
                 object tsSolicitacao: TTabSheet
                   Caption = 'Solicita'#231#227'o'
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object grpSolicitacao: TGroupBox
                     Left = 0
                     Top = 0
@@ -307,10 +304,6 @@ inherited frmDepartamento: TfrmDepartamento
                 object tsChamado: TTabSheet
                   Caption = 'Chamado'
                   ImageIndex = 1
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object grpChamado: TGroupBox
                     Left = 3
                     Top = 1
@@ -362,10 +355,6 @@ inherited frmDepartamento: TfrmDepartamento
                 object tsAtividade: TTabSheet
                   Caption = 'Atividade'
                   ImageIndex = 2
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object grpAtividade: TGroupBox
                     Left = 0
                     Top = 0
@@ -418,10 +407,6 @@ inherited frmDepartamento: TfrmDepartamento
                 object tsAgendamento: TTabSheet
                   Caption = 'Agendamento'
                   ImageIndex = 3
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object GroupBox3: TGroupBox
                     Left = 0
                     Top = 0
@@ -457,10 +442,6 @@ inherited frmDepartamento: TfrmDepartamento
           object tsEmail: TTabSheet
             Caption = 'Email Supervisor'
             ImageIndex = 1
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Panel8: TPanel
               Left = 0
               Top = 0
@@ -581,10 +562,6 @@ inherited frmDepartamento: TfrmDepartamento
           object tsHorario: TTabSheet
             Caption = 'Hor'#225'rios'
             ImageIndex = 2
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
             object Panel9: TPanel
               Left = 0
               Top = 0

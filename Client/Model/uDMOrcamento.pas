@@ -899,6 +899,8 @@ type
     ppLabel46: TppLabel;
     ppDesignLayers29: TppDesignLayers;
     ppDesignLayer29: TppDesignLayer;
+    ppLabel42: TppLabel;
+    ppLabel47: TppLabel;
     procedure DataModuleCreate(Sender: TObject);
     procedure CDSCadastroOrc_DataSetText(Sender: TField; const Text: string);
     procedure CDSItensBeforePost(DataSet: TDataSet);
