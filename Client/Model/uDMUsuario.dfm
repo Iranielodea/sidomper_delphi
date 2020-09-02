@@ -51,6 +51,7 @@ inherited DMUsuario: TDMUsuario
   end
   inherited CDSCadastro: TClientDataSet
     ProviderName = 'dspUsuarioCad'
+    RemoteServer = DM.DSPConexao
     BeforePost = CDSCadastroBeforePost
     OnNewRecord = CDSCadastroNewRecord
     OnReconcileError = CDSCadastroReconcileError
@@ -154,6 +155,9 @@ inherited DMUsuario: TDMUsuario
     object CDSCadastroCtaEm_Nome: TStringField
       FieldName = 'CtaEm_Nome'
       Size = 60
+    end
+    object CDSCadastroUsu_Telefone: TStringField
+      FieldName = 'Usu_Telefone'
     end
   end
   object Rel: TppReport

@@ -730,6 +730,7 @@ type
     QChamadoCadCha_Origem: TIntegerField;
     QRelChamadoModelo9: TFDQuery;
     dspRelChamadoModelo9: TDataSetProvider;
+    QUsuarioCadUsu_Telefone: TStringField;
     procedure dspRevendaCadUpdateError(Sender: TObject;
       DataSet: TCustomClientDataSet; E: EUpdateError; UpdateKind: TUpdateKind;
       var Response: TResolverResponse);

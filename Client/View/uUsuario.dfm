@@ -4,6 +4,7 @@ inherited frmUsuario: TfrmUsuario
   ClientHeight = 643
   ClientWidth = 787
   OnDestroy = FormDestroy
+  ExplicitTop = -100
   ExplicitWidth = 793
   ExplicitHeight = 672
   PixelsPerInch = 96
@@ -11,6 +12,7 @@ inherited frmUsuario: TfrmUsuario
   inherited pgControl: TPageControl
     Width = 787
     Height = 643
+    ActivePage = tsEdicao
     ExplicitWidth = 787
     ExplicitHeight = 643
     inherited tsPesquisa: TTabSheet
@@ -162,15 +164,15 @@ inherited frmUsuario: TfrmUsuario
                 Caption = 'Nome *'
               end
               object Label6: TLabel
-                Left = 16
-                Top = 120
-                Width = 60
+                Left = 17
+                Top = 168
+                Width = 53
                 Height = 14
-                Caption = 'Usu'#225'rio *'
+                Caption = 'Telefone'
               end
               object Label7: TLabel
-                Left = 16
-                Top = 168
+                Left = 312
+                Top = 120
                 Width = 52
                 Height = 14
                 Caption = 'Senha *'
@@ -238,6 +240,13 @@ inherited frmUsuario: TfrmUsuario
                 Height = 14
                 Caption = 'Departamento *'
               end
+              object Label16: TLabel
+                Left = 16
+                Top = 120
+                Width = 60
+                Height = 14
+                Caption = 'Usu'#225'rio *'
+              end
               object edtCodigo: TDBEdit
                 Left = 16
                 Top = 44
@@ -266,9 +275,9 @@ inherited frmUsuario: TfrmUsuario
                 TabOrder = 2
               end
               object DBEdit2: TDBEdit
-                Left = 16
-                Top = 188
-                Width = 281
+                Left = 312
+                Top = 140
+                Width = 308
                 Height = 22
                 DataField = 'Usu_Password'
                 DataSource = dsCad
@@ -282,7 +291,7 @@ inherited frmUsuario: TfrmUsuario
                 Height = 22
                 DataField = 'Usu_Email'
                 DataSource = dsCad
-                TabOrder = 4
+                TabOrder = 5
               end
               object edtRevenda: TDBEdit
                 Left = 16
@@ -295,7 +304,7 @@ inherited frmUsuario: TfrmUsuario
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 9
+                TabOrder = 10
                 OnExit = edtRevendaExit
                 OnKeyDown = edtRevendaKeyDown
               end
@@ -309,7 +318,7 @@ inherited frmUsuario: TfrmUsuario
                 DataField = 'Rev_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 10
+                TabOrder = 11
               end
               object edtCliente: TDBEdit
                 Left = 16
@@ -322,7 +331,7 @@ inherited frmUsuario: TfrmUsuario
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 11
+                TabOrder = 12
                 OnExit = edtClienteExit
                 OnKeyDown = edtRevendaKeyDown
               end
@@ -336,14 +345,14 @@ inherited frmUsuario: TfrmUsuario
                 DataField = 'Cli_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 12
+                TabOrder = 13
               end
               object GroupBox2: TGroupBox
                 Left = 17
                 Top = 461
                 Width = 133
                 Height = 70
-                TabOrder = 13
+                TabOrder = 14
                 object DBCheckBox2: TDBCheckBox
                   Left = 12
                   Top = 11
@@ -387,7 +396,7 @@ inherited frmUsuario: TfrmUsuario
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 7
+                TabOrder = 8
                 OnExit = edtCodContaEmailExit
                 OnKeyDown = edtRevendaKeyDown
               end
@@ -401,7 +410,7 @@ inherited frmUsuario: TfrmUsuario
                 DataField = 'CtaEm_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 8
+                TabOrder = 9
               end
               object edtDepartamento: TDBEdit
                 Left = 16
@@ -414,7 +423,7 @@ inherited frmUsuario: TfrmUsuario
                 DataSource = dsCad
                 ParentShowHint = False
                 ShowHint = True
-                TabOrder = 5
+                TabOrder = 6
                 OnExit = edtDepartamentoExit
                 OnKeyDown = edtRevendaKeyDown
               end
@@ -428,7 +437,16 @@ inherited frmUsuario: TfrmUsuario
                 DataField = 'Dep_Nome'
                 DataSource = dsCad
                 ReadOnly = True
-                TabOrder = 6
+                TabOrder = 7
+              end
+              object dbedtUsu_UserName: TDBEdit
+                Left = 17
+                Top = 188
+                Width = 281
+                Height = 22
+                DataField = 'Usu_Telefone'
+                DataSource = dsCad
+                TabOrder = 4
               end
             end
           end

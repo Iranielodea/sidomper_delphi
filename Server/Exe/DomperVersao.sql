@@ -3356,3 +3356,8 @@ ALTER TABLE Chamado ADD Cha_Origem int
 GO
 UPDATE Chamado SET Cha_Origem = 1 WHERE Cha_Origem is null
 GO
+-------------------------------------------------------------------------------
+--VERSAO 1.000.48
+-------------------------------------------------------------------------------
+ALTER TABLE Usuario ADD Usu_Telefone VarChar(20)
+GO

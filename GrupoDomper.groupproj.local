@@ -2,6 +2,6 @@
 <BorlandProject>
 	<Transactions/>
 	<Default.Personality>
-		<Projects ActiveProject="C:\Projetos\SIDomper\Client\SIDomper.dproj"/>
+		<Projects ActiveProject="C:\Projetos\SIDomper\Server\SIDomperServer.dproj"/>
 	</Default.Personality>
 </BorlandProject>

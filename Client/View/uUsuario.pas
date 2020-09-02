@@ -75,6 +75,8 @@ type
     grp1: TGroupBox;
     lbl4: TLabel;
     cbbModelo: TComboBox;
+    Label16: TLabel;
+    dbedtUsu_UserName: TDBEdit;
     procedure edtDescricaoKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure btnFiltroClick(Sender: TObject);

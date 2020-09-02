@@ -66,6 +66,7 @@ type
     CDSCadastroCtaEm_Nome: TStringField;
     CDSConsultaUsu_Email: TWideStringField;
     CDSConsultaCtaEm_Codigo: TIntegerField;
+    CDSCadastroUsu_Telefone: TStringField;
     procedure CDSCadastroNewRecord(DataSet: TDataSet);
     procedure CDSCadastroReconcileError(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind;

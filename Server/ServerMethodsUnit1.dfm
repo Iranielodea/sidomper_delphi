@@ -89,6 +89,7 @@ object ServerMethods1: TServerMethods1
       #9'Usu_Revenda,'
       #9'Usu_UserName,'
       '        Usu_ContaEmail,'
+      '  Usu_Telefone,'
       #9'Cli_Codigo,'
       #9'Cli_Nome,'
       #9'Dep_Codigo,'
@@ -240,6 +241,11 @@ object ServerMethods1: TServerMethods1
       Origin = 'CtaEm_Nome'
       ProviderFlags = []
       Size = 60
+    end
+    object QUsuarioCadUsu_Telefone: TStringField
+      FieldName = 'Usu_Telefone'
+      Origin = 'Usu_Telefone'
+      ProviderFlags = [pfInUpdate]
     end
   end
   object QUsuarioCons: TFDQuery
