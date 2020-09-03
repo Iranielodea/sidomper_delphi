@@ -350,6 +350,7 @@ if TFuncoes.ModoDesenvolvimento() then
   try
     try
       sData := ParametroController.OrcamentoBuscarDataUltimoEmail();
+
       if StrToDate(sData) <> Date then
       begin
         ParametroController.OrcamentoGravarDataUltimoEmail();
@@ -359,7 +360,7 @@ if TFuncoes.ModoDesenvolvimento() then
     except
       on E: Exception do
       begin
-        ShowMessage(E.Message);
+        ShowMessage('Erro ao Enviar email dos Recados. ' + E.Message);
       end;
     end;
   finally
