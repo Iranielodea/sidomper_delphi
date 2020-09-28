@@ -77,7 +77,6 @@ object DMChamado: TDMChamado
     Aggregates = <>
     Params = <>
     ProviderName = 'dspChamadoCad'
-    RemoteServer = DM.DSPConexao
     BeforePost = CDSCadastroBeforePost
     OnNewRecord = CDSCadastroNewRecord
     OnReconcileError = CDSCadastroReconcileError

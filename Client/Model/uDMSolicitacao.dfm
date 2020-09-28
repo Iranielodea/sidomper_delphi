@@ -1714,7 +1714,6 @@ inherited DMSolicitacao: TDMSolicitacao
     Aggregates = <>
     Params = <>
     ProviderName = 'dspSolicitacaoProblemaSolucao'
-    RemoteServer = DM.DSPConexao
     Left = 288
     Top = 352
     object CDSListarProblemaSolucaoSol_Id: TAutoIncField

@@ -998,6 +998,8 @@ begin
   else
     CDSChamadoOcorrenciaConsChOco_HoraInicio.AsDateTime := Time;
 
+//  CDSChamadoOcorrenciaConsChOco_HoraInicio.AsDateTime := Time;
+
   CDSChamadoOcorrenciaConsChOco_Chamado.AsInteger := -1;
 
   CDSChamadoOcorrenciaConsChOco_Id.AsInteger := FId;

@@ -11,7 +11,7 @@
   inherited pgControl: TPageControl
     Width = 1018
     Height = 671
-    ActivePage = tsFiltro
+    ActivePage = tsEdicao
     ExplicitWidth = 1018
     ExplicitHeight = 671
     inherited tsPesquisa: TTabSheet
@@ -796,7 +796,6 @@
     Top = 105
   end
   inherited dsCad: TDataSource
-    DataSet = DMVersao.CDSCadastro
     Left = 616
     Top = 96
   end

@@ -2892,7 +2892,7 @@ begin
 
   sb := TStringBuilder.Create;
 
-  dm.Conectar;
+//  dm.Conectar;
   Negocio := TServerMethods1Client.Create(DM.Conexao.DBXConnection);
   try
     try
@@ -2905,7 +2905,7 @@ begin
       sb.AppendLine(' WHERE Cha_Id = ' + IntToStr(AIdChamado));
 
       Negocio.ExecutarSQL(sb.ToString);
-      dm.Desconectar;
+//      dm.Desconectar;
     except
       On E: Exception do
       begin

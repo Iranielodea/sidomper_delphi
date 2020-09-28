@@ -41,6 +41,8 @@ begin
   InstrucaoSQL := InstrucaoSQL + ' SELECT';
   InstrucaoSQL := InstrucaoSQL + '	Ver_Id,';
   InstrucaoSQL := InstrucaoSQL + '	Ver_Versao,';
+  InstrucaoSQL := InstrucaoSQL + '	Ver_DataInicio,';
+  InstrucaoSQL := InstrucaoSQL + '	Ver_DataLiberacao,';
   InstrucaoSQL := InstrucaoSQL + '	Sol_Tipo,';
   InstrucaoSQL := InstrucaoSQL + '	Prod_Nome,';
   InstrucaoSQL := InstrucaoSQL + '	Mod_Nome,';

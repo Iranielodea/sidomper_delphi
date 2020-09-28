@@ -958,10 +958,12 @@ type
     procedure TituloJanela(AIdRevenda: Integer);
     procedure EncerrarWEB(Id: Integer);
     procedure OrdenarGrids(AClientDataSet: TClientDataSet; ACampo: string);
+
     function VerificarTarefas(APrograma: Integer): Boolean;
-    function VerificarTarefasSolicitacao(): Boolean;
+    function VerificarTarefasSolicitacao(ADataSet: TDataSet): Boolean;
     function VerificarTarefasChamado(): Boolean;
     function VerificarTarefasAtividade(): Boolean;
+    function RetornarSolicitacaoEmAberto(ADataSet: TDataSet): Boolean;
   public
     { Public declarations }
     constructor Create();
@@ -1803,9 +1805,6 @@ begin
   if not FileExists('ControleTempo.exe') then
     raise Exception.Create('É necessário ter o arquivo ControleTempo.exe na mesma pasta do executável deste sistema.');
 
-  if VerificarTarefasSolicitacao() then
-    Exit;
-
   sLinha := 'ControleTempo.exe ' + AIdSolicitacao.ToString() + ' ' + IntToStr(dm.IdUsuario);
   sComando := PansiChar(sLinha);
 
@@ -2287,6 +2286,9 @@ end;
 
 procedure TfrmQuadro2.miSolIniciar11Click(Sender: TObject);
 begin
+  if VerificarTarefasSolicitacao(dsQuadroSol11.DataSet) then
+    Exit;
+
   IniciarTempo(FControllerSolicitacao.Model.cdsQuadro11Sol_UsuarioAtendeAtual.AsInteger,
               FControllerSolicitacao.Model.cdsQuadro11Sol_Id.AsInteger, lblTitSolicitacao11.Caption);
 end;
@@ -2317,24 +2319,36 @@ end;
 
 procedure TfrmQuadro2.miSolIniciar4Click(Sender: TObject);
 begin
+  if VerificarTarefasSolicitacao(dsQuadroSol4.DataSet) then
+    Exit;
+
   IniciarTempo(FControllerSolicitacao.Model.cdsQuadro4Sol_UsuarioAtendeAtual.AsInteger,
               FControllerSolicitacao.Model.cdsQuadro4Sol_Id.AsInteger, lblTitSolicitacao4.Caption);
 end;
 
 procedure TfrmQuadro2.miSolIniciar5Click(Sender: TObject);
 begin
+  if VerificarTarefasSolicitacao(dsQuadroSol5.DataSet) then
+    Exit;
+
   IniciarTempo(FControllerSolicitacao.Model.cdsQuadro5Sol_UsuarioAtendeAtual.AsInteger,
               FControllerSolicitacao.Model.cdsQuadro5Sol_Id.AsInteger, lblTitSolicitacao5.Caption);
 end;
 
 procedure TfrmQuadro2.miSolIniciar6Click(Sender: TObject);
 begin
+  if VerificarTarefasSolicitacao(dsQuadroSol6.DataSet) then
+    Exit;
+
   IniciarTempo(FControllerSolicitacao.Model.cdsQuadro6Sol_UsuarioAtendeAtual.AsInteger,
               FControllerSolicitacao.Model.cdsQuadro6Sol_Id.AsInteger, lblTitSolicitacao6.Caption);
 end;
 
 procedure TfrmQuadro2.miSolIniciar7Click(Sender: TObject);
 begin
+  if VerificarTarefasSolicitacao(dsQuadroSol7.DataSet) then
+    Exit;
+
   IniciarTempo(FControllerSolicitacao.Model.cdsQuadro7Sol_UsuarioAtendeAtual.AsInteger,
               FControllerSolicitacao.Model.cdsQuadro7Sol_Id.AsInteger, lblTitSolicitacao7.Caption);
 end;
@@ -3187,9 +3201,6 @@ begin
   if AClientDataSet.IsEmpty then
     raise Exception.Create('Não há Registros para Editar!');
 
-  if VerificarTarefasSolicitacao() then
-    Exit;
-
   ExecutarTimer(False);
 
   bGeral    := (ATipoSol = solOcorrGeral);
@@ -3343,9 +3354,13 @@ end;
 procedure TfrmQuadro2.dbAtivQuadro1DblClick(Sender: TObject);
 begin
   ExecutarTimer(False);
+  if VerificarTarefasAtividade() then
+  begin
+    ExecutarTimer(True);
+    Exit;
+  end;
+
   try
-    if VerificarTarefasAtividade() then
-      Exit;
 
     if Sender = dbAtivQuadro1 then
       ValidarChamado(dbAtivQuadro1, FControllerChamado.Model.CDSAtividade1, edtAtivCodigo1.Text, caAtividade)
@@ -3414,12 +3429,15 @@ end;
 
 procedure TfrmQuadro2.dbQuadro1DblClick(Sender: TObject);
 begin
-
   ExecutarTimer(False);
-  try
-    if VerificarTarefasChamado() then
-      Exit;
 
+  if VerificarTarefasChamado() then
+  begin
+    ExecutarTimer(True);
+    Exit;
+  end;
+
+  try
     if Sender = dbQuadro1 then
       ValidarChamado(dbQuadro1, FControllerChamado.Model.CDSQuadro1, edtChaCodigo1.Text)
     else if Sender = dbQuadro2 then
@@ -3522,7 +3540,9 @@ end;
 procedure TfrmQuadro2.dbQuadroSol1DblClick(Sender: TObject);
 begin
   ExecutarTimer(False);
+
   try
+
     if Sender = dbQuadroSol1 then
       ValidarSolicitacao(dbQuadroSol1, FControllerSolicitacao.Model.cdsQuadro1)
     else if Sender = dbQuadroSol2 then
@@ -4322,6 +4342,27 @@ begin
     ALabel.Caption := FTituloSolicitacao[AIndice] + sRegistros;
 end;
 
+function TfrmQuadro2.RetornarSolicitacaoEmAberto(ADataSet: TDataSet): Boolean;
+begin
+  Result := False;
+  if ADataSet.Active then
+  begin
+    ADataSet.First;
+    if ADataSet.Locate('Usu_Nome', dm.NomeUsuario, []) then
+    begin
+      while not ADataSet.Eof do
+      begin
+        if ADataSet.FieldByName('Aberta').AsInteger > 0 then
+        begin
+          Result := True;
+          Break;
+        end;
+        ADataSet.Next;
+      end;
+    end;
+  end;
+end;
+
 function TfrmQuadro2.RetornarTituloSolicitacao(ATitulo: string): string;
 var
   iTamanho: Integer;
@@ -4518,7 +4559,6 @@ var
   Perfil: Integer;
   bPermissao: Boolean;
 begin
-  dm.ConexaoBanco;
   if ATipo = caChamado then
   begin
     if not FControllerChamado.PermissaoChamadoOcorrencia(DM.IdUsuario) then
@@ -4571,9 +4611,6 @@ begin
 
   IdSolicitacao := AGrade.Columns[0].Field.AsInteger;
 
-  if VerificarTarefasSolicitacao() then
-    Exit;
-
 //  if FControllerSolicitacao.SolicitacaoAtualAberta(IdSolicitacao) then
 //    raise Exception.Create('Solicitação está Aberta, será Necessário Encerrá-la!');
 
@@ -4609,6 +4646,7 @@ var
   QuadroController: TQuadroController;
 begin
   Result := False;
+//  Exit;
 
   QuadroController := TQuadroController.Create;
   try
@@ -4628,17 +4666,106 @@ end;
 
 function TfrmQuadro2.VerificarTarefasAtividade: Boolean;
 begin
-  Result := VerificarTarefas(CAtividadePrograma);
+  Result := false;
+// VERIFICA OS CHAMADOS
+  if dsQuadro2.DataSet.Active then
+  begin
+    dsQuadro2.DataSet.First;
+    if dsQuadro2.DataSet.Locate('Usu_Nome', dm.NomeUsuario, []) then
+      Result := True;
+  end;
+// VERIFICA AS SOLICITACOES
+  if Result = false then
+  begin
+    Result := RetornarSolicitacaoEmAberto(dsQuadroSol4.DataSet);
+    if Result = False then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol5.DataSet);
+    if Result = False then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol6.DataSet);
+    if Result = False then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol11.DataSet);
+  end;
+
+  if Result then
+    ShowMessage('Usuário já está com Solicitação ou Chamado em Aberto');
+
+  //Result := VerificarTarefas(CAtividadePrograma);
 end;
 
 function TfrmQuadro2.VerificarTarefasChamado: Boolean;
 begin
-  Result := VerificarTarefas(CChamadoPrograma);
+  Result := false;
+// VERIFICA OS ATIVIDADES
+  if dsAtivQuadro2.DataSet.Active then
+  begin
+    dsAtivQuadro2.DataSet.First;
+    if dsAtivQuadro2.DataSet.Locate('Usu_Nome', dm.NomeUsuario, []) then
+      Result := True;
+  end;
+// VERIFICA AS SOLICITACOES
+  if Result = false then
+  begin
+    Result := RetornarSolicitacaoEmAberto(dsQuadroSol4.DataSet);
+    if Result = False then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol5.DataSet);
+    if Result = False then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol6.DataSet);
+    if Result = False then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol11.DataSet);
+  end;
+
+  if Result then
+    ShowMessage('Usuário já está com Solicitação ou Atividade em Aberto');
+
+  //Result := VerificarTarefas(CChamadoPrograma);
 end;
 
-function TfrmQuadro2.VerificarTarefasSolicitacao: Boolean;
+function TfrmQuadro2.VerificarTarefasSolicitacao(ADataSet: TDataSet): Boolean;
 begin
-  Result := VerificarTarefas(CSolicitacaoPrograma);
+//  Result := VerificarTarefas(CSolicitacaoPrograma);
+
+  Result := false;
+// VERIFICA OS CHAMADOS
+  if dsQuadro2.DataSet.Active then
+  begin
+    dsQuadro2.DataSet.First;
+    if dsQuadro2.DataSet.Locate('Usu_Nome', dm.NomeUsuario, []) then
+      Result := True;
+  end;
+
+// VERIFICA OS ATIVIDADES
+  if Result = false then
+  begin
+    if dsAtivQuadro2.DataSet.Active then
+    begin
+      dsAtivQuadro2.DataSet.First;
+      if dsAtivQuadro2.DataSet.Locate('Usu_Nome', dm.NomeUsuario, []) then
+        Result := True;
+    end;
+  end;
+
+// VERIFICA AS SOLICITACOES
+  if Result = false then
+  begin
+    if (Result = False) and (ADataSet.Name <> dsQuadro4.DataSet.Name) then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol4.DataSet);
+
+    if (Result = False) and (ADataSet.Name <> dsQuadroSol5.DataSet.Name) then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol5.DataSet);
+
+    if (Result = False) and (ADataSet.Name <> dsQuadro6.DataSet.Name) then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol6.DataSet);
+
+    if (Result = False) and (ADataSet.Name <> dsQuadroSol7.DataSet.Name) then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol7.DataSet);
+
+    if (Result = False) and (ADataSet.Name <> dsQuadroSol11.DataSet.Name) then
+      Result := RetornarSolicitacaoEmAberto(dsQuadroSol11.DataSet);
+  end;
+
+  if Result then
+    ShowMessage('Usuário já está com Solicitação ou Atividade ou Chamado em Aberto');
+
 end;
 
 procedure TfrmQuadro2.WMSysCommand(var Msg: TWMSysCommand);

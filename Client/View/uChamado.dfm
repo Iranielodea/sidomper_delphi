@@ -4,7 +4,6 @@
   ClientHeight = 671
   ClientWidth = 1018
   OnDestroy = FormDestroy
-  ExplicitTop = -133
   ExplicitWidth = 1024
   ExplicitHeight = 700
   PixelsPerInch = 96

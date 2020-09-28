@@ -5781,6 +5781,8 @@ object ServerMethods1: TServerMethods1
       'SELECT'
       #9'Ver_Id,'
       #9'Ver_Versao,'
+      '  Ver_DataInicio,'
+      '  Ver_DataLiberacao,'
       #9'Sol_Tipo,'
       #9'Prod_Nome,'
       '  Prod_Codigo,'

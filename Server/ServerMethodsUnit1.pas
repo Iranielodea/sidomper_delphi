@@ -4100,6 +4100,7 @@ begin
   obj := TChamado.Create;
   try
     try
+
       if APrograma = CChamadoPrograma then // chamado 1
       begin
         bResult := obj.VerificarAtividadeAberto(AIdUsuario);
@@ -4279,7 +4280,26 @@ begin
   obj := TChamado.Create;
   UnMarshal := TJSONUnMarshal.Create;
   try
+
     oObjVO := TChamadoVO(UnMarshal.Unmarshal(ChamadoVO));
+
+//    if oObjVO.TipoMovimento = 1 then  // chamado
+//    begin
+//      if oObjVO.IdStatus = 2 then // Em Atendimento
+//      begin
+//        if VerificarQuadroTarefasEmAberto(IdUsuario, 111) then //atividade
+//          raise Exception.Create('Já Existe Chamado ou Solicitação em Aberto!');
+//      end;
+//    end
+//    else begin // atividade
+//      if oObjVO.IdStatus = 28 then // Em Execucao
+//      begin
+//        if VerificarQuadroTarefasEmAberto(IdUsuario, 1) then
+//          raise Exception.Create('Já Existe Atividade ou Solicitação em Aberto!');
+//      end;
+//    end;
+
+
     iResultado := obj.Salvar(oObjVO,
                             spChamado,
                             spChamadoOcorrencia);

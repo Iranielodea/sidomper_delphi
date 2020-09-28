@@ -104,6 +104,7 @@ begin
     try
       usuario.LocalizarUsuario(edtUsuario.Text, edtSenha.Text);
       dm.IdUsuario := usuario.Model.CDSCadastroUsu_Id.AsInteger;
+      dm.NomeUsuario := usuario.Model.CDSCadastroUsu_Nome.AsString;
     except
       On E: Exception do
       begin
@@ -237,6 +238,7 @@ var
   ParametroController: TParametrosController;
 begin
   Result := True;
+
   sArquivo := ExtractFileDir(Application.ExeName) + '\SIDomper.exe';
   if FileExists(sArquivo) then
   begin

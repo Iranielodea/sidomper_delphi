@@ -116,6 +116,12 @@ type
     lblTotalHoras: TppLabel;
     dbCalcHoras: TppDBCalc;
     ppLabel18: TppLabel;
+    CDSRelVersaoDocVer_DataInicio: TDateField;
+    CDSRelVersaoDocVer_DataLiberacao: TDateField;
+    ppLabel19: TppLabel;
+    ppDBText11: TppDBText;
+    ppLabel20: TppLabel;
+    ppDBText16: TppDBText;
     procedure DataModuleCreate(Sender: TObject);
     procedure CDSRelVersaoCalcFields(DataSet: TDataSet);
     procedure CDSRelVersaoDocCalcFields(DataSet: TDataSet);

@@ -40,6 +40,7 @@ type
     FIdUsuario: Integer;
     FIdCadastro: Integer;
     FTema: string;
+    FNomeUsuario: string;
     procedure CarregarIni;
     procedure SetTema(const Value: string);
     function GetTema: string;
@@ -56,6 +57,7 @@ type
 
     property IdSelecionado: integer read FIdSelecionado write FIdSelecionado;
     property IdUsuario: Integer read FIdUsuario write FIdUsuario;
+    property NomeUsuario: string read FNomeUsuario write FNomeUsuario;
     property IdCadastro: Integer read FIdCadastro write FIdCadastro;
     property Tema: string read GetTema write SetTema;
   end;
